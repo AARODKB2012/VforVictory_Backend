@@ -21,7 +21,7 @@ var connectionConfig = {
     userName: process.env.DB_USER_NAME,
     password: process.env.DB_PASSWORD,
     server: process.env.DB_SERVER_IP,
-    options: {encrypt: true, database: process.env.DB_NAME, port: 1488}
+    options: {encrypt: true, database: process.env.DB_NAME}
 };
 
 //create the pool
@@ -34,7 +34,7 @@ pool.on('error', function(err) {
 //Query Example
 exports.getAllVolunteers = function() {
     return new Promise( resolve => {
-        tp.sql("SELECT * FROM [ProjectZero].[dbo].[Volunteers]")
+        tp.sql("SELECT * FROM [dbo].[Volunteers]")
         .execute()
         .then(function(results) {
             // console.log(results);
@@ -47,8 +47,8 @@ exports.getAllVolunteers = function() {
 
 exports.getVolunteerByUserNameAndPassword = function(userName, password) {
     return new Promise( resolve => {
-        tp.sql("SELECT [id] ,[first_name] ,[last_name] ,[username],[role],[email], [status] " +
-        " FROM [ProjectZero].[dbo].[Volunteers] where username= '"+userName+"' and password=HashBytes('MD5', '"+password+"') and status = 'Approved'")
+        tp.sql("SELECT [record_id] ,[first_name] ,[last_name] ,[username],[role],[email], [status] " +
+        " FROM [dbo].[Volunteers] where username= '"+userName+"' and password=HashBytes('MD5', '"+password+"') and status = 'Active'")
         .execute()
         .then(function(results) {
             //console.log(results);
@@ -113,7 +113,7 @@ exports.createNewVolunteer = function(userObject) {
 
 exports.getAllVolunteersByStatus = function(status) {
   return new Promise( resolve => {
-      tp.sql("SELECT * FROM [ProjectZero].[dbo].[Volunteers] where status='"+status+"'")
+      tp.sql("SELECT * FROM [dbo].[Volunteers] where status='"+status+"'")
       .execute()
       .then(function(results) {
           // console.log(results);
