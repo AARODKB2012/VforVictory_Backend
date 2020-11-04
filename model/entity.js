@@ -47,7 +47,7 @@ exports.getAllVolunteers = function() {
 exports.getVolunteerByUserNameAndPassword = function(userName, password) {
     return new Promise( resolve => {
         var sql = "SELECT [record_id] ,[first_name] ,[last_name] ,[username],[role],[email], [status] " +
-                    " FROM [dbo].[Volunteers] where username= '"+userName+"' and password=HashBytes('MD5', '"+password+"') and status = 'Active'";
+                    " FROM [dbo].[Volunteers] where username= '"+userName+"' and password=HashBytes('MD5', '"+password+"') and status = 1";
         tp.sql(sql)
         .execute()
         .then(function(results) {
