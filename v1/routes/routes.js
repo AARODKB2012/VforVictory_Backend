@@ -13,6 +13,7 @@ router.get('/volunteer',controller.getAllVolunteers);
 router.get('/volunteer/:userName/password/:password',controller.getVolunteerByUserNameAndPassword);
 router.get('/volunteer/status/:status',controller.getAllVolunteersByStatus);
 router.get('/volunteer/search/:searchValue',controller.getAllVolunteersBySearchValue);
+router.get('/volunteer/id/:volunteerId',controller.getVolunteerById);
 
 //Add POST endpoint here
 router.post('/volunteer/new',controller.createNewVolunteer);

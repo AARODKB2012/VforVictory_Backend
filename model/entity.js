@@ -4,7 +4,6 @@ var Request = require('tedious').Request;
 var TYPES = require('tedious').TYPES;
 var tp = require('tedious-promises');
 const { resolve } = require('path');
-var md5 = require('md5');
 
 //This line alows to read environment variables from .env file or Azure App Service
 require('dotenv').config();
@@ -47,8 +46,9 @@ exports.getAllVolunteers = function() {
 
 exports.getVolunteerByUserNameAndPassword = function(userName, password) {
     return new Promise( resolve => {
-        tp.sql("SELECT [record_id] ,[first_name] ,[last_name] ,[username],[role],[email], [status] " +
-        " FROM [dbo].[Volunteers] where username= '"+userName+"' and password=HashBytes('MD5', '"+password+"') and status = 'Active'")
+        var sql = "SELECT [record_id] ,[first_name] ,[last_name] ,[username],[role],[email], [status] " +
+                    " FROM [dbo].[Volunteers] where username= '"+userName+"' and password=HashBytes('MD5', '"+password+"') and status = 'Active'";
+        tp.sql(sql)
         .execute()
         .then(function(results) {
             //console.log(results);
@@ -137,4 +137,17 @@ exports.getAllVolunteersBySearchValue = function(searchValue) {
           console.log(err);
       });
   });
+}
+
+exports.getVolunteerById = function(volunteerId) {
+    return new Promise( resolve => {
+        tp.sql("SELECT * FROM [dbo].[Volunteers] where record_id = " + volunteerId)
+        .execute()
+        .then(function(results) {
+            // console.log(results);
+            resolve(results);
+        }).fail(function(err) {
+            console.log(err);
+        });
+    });
 }

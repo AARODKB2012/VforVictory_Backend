@@ -57,3 +57,13 @@ exports.getAllVolunteersBySearchValue = async function (req, res,next){
       res.status(204).send();
   }
 }
+
+exports.getVolunteerById = async function (req, res,next){
+    let volunteerList = [];
+    volunteerList = await sql.getVolunteerById(req.params.volunteerId);
+    if(volunteerList.length > 0){
+        res.status(200).json({status:200, results: volunteerList, resultsLength: volunteerList.length});
+    }else{
+        res.status(204).send();
+    }
+  }
