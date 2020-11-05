@@ -66,4 +66,15 @@ exports.getVolunteerById = async function (req, res,next){
     }else{
         res.status(204).send();
     }
+}
+
+exports.updateVolunteer = async function (req, res,next){
+    let rowCount = sql.updateVolunteer(req.body);
+    console.log(rowCount);
+    if(rowCount == 1){
+      res.status(201).json({userUpdated: true});
+    }else{
+      res.status(202).send();
+    }
   }
+

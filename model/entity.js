@@ -111,6 +111,57 @@ exports.createNewVolunteer = function(userObject) {
   return 1;
 }
 
+exports.updateVolunteer = function(userObject) {
+    console.log(userObject);
+    pool.acquire(function (err, connection) {
+        if (err) {
+            console.error(err);
+            return;
+        }
+        //use the connection as normal
+        var request = new Request("UPDATE [dbo].[Volunteers] " + 
+        "SET [first_name] = @FIRST_NAME, [last_name] = @LAST_NAME, [username] = @USER_NAME, [home_phone] = @HOME_PHONE, [work_phone] = @WORK_PHONE, [cell_phone] = @CELL_PHONE, " + 
+        "[email] = @EMAIL, [educational_background] = @EDUCATION, [current_licenses] = @LICENSES, [availability] = @AVAILABILITY, [role] = @ROLE, [status] = @STATUS, " + 
+        "[emergency_contact_name] = @EMERGENCY_FIRST_NAME, [emergency_contact_phone] = @EMERGENCY_PHONE, [emergency_contact_email] = @EMERGENCY_EMAIL, [emergency_contact_address] = @EMERGENCY_ADDRESS " + 
+        "WHERE [record_id] = @ID",
+        function(err, rowCount) {
+            if (err) {
+                console.error(err);
+                return;
+            }
+            //release the connection back to the pool when finished
+            connection.release();
+        });
+  
+        request.addParameter('ID', TYPES.VarChar, userObject.id);
+        request.addParameter('FIRST_NAME', TYPES.VarChar, userObject.firstName);
+        request.addParameter('LAST_NAME', TYPES.VarChar, userObject.lastName);
+        request.addParameter('USER_NAME', TYPES.VarChar, userObject.username);
+        request.addParameter('PASSWORD', TYPES.VarChar, userObject.password);
+        request.addParameter('EMAIL', TYPES.VarChar, userObject.email);
+        request.addParameter('ADDRESS', TYPES.VarChar, userObject.address);
+        request.addParameter('HOME_PHONE', TYPES.VarChar, userObject.homePhone);
+        request.addParameter('CELL_PHONE', TYPES.VarChar, userObject.cellPhone);
+        request.addParameter('WORK_PHONE', TYPES.VarChar, userObject.workPhone);
+        request.addParameter('EDUCATION', TYPES.VarChar, userObject.education);
+        request.addParameter('LICENSES', TYPES.VarChar, userObject.licenses);
+        request.addParameter('AVAILABILITY', TYPES.VarChar, userObject.availability);
+        request.addParameter('ROLE', TYPES.VarChar, userObject.role);
+        request.addParameter('STATUS', TYPES.VarChar, userObject.status);
+        request.addParameter('DRIVER_LICENSE', TYPES.Bit, userObject.driversLicense);
+        request.addParameter('SOCIAL_SECURITY', TYPES.Bit, userObject.socialSecurity);
+        request.addParameter('EMERGENCY_FIRST_NAME', TYPES.VarChar, userObject.emergencyFirstName);
+        request.addParameter('EMERGENCY_LAST_NAME', TYPES.VarChar, userObject.emergencyLastName);
+        request.addParameter('EMERGENCY_EMAIL', TYPES.VarChar, userObject.emergencyEmail);
+        request.addParameter('EMERGENCY_PHONE', TYPES.VarChar, userObject.emergencyPhone);
+        request.addParameter('EMERGENCY_ADDRESS', TYPES.VarChar, userObject.emergencyAddress);
+        connection.execSql(request);
+    });
+  
+    // Returning one if no error occurred.
+    return 1;
+  }
+
 exports.getAllVolunteersByStatus = function(status) {
   return new Promise( resolve => {
       tp.sql("SELECT * FROM [dbo].[Volunteers] where status='"+status+"'")
