@@ -18,6 +18,7 @@ router.get('/volunteer/id/:volunteerId',controller.getVolunteerById);
 //Add POST endpoint here
 router.post('/volunteer/new',controller.createNewVolunteer);
 router.post('/volunteer/edit',controller.updateVolunteer);
+router.post('/volunteer/change_password/:passwordHash/:volunteerId',controller.changeVolunteerPassword);
 
 //Will catch all not defined routes
 router.get('*',controller.getNotFound);

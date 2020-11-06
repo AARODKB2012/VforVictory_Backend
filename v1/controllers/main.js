@@ -76,5 +76,14 @@ exports.updateVolunteer = async function (req, res,next){
     }else{
       res.status(202).send();
     }
-  }
+}
+
+exports.changeVolunteerPassword = async function (req, res,next){
+    let rowCount = await sql.changeVolunteerPassword(req.params.passwordHash, req.params.volunteerId);
+    if(rowCount == 1){
+        res.status(201).json({userUpdated: true});
+    }else{
+        res.status(204).send();
+    }
+}
 

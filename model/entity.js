@@ -61,7 +61,6 @@ exports.getVolunteerByUserNameAndPassword = function(userName, password) {
 
 // Use this example for when we need to insert something to DB
 exports.createNewVolunteer = function(userObject) {
-  console.log(userObject);
   pool.acquire(function (err, connection) {
       if (err) {
           console.error(err);
@@ -112,7 +111,6 @@ exports.createNewVolunteer = function(userObject) {
 }
 
 exports.updateVolunteer = function(userObject) {
-    console.log(userObject);
     pool.acquire(function (err, connection) {
         if (err) {
             console.error(err);
@@ -160,7 +158,34 @@ exports.updateVolunteer = function(userObject) {
   
     // Returning one if no error occurred.
     return 1;
-  }
+}
+
+exports.changeVolunteerPassword = function(passwordHash, volunteerId) {
+    pool.acquire(function (err, connection) {
+        if (err) {
+            console.error(err);
+            return;
+        }
+        //use the connection as normal
+        var request = new Request("UPDATE [dbo].[Volunteers] SET [password] = HashBytes('MD5', @PASSWORD)" + 
+        "WHERE [record_id] = @ID",
+        function(err, rowCount) {
+            if (err) {
+                console.error(err);
+                return;
+            }
+            //release the connection back to the pool when finished
+            connection.release();
+        });
+  
+        request.addParameter('PASSWORD', TYPES.VarChar, passwordHash);
+        request.addParameter('ID', TYPES.VarChar, volunteerId);
+        connection.execSql(request);
+    });
+  
+    // Returning one if no error occurred.
+    return 1;
+}
 
 exports.getAllVolunteersByStatus = function(status) {
   return new Promise( resolve => {
