@@ -227,3 +227,16 @@ exports.getVolunteerById = function(volunteerId) {
         });
     });
 }
+
+exports.getVolunteerByEmail = function(volunteerEmail) {
+    return new Promise( resolve => {
+        tp.sql("SELECT * FROM [dbo].[Volunteers] where email = '" + volunteerEmail + "'")
+        .execute()
+        .then(function(results) {
+            // console.log(results);
+            resolve(results);
+        }).fail(function(err) {
+            console.log(err);
+        });
+    });
+}
