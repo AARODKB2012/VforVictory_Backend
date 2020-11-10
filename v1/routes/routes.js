@@ -20,6 +20,8 @@ router.post('/volunteer/new',controller.createNewVolunteer);
 router.post('/volunteer/edit',controller.updateVolunteer);
 router.post('/volunteer/change_password/:passwordHash/:volunteerId',controller.changeVolunteerPassword);
 
+router.post('/email/send',controller.sendEmail);
+
 //Will catch all not defined routes
 router.get('*',controller.getNotFound);
 

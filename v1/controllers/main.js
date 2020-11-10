@@ -1,4 +1,14 @@
 const sql = require('../../model/entity');
+const nodemailer = require('nodemailer');
+require('dotenv').config();
+
+var transporter = nodemailer.createTransport({
+    service: process.env.EMAIL_SERVICE,
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASSWORD
+    }
+  });
 
 exports.getNotFound = function (req, res,next){
     res.status(404).send();
@@ -87,3 +97,23 @@ exports.changeVolunteerPassword = async function (req, res,next){
     }
 }
 
+exports.sendEmail = async function (req, res,next){
+    console.log(JSON.stringify(req.body));
+
+    var mailOptions = {
+        from: process.env.EMAIL_USER,
+        to: req.body.mailTo,
+        subject: req.body.subject,
+        text: req.body.messageBody
+    };
+
+    transporter.sendMail(mailOptions, function(error, info){
+        if (error) {
+          console.log(error);
+          res.status(200).json({mailResponse: error});
+        } else {
+          console.log('Email sent: ' + info.response);
+          res.status(200).json({mailResponse: true});
+        }
+    });
+}
