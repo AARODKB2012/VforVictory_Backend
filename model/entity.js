@@ -240,3 +240,29 @@ exports.getVolunteerByEmail = function(volunteerEmail) {
         });
     });
 }
+
+exports.getAllEducations = function() {
+    return new Promise( resolve => {
+        tp.sql("SELECT * FROM [dbo].[Education_Levels]")
+        .execute()
+        .then(function(results) {
+            // console.log(results);
+            resolve(results);
+        }).fail(function(err) {
+            console.log(err);
+        });
+    });
+}
+
+exports.getAllRoles = function() {
+    return new Promise( resolve => {
+        tp.sql("SELECT * FROM [dbo].[Roles]")
+        .execute()
+        .then(function(results) {
+            // console.log(results);
+            resolve(results);
+        }).fail(function(err) {
+            console.log(err);
+        });
+    });
+}

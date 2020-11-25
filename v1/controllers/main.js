@@ -106,3 +106,23 @@ exports.getVolunteerByEmail = async function (req, res,next){
         res.status(204).json();
     }
 }
+
+exports.getAllEducations = async function (req, res,next){
+    let educationList = [];
+    educationList = await sql.getAllEducations();
+    if(educationList.length > 0){
+        res.status(200).json({status:200, results: educationList, resultsLength: educationList.length});
+    }else{
+        res.status(204).json();
+    }
+}
+
+exports.getAllRoles = async function (req, res,next){
+    let roleList = [];
+    roleList = await sql.getAllRoles();
+    if(roleList.length > 0){
+        res.status(200).json({status:200, results: roleList, resultsLength: roleList.length});
+    }else{
+        res.status(204).json();
+    }
+}
