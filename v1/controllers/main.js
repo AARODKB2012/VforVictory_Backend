@@ -57,3 +57,23 @@ exports.getAllVolunteersBySearchValue = async function (req, res,next){
       res.status(204).send();
   }
 }
+
+exports.getAllBusinesses = async function (req, res,next){
+    let businessesArray = [];
+   businessesArray = await sql.getAllBusinesses();
+    if(businessesArray.length > 0){
+        res.status(200).json({status:200, results:businessesArray, resultsLength:businessesArray.length});
+    }else{
+        res.status(204).send();
+    }
+}
+
+exports.createNewBusiness = async function (req, res,next){
+  let rowCount = JSON.stringify(sql.createNewBusiness(req.body));
+  console.log(rowCount);
+  if(rowCount == 1){
+    res.status(201).json({businessObject: true});
+  }else{
+    res.status(202).send();
+  }
+}
