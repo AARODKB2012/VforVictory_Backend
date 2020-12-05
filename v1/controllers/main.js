@@ -107,6 +107,16 @@ exports.getVolunteerByEmail = async function (req, res,next){
     }
 }
 
+exports.getVolunteerByUsername = async function (req, res,next){
+    let volunteerList = [];
+    volunteerList = await sql.getVolunteerByUsername(req.params.username);
+    if(volunteerList.length > 0){
+        res.status(200).json({status:200, results: volunteerList, resultsLength: volunteerList.length});
+    }else{
+        res.status(204).json();
+    }
+}
+
 exports.getAllEducations = async function (req, res,next){
     let educationList = [];
     educationList = await sql.getAllEducations();

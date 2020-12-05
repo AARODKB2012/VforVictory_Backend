@@ -241,6 +241,19 @@ exports.getVolunteerByEmail = function(volunteerEmail) {
     });
 }
 
+exports.getVolunteerByUsername = function(username) {
+    return new Promise( resolve => {
+        tp.sql("SELECT * FROM [dbo].[Volunteers] where [username] = '" + username + "'")
+        .execute()
+        .then(function(results) {
+            // console.log(results);
+            resolve(results);
+        }).fail(function(err) {
+            console.log(err);
+        });
+    });
+}
+
 exports.getAllEducations = function() {
     return new Promise( resolve => {
         tp.sql("SELECT * FROM [dbo].[Education_Levels]")

@@ -16,6 +16,7 @@ router.get('/volunteer/status/:status',controller.getAllVolunteersByStatus);
 router.get('/volunteer/search/:searchValue',controller.getAllVolunteersBySearchValue);
 router.get('/volunteer/id/:volunteerId',controller.getVolunteerById);
 router.get('/volunteer/email/:volunteerEmail',controller.getVolunteerByEmail);
+router.get('/volunteer/username/:username',controller.getVolunteerByUsername);
 router.get('/volunteer/education/',controller.getAllEducations);
 router.get('/volunteer/role/',controller.getAllRoles);
 
