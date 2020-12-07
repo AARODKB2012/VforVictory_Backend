@@ -69,7 +69,7 @@ exports.getAllBusinesses = async function (req, res, next) {
 };
 
 exports.createNewBusiness = async function (req, res, next) {
-    let rowCount = JSON.stringify(sql.createNewBusiness(req.body));
+    let rowCount = sql.createNewBusiness(req.body);
     console.log(rowCount);
     if (rowCount == 1) {
         res.status(201).json({businessObject: true});
