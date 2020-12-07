@@ -1,4 +1,3 @@
-const http = require('http');
 const express = require('express');
 const bodyParser = require("body-parser");
 const routes = require('./v1/routes/routes');
