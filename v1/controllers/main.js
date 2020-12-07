@@ -68,7 +68,6 @@ exports.getAllBusinesses = async function (req, res,next){
     }
 }
 
-<<<<<<< Updated upstream
 exports.createNewBusiness = async function (req, res,next){
   let rowCount = JSON.stringify(sql.createNewBusiness(req.body));
   console.log(rowCount);
@@ -78,64 +77,3 @@ exports.createNewBusiness = async function (req, res,next){
     res.status(202).send();
   }
 }
-=======
-exports.getVolunteerByEmail = async function (req, res,next){
-    let volunteerList = [];
-    volunteerList = await sql.getVolunteerByEmail(req.params.volunteerEmail);
-    if(volunteerList.length > 0){
-        res.status(200).json({status:200, results: volunteerList, resultsLength: volunteerList.length});
-    }else{
-        res.status(204).json();
-    }
-}
-
-exports.getVolunteerByUsername = async function (req, res,next){
-    let volunteerList = [];
-    volunteerList = await sql.getVolunteerByUsername(req.params.username);
-    if(volunteerList.length > 0){
-        res.status(200).json({status:200, results: volunteerList, resultsLength: volunteerList.length});
-    }else{
-        res.status(204).json();
-    }
-}
-
-exports.getAllEducations = async function (req, res,next){
-    let educationList = [];
-    educationList = await sql.getAllEducations();
-    if(educationList.length > 0){
-        res.status(200).json({status:200, results: educationList, resultsLength: educationList.length});
-    }else{
-        res.status(204).json();
-    }
-}
-
-exports.getAllRoles = async function (req, res,next){
-    let roleList = [];
-    roleList = await sql.getAllRoles();
-    if(roleList.length > 0){
-        res.status(200).json({status:200, results: roleList, resultsLength: roleList.length});
-    }else{
-        res.status(204).json();
-    }
-}
-
-exports.getAllBusinesses = async function (req,res,next){
-    let BusinessList = [];
-    BusinessList = await sql.getAllBusinesses();
-    if(BusinessList.length > 0){
-        res.status(200).json({status:200, results: BusinessList, resultsLength: BusinessList.length});
-    }else{
-        res.status(204).json();
-    }
-}
-
-exports.createNewBusiness = async function (req, res,next){
-    let rowCount = sql.createNewBusiness(req.body);
-    console.log(rowCount);
-    if(rowCount == 1){
-      res.status(201).json({businessObject: true});
-    }else{
-      res.status(202).send();
-    }
-  }
->>>>>>> Stashed changes
