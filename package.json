@@ -16,6 +16,7 @@
   "author": "Swisher IT",
   "license": "ISC",
   "dependencies": {
+    "@types/dotenv": "^8.2.0",
     "chai": "^4.2.0",
     "dotenv": "^6.2.0",
     "expect": "^23.6.0",
