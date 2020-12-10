@@ -7,17 +7,25 @@ const controller = require('../controllers/main');
 
 app.use(bodyParser.json());
 
-// Add GET endpoints here
-router.get('/helloWorld', controller.getHelloWorld);
-router.get('/volunteer', controller.getAllVolunteers);
-router.get('/volunteer/:userName/password/:password', controller.getVolunteerByUserNameAndPassword);
-router.get('/volunteer/status/:status', controller.getAllVolunteersByStatus);
-router.get('/volunteer/search/:searchValue', controller.getAllVolunteersBySearchValue);
+//Add GET endpoints here
+router.get('/helloWorld',controller.getHelloWorld);
+router.get('/volunteer',controller.getAllVolunteers);
+router.get('/family',controller.getAllFamily);
+router.get('/volunteer/:userName/password/:password',controller.getVolunteerByUserNameAndPassword);
+router.get('/volunteer/status/:status',controller.getAllVolunteersByStatus);
+router.get('/volunteer/search/:searchValue',controller.getAllVolunteersBySearchValue);
+router.get('/volunteer/id/:volunteerId',controller.getVolunteerById);
+router.get('/volunteer/email/:volunteerEmail',controller.getVolunteerByEmail);
+router.get('/volunteer/username/:username',controller.getVolunteerByUsername);
+router.get('/volunteer/education/',controller.getAllEducations);
+router.get('/volunteer/role/',controller.getAllRoles);
 router.get('/business', controller.getAllBusinesses);
 router.get('/budget',controller.getAllBudgets);
 
-// Add POST endpoint here
-router.post('/volunteer/new', controller.createNewVolunteer);
+//Add POST endpoint here
+router.post('/volunteer/new',controller.createNewVolunteer);
+router.post('/volunteer/edit',controller.updateVolunteer);
+router.post('/volunteer/change_password/:passwordHash/:volunteerId',controller.changeVolunteerPassword);
 router.post('/business/new', controller.createNewBusiness);
 router.post('/budget/new', controller.createNewBudget);
 
