@@ -64,7 +64,7 @@ exports.getAllBusinesses = async function (req, res, next) {
     if (businessesArray.length > 0) {
         res.status(200).json({status: 200, results: businessesArray, resultsLength: businessesArray.length});
     } else {
-        res.status(204).json();
+        res.status(204).send();
     }
 };
 
@@ -74,9 +74,10 @@ exports.createNewBusiness = async function (req, res, next) {
     if (rowCount == 1) {
         res.status(201).json({businessCreated: true});
     } else {
-        res.status(202).json();
+        res.status(202).send();
     }
 };
+
 
 exports.getAllBudgets = async function (req, res, next) {
     let budgetArray = [];
@@ -84,7 +85,7 @@ exports.getAllBudgets = async function (req, res, next) {
     if (budgetArray.length > 0) {
         res.status(200).json({status: 200, results: budgetArray, resultsLength: budgetArray.length});
     } else {
-        res.status(204).json();
+        res.status(204).send();
     }
 };
 
@@ -94,6 +95,6 @@ exports.createNewBudget = async function(req,res,next){
     if (rowCount == 1) {
         res.status(201).json({budgetCreated: true});
     } else {
-        res.status(202).json();
+        res.status(202).send();
     }
 };
