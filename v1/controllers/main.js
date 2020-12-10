@@ -28,6 +28,17 @@ exports.getAllVolunteers = async function (req, res,next){
     }
 }
 
+
+exports.getAllFamily = async function (req, res,next){
+    let familyList = [];
+    familyList = await sql.getAllFamily();
+    if(familyList.length > 0){
+        res.status(200).json({status:200, results: familyList, resultsLength: familyList.length});
+    }else{
+        res.status(204).json();
+    }
+}
+
 exports.getVolunteerByUserNameAndPassword = async function (req, res,next){
     let volunteerList = [];
     volunteerList = await sql.getVolunteerByUserNameAndPassword(req.params.userName,req.params.password);

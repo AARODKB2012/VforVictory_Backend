@@ -44,6 +44,19 @@ exports.getAllVolunteers = function() {
     });
 }
 
+exports.getAllFamily = function() {
+    return new Promise((resolve) => {
+        tp.sql("SELECT * FROM [dbo].[Family]")
+        .execute()
+        .then(function(results) {
+            console.log(results);
+            resolve(results);
+        }).fail(function(err) {
+            console.log(err);
+        });
+    });
+}
+
 exports.getVolunteerByUserNameAndPassword = function(userName, password) {
     return new Promise( resolve => {
         var sql = "SELECT [record_id] ,[first_name] ,[last_name] ,[username],[role],[email], [status] " +
