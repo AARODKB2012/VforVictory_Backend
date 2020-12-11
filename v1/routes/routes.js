@@ -17,14 +17,21 @@ router.get('/volunteer/status/:status',controller.getAllVolunteersByStatus);
 router.get('/volunteer/search/:searchValue',controller.getAllVolunteersBySearchValue);
 router.get('/volunteer/id/:volunteerId',controller.getVolunteerById);
 router.get('/volunteer/email/:volunteerEmail',controller.getVolunteerByEmail);
-router.get('/volunteer/username/:username',controller.getVolunteerByUsername);
 router.get('/volunteer/education/',controller.getAllEducations);
 router.get('/volunteer/role/',controller.getAllRoles);
+
+router.get('/service',controller.getAllServices);
+router.get('/service/active',controller.getActiveServices);
+router.get('/service/rendered',controller.getRenderedServices);
 
 //Add POST endpoint here
 router.post('/volunteer/new',controller.createNewVolunteer);
 router.post('/volunteer/edit',controller.updateVolunteer);
 router.post('/volunteer/change_password/:passwordHash/:volunteerId',controller.changeVolunteerPassword);
+
+router.post('/service/new',controller.createNewRequest);
+router.post('/service/fulfill',controller.fulfillRequest);
+
 
 // Email Functions
 router.post('/email/send',emailController.sendEmail);
