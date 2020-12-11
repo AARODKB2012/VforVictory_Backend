@@ -4,6 +4,7 @@ const router = express.Router();
 const bodyParser = require("body-parser");
 
 const controller = require('../controllers/main');
+const emailController = require('../controllers/email');
 
 app.use(bodyParser.json());
 
@@ -21,13 +22,27 @@ router.get('/volunteer/education/',controller.getAllEducations);
 router.get('/volunteer/role/',controller.getAllRoles);
 router.get('/business', controller.getAllBusinesses);
 router.get('/budget',controller.getAllBudgets);
+router.get('/volunteer/education/',controller.getAllEducations);
+router.get('/volunteer/role/',controller.getAllRoles);
+
+router.get('/service',controller.getAllServices);
+router.get('/service/active',controller.getActiveServices);
+router.get('/service/rendered',controller.getRenderedServices);
 
 //Add POST endpoint here
 router.post('/volunteer/new',controller.createNewVolunteer);
 router.post('/volunteer/edit',controller.updateVolunteer);
 router.post('/volunteer/change_password/:passwordHash/:volunteerId',controller.changeVolunteerPassword);
+
 router.post('/business/new', controller.createNewBusiness);
 router.post('/budget/new', controller.createNewBudget);
+
+router.post('/service/new',controller.createNewRequest);
+router.post('/service/fulfill',controller.fulfillRequest);
+
+
+// Email Functions
+router.post('/email/send',emailController.sendEmail);
 
 // Will catch all not defined routes
 router.get('*', controller.getNotFound);
