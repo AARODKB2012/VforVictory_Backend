@@ -17,6 +17,11 @@ router.get('/volunteer/status/:status',controller.getAllVolunteersByStatus);
 router.get('/volunteer/search/:searchValue',controller.getAllVolunteersBySearchValue);
 router.get('/volunteer/id/:volunteerId',controller.getVolunteerById);
 router.get('/volunteer/email/:volunteerEmail',controller.getVolunteerByEmail);
+router.get('/volunteer/username/:username',controller.getVolunteerByUsername);
+router.get('/volunteer/education/',controller.getAllEducations);
+router.get('/volunteer/role/',controller.getAllRoles);
+router.get('/business', controller.getAllBusinesses);
+router.get('/budget',controller.getAllBudgets);
 router.get('/volunteer/education/',controller.getAllEducations);
 router.get('/volunteer/role/',controller.getAllRoles);
 
@@ -29,6 +34,9 @@ router.post('/volunteer/new',controller.createNewVolunteer);
 router.post('/volunteer/edit',controller.updateVolunteer);
 router.post('/volunteer/change_password/:passwordHash/:volunteerId',controller.changeVolunteerPassword);
 
+router.post('/business/new', controller.createNewBusiness);
+router.post('/budget/new', controller.createNewBudget);
+
 router.post('/service/new',controller.createNewRequest);
 router.post('/service/fulfill',controller.fulfillRequest);
 
@@ -36,7 +44,7 @@ router.post('/service/fulfill',controller.fulfillRequest);
 // Email Functions
 router.post('/email/send',emailController.sendEmail);
 
-//Will catch all not defined routes
-router.get('*',controller.getNotFound);
+// Will catch all not defined routes
+router.get('*', controller.getNotFound);
 
 module.exports = router;
