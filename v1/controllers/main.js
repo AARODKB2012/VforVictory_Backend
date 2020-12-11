@@ -107,16 +107,6 @@ exports.getVolunteerByEmail = async function (req, res,next){
     }
 }
 
-exports.getVolunteerByUsername = async function (req, res,next){
-    let volunteerList = [];
-    volunteerList = await sql.getVolunteerByUsername(req.params.username);
-    if(volunteerList.length > 0){
-        res.status(200).json({status:200, results: volunteerList, resultsLength: volunteerList.length});
-    }else{
-        res.status(204).json();
-    }
-}
-
 exports.getAllEducations = async function (req, res,next){
     let educationList = [];
     educationList = await sql.getAllEducations();
@@ -135,4 +125,54 @@ exports.getAllRoles = async function (req, res,next){
     }else{
         res.status(204).json();
     }
+}
+
+exports.getAllServices = async function (req, res,next){
+  let serviceList = [];
+  serviceList = await sql.getAllServices();
+  if(serviceList.length > 0){
+      res.status(200).json({status:200, results: serviceList, resultsLength: serviceList.length});
+  }else{
+      res.status(204).send();
+  }
+}
+
+exports.getActiveServices = async function (req, res,next){
+  let activeList = [];
+  activeList = await sql.getActiveServices();
+  if(activeList.length > 0){
+      res.status(200).json({status:200, results: activeList, resultsLength: activeList.length});
+  }else{
+      res.status(204).send();
+  }
+}
+
+exports.getRenderedServices = async function (req, res,next){
+  let renderedList = [];
+  renderedList = await sql.getRenderedServices();
+  if(renderedList.length > 0){
+      res.status(200).json({status:200, results: renderedList, resultsLength: renderedList.length});
+  }else{
+      res.status(204).send();
+  }
+}
+
+exports.createNewRequest = async function (req, res,next){
+  let rowCount = sql.createNewRequest(req.body);
+  console.log(rowCount);
+  if(rowCount == 1){
+    res.status(201).json({requestCreated: true});
+  }else{
+    res.status(202).send();
+  }
+}
+
+exports.fulfillRequest = async function (req, res,next){
+  let rowCount = sql.fulfillRequest(req.body);
+  console.log(rowCount);
+  if(rowCount == 1){
+    res.status(201).json({requestFulfilled: true});
+  }else{
+    res.status(202).send();
+  }
 }
