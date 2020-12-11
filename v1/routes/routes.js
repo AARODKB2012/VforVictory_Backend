@@ -2,7 +2,6 @@ const express = require('express');
 const app = express();
 const router = express.Router();
 const bodyParser = require("body-parser");
-
 const controller = require('../controllers/main');
 const emailController = require('../controllers/email');
 

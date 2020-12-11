@@ -2,14 +2,6 @@ const sql = require('../../model/entity');
 const nodemailer = require('nodemailer');
 require('dotenv').config();
 
-var transporter = nodemailer.createTransport({
-    service: process.env.EMAIL_SERVICE,
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASSWORD
-    }
-});
-
 exports.getNotFound = function (req, res, next) {
     res.status(404).send();
 };
@@ -49,6 +41,8 @@ exports.getVolunteerByUserNameAndPassword = async function (req, res,next){
     }
 };
 
+
+
 exports.createNewVolunteer = async function (req, res, next) {
     let rowCount = sql.createNewVolunteer(req.body);
     console.log(rowCount);
@@ -62,6 +56,16 @@ exports.createNewVolunteer = async function (req, res, next) {
 exports.getAllVolunteersByStatus = async function (req, res, next) {
     let volunteerList = [];
     volunteerList = await sql.getAllVolunteersByStatus(req.params.status);
+    if (volunteerList.length > 0) {
+        res.status(200).json({status: 200, results: volunteerList, resultsLength: volunteerList.length});
+    } else {
+        res.status(204).send();
+    }
+};
+
+exports.getVolunteerByUsername = async function (req, res, next) {
+    let volunteerList = [];
+    volunteerList = await sql.getVolunteerByUsername(req.params.status);
     if (volunteerList.length > 0) {
         res.status(200).json({status: 200, results: volunteerList, resultsLength: volunteerList.length});
     } else {
@@ -119,7 +123,6 @@ exports.createNewBudget = async function(req,res,next){
         res.status(202).send();
     }
 };
-}
 
 exports.createNewVolunteer = async function (req, res,next){
   let rowCount = sql.createNewVolunteer(req.body);

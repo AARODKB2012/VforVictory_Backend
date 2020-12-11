@@ -48,7 +48,6 @@ exports.getAllFamily = function() {
         tp.sql("SELECT * FROM [dbo].[Family]")
         .execute()
         .then(function(results) {
-            console.log(results);
             resolve(results);
         }).fail(function(err) {
             console.log(err);
@@ -123,6 +122,16 @@ exports.createNewVolunteer = function(userObject) {
 exports.getAllVolunteersByStatus = function (status) {
     return new Promise((resolve) => {
         tp.sql("SELECT * FROM [dbo].[Volunteers] where status='" + status + "'").execute().then(function (results) { // console.log(results);
+            resolve(results);
+        }).fail(function (err) {
+            console.log(err);
+        });
+    });
+};
+
+exports.getVolunteerByUsername = function (username) {
+    return new Promise((resolve) => {
+        tp.sql("SELECT * FROM [dbo].[Volunteers] where username='" + username + "'").execute().then(function (results) { // console.log(results);
             resolve(results);
         }).fail(function (err) {
             console.log(err);
@@ -246,18 +255,8 @@ exports.getAllBudgets = function () {
             console.log(err);
         });
     });
-            //release the connection back to the pool when finished
-            connection.release();
-        });
-
-        request.addParameter('PASSWORD', TYPES.VarChar, passwordHash);
-        request.addParameter('ID', TYPES.VarChar, volunteerId);
-        connection.execSql(request);
-    });
-
-    // Returning one if no error occurred.
-    return 1;
 }
+
 
 exports.getAllVolunteersByStatus = function(status) {
   return new Promise( resolve => {
@@ -354,8 +353,6 @@ pool.acquire(function (err, connection) {
 
   return 1;
 };
-
-}
 
 exports.getVolunteerById = function(volunteerId) {
     return new Promise( resolve => {
@@ -476,7 +473,7 @@ exports.createNewRequest = function(userObject) {
       request.addParameter('NOTIFIED_FAMILY', TYPES.Bit, userObject.notifiedFamily);
       request.addParameter('FOLLOWEDUP_BUSINESS', TYPES.Bit, userObject.followedupBusiness);
       request.addParameter('FOLLOWEDUP_FAMILY', TYPES.Bit, userObject.followedupFamily);
-      request.addParameter('ACTIVE', TYPES.Bit, userObject.active);
+      request.addParameter('ACTIVE', TYPES.Bit, 1);
       connection.execSql(request);
   });
 
