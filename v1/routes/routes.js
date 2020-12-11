@@ -11,6 +11,7 @@ app.use(bodyParser.json());
 //Add GET endpoints here
 router.get('/helloWorld',controller.getHelloWorld);
 router.get('/volunteer',controller.getAllVolunteers);
+router.get('/family',controller.getAllFamily);
 router.get('/volunteer/:userName/password/:password',controller.getVolunteerByUserNameAndPassword);
 router.get('/volunteer/status/:status',controller.getAllVolunteersByStatus);
 router.get('/volunteer/search/:searchValue',controller.getAllVolunteersBySearchValue);
