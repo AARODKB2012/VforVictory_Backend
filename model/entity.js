@@ -228,20 +228,8 @@ exports.changeVolunteerPassword = function(passwordHash, volunteerId) {
             // release the connection back to the pool when finished
             connection.release();
         });
-        request.addParameter("BUSINESS_NAME", TYPES.VarChar, businessObject.business_name);
-        request.addParameter("EMAIL", TYPES.VarChar, businessObject.email);
-        request.addParameter("PRIMARY_CONTACT_FNAME", TYPES.VarChar, businessObject.primary_contact_fName);
-        request.addParameter("PRIMARY_CONTACT_LNAME", TYPES.VarChar, businessObject.primary_contact_lName);
-        request.addParameter("PRIMARY_CONTACT_PHONE_NUMBER", TYPES.VarChar, businessObject.primary_contact_phone_number);
-        request.addParameter("SECONDARY_CONTACT_FNAME", TYPES.VarChar, businessObject.secondary_contact_fName);
-        request.addParameter("SECONDARY_CONTACT_LNAME", TYPES.VarChar, businessObject.secondary_contact_lName);
-        request.addParameter("SECONDARY_CONTACT_PHONE_NUMBER", TYPES.VarChar, businessObject.secondary_contact_phone_number);
-        request.addParameter("ADDRESS", TYPES.VarChar, businessObject.address);
-        request.addParameter("SERVICES_OFFERED", TYPES.VarChar, businessObject.Services_Offered);
-        request.addParameter("SERVICE_AREA", TYPES.VarChar, businessObject.Service_Area);
-        request.addParameter("DISCOUNT_AMOUNT", TYPES.VarChar, businessObject.Discount_Amount);
-        request.addParameter("PREFERRED_METHOD_CONTACT", TYPES.NVarChar, businessObject.Preferred_Method_Contact);
-        request.addParameter("EOY_RECEIPT", TYPES.VarChar, businessObject.EOY_Receipt);
+        request.addParameter("PASSWORD", TYPES.VarChar, passwordHash);
+        request.addParameter("ID", TYPES.VarChar, volunteerId);
         connection.execSql(request);
     });
     return 1;
