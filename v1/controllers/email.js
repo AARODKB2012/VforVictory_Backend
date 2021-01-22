@@ -1,5 +1,8 @@
 const nodemailer = require('nodemailer');
 require('dotenv').config();
+const fs = require('fs');
+const path = require('path');
+var handlebars = require('handlebars');
 
 var transporter = nodemailer.createTransport({
     service: process.env.EMAIL_SERVICE,
@@ -10,18 +13,25 @@ var transporter = nodemailer.createTransport({
 });
 
 exports.sendEmail = async function (req, res,next){
-    var mailOptions = {
-        from: process.env.EMAIL_USER,
-        to: req.body.mailTo,
-        subject: req.body.subject,
-        text: req.body.messageBody
-    };
+  const filePath = path.join(__dirname, '../../templates/password_reset.html');
+  const source = fs.readFileSync(filePath, 'utf-8').toString();
+  const template = handlebars.compile(source);
+  const replacements = {
+    resetURL: req.body.messageBody
+  };
+  const htmlToSend = template(replacements);
 
-    transporter.sendMail(mailOptions, function(error, info){
-        if (error) {
-          res.status(200).json({mailResponse: error});
-        } else {
-          res.status(200).json({mailResponse: true});
-        }
-    });
+  var mailOptions = {
+    from: process.env.EMAIL_USER,
+    to: req.body.mailTo,
+    subject: req.body.subject,
+    html: htmlToSend
+  };
+  transporter.sendMail(mailOptions, function(error, info){
+    if (error) {
+      res.status(200).json({mailResponse: error});
+    } else {
+      res.status(200).json({mailResponse: true});
+    }
+  });
 }

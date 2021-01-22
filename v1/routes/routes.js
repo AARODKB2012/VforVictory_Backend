@@ -4,6 +4,18 @@ const router = express.Router();
 const bodyParser = require("body-parser");
 const controller = require('../controllers/main');
 const emailController = require('../controllers/email');
+var multer  = require('multer')
+
+var storage = multer.diskStorage(
+    {
+        destination: 'uploads/',
+        filename: function ( req, file, cb ) {
+            cb( null, file.originalname);
+        }
+    }
+);
+
+var upload = multer( { storage: storage } );
 
 app.use(bodyParser.json());
 
@@ -23,6 +35,7 @@ router.get('/business', controller.getAllBusinesses);
 router.get('/budget',controller.getAllBudgets);
 router.get('/volunteer/education/',controller.getAllEducations);
 router.get('/volunteer/role/',controller.getAllRoles);
+router.get('/volunteer/id/:volunteerId/profile/picture',controller.getProfilePicture);
 
 router.get('/service',controller.getAllServices);
 router.get('/service/active',controller.getActiveServices);
@@ -32,6 +45,7 @@ router.get('/service/rendered',controller.getRenderedServices);
 router.post('/volunteer/new',controller.createNewVolunteer);
 router.post('/volunteer/edit',controller.updateVolunteer);
 router.post('/volunteer/change_password/:passwordHash/:volunteerId',controller.changeVolunteerPassword);
+router.post('/volunteer/picture/:volunteerId/mode/:mode', upload.single('fileKey'),controller.updateProfilePicture);
 
 router.post('/business/new', controller.createNewBusiness);
 router.post('/budget/new', controller.createNewBudget);

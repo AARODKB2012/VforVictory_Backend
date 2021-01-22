@@ -2,7 +2,7 @@ var Connection = require('tedious').Connection;
 var ConnectionPool = require('tedious-connection-pool');
 var Request = require('tedious').Request;
 var TYPES = require('tedious').TYPES;
-var tp = require('tedious-promises');
+var tp = exports.tp = require('tedious-promises');
 const { resolve } = require('path');
 
 // This line alows to read environment variables from .env file or Azure App Service
@@ -57,7 +57,7 @@ exports.getAllFamily = function() {
 
 exports.getVolunteerByUserNameAndPassword = function(userName, password) {
     return new Promise( resolve => {
-        var sql = "SELECT [record_id] ,[first_name] ,[last_name] ,[username],[role],[email], [status] " +
+        var sql = "SELECT [record_id] ,[first_name] ,[last_name] ,[username],[role],[email], [status], [profile_picture_url] " +
                     " FROM [dbo].[Volunteers] where username= '"+userName+"' and password=HashBytes('MD5', '"+password+"') and status = 1";
         tp.sql(sql)
         .execute()

@@ -6,7 +6,8 @@ const routes = require('./v1/routes/routes');
 const port = process.env.PORT || 3000;
 
 const app = express();
-app.use(bodyParser.json());
+app.use(bodyParser.json({limit: "50mb"}));
+app.use(bodyParser.urlencoded({limit: "50mb", extended: true, parameterLimit:50000}));
 
 // Allowing access to app resources from other servers.
 app.use((req, res, next) => {

@@ -1,6 +1,9 @@
 const sql = require('../../model/entity');
 const nodemailer = require('nodemailer');
 require('dotenv').config();
+const fs = require('fs');
+const path = require('path')
+const stream = require('stream')
 
 exports.getNotFound = function (req, res, next) {
     res.status(404).send();
@@ -166,13 +169,68 @@ exports.getVolunteerById = async function (req, res,next){
 
 exports.updateVolunteer = async function (req, res,next){
     let rowCount = sql.updateVolunteer(req.body);
-    console.log(rowCount);
     if(rowCount == 1){
       res.status(201).json({userUpdated: true});
     }else{
       res.status(202).send();
     }
 }
+
+exports.updateProfilePicture = async function (req, res,next){
+    //let rowCount = sql.updateVolunteer(req.body);
+    //console.log(req.file);
+    var fileExtension = path.extname('uploads/'+req.file.originalname);
+    var newFileName = 'uploads/'+req.params.volunteerId + fileExtension;
+    fs.rename('uploads/'+req.file.originalname, newFileName, function(err) {
+        if ( err ) console.log('ERROR: ' + err);
+    });
+
+    var storeProcedure = '';
+    console.log('Mode: ' + req.params.mode);
+    if (req.params.mode == 'edit'){
+        storeProcedure = '[usp_updateProfilePictureURL]';
+    }
+    if (req.params.mode == 'create'){
+        storeProcedure = '[usp_updateProfilePictureURLByUsername]';
+    }
+
+    sql.tp.sql(`exec ${storeProcedure} ${req.params.volunteerId}, '${newFileName}'`)
+        .returnRowCount()
+        .execute()
+        .then(function(rowCount) {
+            if(rowCount > 0){
+                res.status(201).json({userUpdated: true});
+            }
+        }).fail(function(err) {
+            console.log(err);
+            res.status(409).json({status: 409, errorMessage: `Error saving to database: ${err}`});
+        });
+}
+
+exports.getProfilePicture = async function (req, res,next){
+    sql.tp.sql(`exec [usp_getProfilePictureURL] '${req.params.volunteerId}'`)
+    .execute()
+    .then(function(results) {
+        if(results){
+            const r = fs.createReadStream(results[0].URL) 
+            const ps = new stream.PassThrough()
+            stream.pipeline(
+            r,
+            ps, 
+            (err) => {
+                if (err) {
+                console.log(err)
+                    return res.status(400).json({status: 409, errorMessage: `Error getting image: ${err}`}); 
+                }
+            })
+            ps.pipe(res)
+            //res.status(201).json({status: 201, successMessage: `Profile URL is ${results[0].URL}`});
+        }
+       }).fail(function(err) {
+           console.log(err);
+           res.status(409).json({status: 409, errorMessage: `Error saving to database: ${err}`});
+       });
+} 
 
 exports.changeVolunteerPassword = async function (req, res,next){
     let rowCount = await sql.changeVolunteerPassword(req.params.passwordHash, req.params.volunteerId);
