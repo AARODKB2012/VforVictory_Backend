@@ -180,21 +180,12 @@ exports.updateProfilePicture = async function (req, res,next){
     //let rowCount = sql.updateVolunteer(req.body);
     //console.log(req.file);
     var fileExtension = path.extname('uploads/'+req.file.originalname);
-    var newFileName = 'uploads/'+req.params.volunteerId + fileExtension;
+    var newFileName = 'uploads/'+req.params.username + fileExtension;
     fs.rename('uploads/'+req.file.originalname, newFileName, function(err) {
         if ( err ) console.log('ERROR: ' + err);
     });
 
-    var storeProcedure = '';
-    console.log('Mode: ' + req.params.mode);
-    if (req.params.mode == 'edit'){
-        storeProcedure = '[usp_updateProfilePictureURL]';
-    }
-    if (req.params.mode == 'create'){
-        storeProcedure = '[usp_updateProfilePictureURLByUsername]';
-    }
-
-    sql.tp.sql(`exec ${storeProcedure} ${req.params.volunteerId}, '${newFileName}'`)
+    sql.tp.sql(`exec [usp_updateProfilePictureURLByUsername] ${req.params.username}, '${newFileName}'`)
         .returnRowCount()
         .execute()
         .then(function(rowCount) {
@@ -208,7 +199,7 @@ exports.updateProfilePicture = async function (req, res,next){
 }
 
 exports.getProfilePicture = async function (req, res,next){
-    sql.tp.sql(`exec [usp_getProfilePictureURL] '${req.params.volunteerId}'`)
+    sql.tp.sql(`exec [usp_getProfilePictureURL] '${req.params.username}'`)
     .execute()
     .then(function(results) {
         if(results){
