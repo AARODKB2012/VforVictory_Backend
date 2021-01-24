@@ -24,6 +24,7 @@ router.get('/helloWorld',controller.getHelloWorld);
 router.get('/volunteer',controller.getAllVolunteers);
 router.get('/family',controller.getAllFamily);
 router.get('/volunteer/:userName/password/:password',controller.getVolunteerByUserNameAndPassword);
+router.get('/volunteer/current/:username',controller.getCurrentUser);
 router.get('/volunteer/status/:status',controller.getAllVolunteersByStatus);
 router.get('/volunteer/search/:searchValue',controller.getAllVolunteersBySearchValue);
 router.get('/volunteer/id/:volunteerId',controller.getVolunteerById);
@@ -36,6 +37,7 @@ router.get('/budget',controller.getAllBudgets);
 router.get('/volunteer/education/',controller.getAllEducations);
 router.get('/volunteer/role/',controller.getAllRoles);
 router.get('/volunteer/username/:username/profile/picture',controller.getProfilePicture);
+router.get('/volunteer/login/history/:userId',controller.getLoginHistory);
 
 router.get('/service',controller.getAllServices);
 router.get('/service/active',controller.getActiveServices);
@@ -46,6 +48,7 @@ router.post('/volunteer/new',controller.createNewVolunteer);
 router.post('/volunteer/edit',controller.updateVolunteer);
 router.post('/volunteer/change_password/:passwordHash/:volunteerId',controller.changeVolunteerPassword);
 router.post('/volunteer/picture/:username', upload.single('fileKey'),controller.updateProfilePicture);
+router.post('/volunteer/login/new',controller.saveLoginHistory);
 
 router.post('/business/new', controller.createNewBusiness);
 router.post('/budget/new', controller.createNewBudget);

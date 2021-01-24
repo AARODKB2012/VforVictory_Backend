@@ -44,6 +44,18 @@ exports.getVolunteerByUserNameAndPassword = async function (req, res,next){
     }
 };
 
+exports.getCurrentUser = async function (req, res,next){
+    let volunteerList = [];
+    console.log(req.params.username);
+    volunteerList = await sql.getCurrentUser(req.params.username);
+    console.log(volunteerList);
+    if (volunteerList.length > 0) {
+        res.status(200).json({status: 200, results: volunteerList, resultsLength: volunteerList.length});
+    } else {
+        res.status(204).send();
+    }
+};
+
 
 
 exports.createNewVolunteer = async function (req, res, next) {
@@ -222,6 +234,33 @@ exports.getProfilePicture = async function (req, res,next){
            res.status(409).json({status: 409, errorMessage: `Error saving to database: ${err}`});
        });
 } 
+
+exports.saveLoginHistory = async function (req, res,next){
+    sql.tp.sql(`exec [usp_insertLoginHistory] ${req.body.userId}, '${req.body.date}' , '${req.body.time}', '${req.body.clientIp}'`)
+        .returnRowCount()
+        .execute()
+        .then(function(rowCount) {
+            if(rowCount > 0){
+                res.status(201).json({sessionSaved: true});
+            }
+        }).fail(function(err) {
+            console.log(err);
+            res.status(409).json({status: 409, errorMessage: `Error saving to database: ${err}`});
+        });
+}
+
+exports.getLoginHistory = async function (req, res,next){
+    sql.tp.sql(`exec [dbo].[usp_getLoginHistory] ${req.params.userId}`)
+        .execute()
+        .then(function(results) {
+            if(results.length > 0){
+                res.status(200).json({ status: 200, results: results, resultsLength: results.length});
+            }
+        }).fail(function(err) {
+            console.log(err);
+            res.status(409).json({status: 409, errorMessage: `Error saving to database: ${err}`});
+        });
+}
 
 exports.changeVolunteerPassword = async function (req, res,next){
     let rowCount = await sql.changeVolunteerPassword(req.params.passwordHash, req.params.volunteerId);

@@ -70,6 +70,20 @@ exports.getVolunteerByUserNameAndPassword = function(userName, password) {
     });
 };
 
+exports.getCurrentUser = function(username) {
+    return new Promise( resolve => {
+        var sql = `SELECT [record_id] ,[first_name] ,[last_name] ,[username],[role],[email], [status], [profile_picture_url] FROM [dbo].[Volunteers] where username = '${username}' and status = 1`;
+        tp.sql(sql)
+        .execute()
+        .then(function(results) {
+            //console.log(results);
+            resolve(results);
+        }).fail(function (err) {
+            //console.log(err);
+        });
+    });
+};
+
 // Use this example for when we need to insert something to DB
 exports.createNewVolunteer = function(userObject) {
   pool.acquire(function (err, connection) {
