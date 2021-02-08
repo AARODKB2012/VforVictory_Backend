@@ -68,6 +68,16 @@ exports.createNewVolunteer = async function (req, res, next) {
     }
 };
 
+exports.createNewFamily = async function (req, res, next) {
+    let rowCount = sql.createNewFamily(req.body);
+    console.log(rowCount);
+    if (rowCount == 1) {
+        res.status(201).json({familyCreated: true});
+    } else {
+        res.status(202).send();
+    }
+};
+
 exports.getAllVolunteersByStatus = async function (req, res, next) {
     let volunteerList = [];
     volunteerList = await sql.getAllVolunteersByStatus(req.params.status);

@@ -132,6 +132,42 @@ exports.createNewVolunteer = function(userObject) {
     return 1;
 };
 
+// Use this example for when we need to insert something to DB
+exports.createNewFamily = function(userObject) {
+    pool.acquire(function (err, connection) {
+        if (err) {
+            console.error(err);
+            return;
+        }
+        //use the connection as normal
+        var request = new Request("INSERT INTO [dbo].[Family] ([first_name], [last_name], [phone_number], [street_address], [zipcode], [email], [cancer_warrior_name], [work_phone], [relationship_to_warrior]," +
+        "[additional_info], [end_of_treatment_date])" +
+        "VALUES (@FIRST_NAME, @LAST_NAME, @PHONE_NUMBER, @STREET_ADDRESS, @ZIPCODE, @EMAIL, @CANCER_WARRIOR_NAME, @WORK_PHONE," +
+        "@RELATIONSHIP_TO_WARRIOR, @ADDITIONAL_INFO, @END_OF_TREATMENT_DATE)",
+        function(err, rowCount) {
+            if (err) {
+                console.error(err);
+                return;
+            }
+            //release the connection back to the pool when finished
+            connection.release();
+        });
+          request.addParameter("FIRST_NAME", TYPES.VarChar, userObject.firstName);
+          request.addParameter("LAST_NAME", TYPES.VarChar, userObject.lastName);
+          request.addParameter("PHONE_NUMBER", TYPES.VarChar, userObject.phoneNumber);
+          request.addParameter("STREET_ADDRESS", TYPES.VarChar, userObject.streetAddress);
+          request.addParameter("ZIPCODE", TYPES.VarChar, userObject.zipcode);
+          request.addParameter("EMAIL", TYPES.VarChar, userObject.email);
+          request.addParameter("CANCER_WARRIOR_NAME", TYPES.VarChar, userObject.cancerWarriorname);
+          request.addParameter("WORK_PHONE", TYPES.VarChar, userObject.workPhone);
+          request.addParameter("RELATIONSHIP_TO_WARRIOR", TYPES.VarChar, userObject.relationshipTowarrior);
+          request.addParameter("ADDITIONAL_INFO", TYPES.VarChar, userObject.additionalInfo);
+          request.addParameter("END_OF_TREATMENT_DATE", TYPES.VarChar, userObject.endOftreatmentDate);
+          connection.execSql(request);
+      });
+      return 1;
+  };
+
 
 exports.getAllVolunteersByStatus = function (status) {
     return new Promise((resolve) => {

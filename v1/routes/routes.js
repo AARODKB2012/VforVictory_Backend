@@ -56,6 +56,7 @@ router.post('/budget/new', controller.createNewBudget);
 router.post('/service/new',controller.createNewRequest);
 router.post('/service/fulfill',controller.fulfillRequest);
 
+router.post('/family/new',controller.createNewFamily);
 
 // Email Functions
 router.post('/email/send',emailController.sendEmail);
