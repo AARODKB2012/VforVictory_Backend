@@ -68,7 +68,6 @@ exports.createNewVolunteer = async function (req, res, next) {
     }
 };
 
-<<<<<<< HEAD
 exports.createNewFamily = async function (req, res, next) {
     let rowCount = sql.createNewFamily(req.body);
     console.log(rowCount);
@@ -79,8 +78,6 @@ exports.createNewFamily = async function (req, res, next) {
     }
 };
 
-=======
->>>>>>> backend-mccann
 exports.getAllVolunteersByStatus = async function (req, res, next) {
     let volunteerList = [];
     volunteerList = await sql.getAllVolunteersByStatus(req.params.status);
@@ -228,7 +225,6 @@ exports.getProfilePicture = async function (req, res,next){
     .execute()
     .then(function(results) {
         if(results){
-<<<<<<< HEAD
             const r = fs.createReadStream(results[0].URL) 
             const ps = new stream.PassThrough()
             stream.pipeline(
@@ -238,17 +234,6 @@ exports.getProfilePicture = async function (req, res,next){
                 if (err) {
                 console.log(err)
                     return res.status(400).json({status: 409, errorMessage: `Error getting image: ${err}`}); 
-=======
-            const r = fs.createReadStream(results[0].URL)
-            const ps = new stream.PassThrough()
-            stream.pipeline(
-            r,
-            ps,
-            (err) => {
-                if (err) {
-                console.log(err)
-                    return res.status(400).json({status: 409, errorMessage: `Error getting image: ${err}`});
->>>>>>> backend-mccann
                 }
             })
             ps.pipe(res)
@@ -258,11 +243,7 @@ exports.getProfilePicture = async function (req, res,next){
            console.log(err);
            res.status(409).json({status: 409, errorMessage: `Error saving to database: ${err}`});
        });
-<<<<<<< HEAD
 } 
-=======
-}
->>>>>>> backend-mccann
 
 exports.saveLoginHistory = async function (req, res,next){
     sql.tp.sql(`exec [usp_insertLoginHistory] ${req.body.userId}, '${req.body.date}' , '${req.body.time}', '${req.body.clientIp}'`)

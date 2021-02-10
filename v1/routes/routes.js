@@ -30,21 +30,12 @@ router.get('/volunteer/search/:searchValue',controller.getAllVolunteersBySearchV
 router.get('/volunteer/id/:volunteerId',controller.getVolunteerById);
 router.get('/volunteer/email/:volunteerEmail',controller.getVolunteerByEmail);
 router.get('/volunteer/username/:username',controller.getVolunteerByUsername);
-<<<<<<< HEAD
 router.get('/volunteer/education/',controller.getAllEducations);
 router.get('/volunteer/role/',controller.getAllRoles);
 router.get('/business', controller.getAllBusinesses);
 router.get('/budget',controller.getAllBudgets);
 router.get('/volunteer/education/',controller.getAllEducations);
 router.get('/volunteer/role/',controller.getAllRoles);
-=======
-router.get('/volunteer/education/',controller.getAllEducations);
-router.get('/volunteer/role/',controller.getAllRoles);
-router.get('/business', controller.getAllBusinesses);
-router.get('/budget',controller.getAllBudgets);
-router.get('/volunteer/education/',controller.getAllEducations);
-router.get('/volunteer/role/',controller.getAllRoles);
->>>>>>> backend-mccann
 router.get('/volunteer/username/:username/profile/picture',controller.getProfilePicture);
 router.get('/volunteer/login/history/:userId',controller.getLoginHistory);
 
