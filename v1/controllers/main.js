@@ -68,6 +68,7 @@ exports.createNewVolunteer = async function (req, res, next) {
     }
 };
 
+<<<<<<< HEAD
 exports.createNewFamily = async function (req, res, next) {
     let rowCount = sql.createNewFamily(req.body);
     console.log(rowCount);
@@ -78,6 +79,8 @@ exports.createNewFamily = async function (req, res, next) {
     }
 };
 
+=======
+>>>>>>> backend-mccann
 exports.getAllVolunteersByStatus = async function (req, res, next) {
     let volunteerList = [];
     volunteerList = await sql.getAllVolunteersByStatus(req.params.status);
@@ -225,6 +228,7 @@ exports.getProfilePicture = async function (req, res,next){
     .execute()
     .then(function(results) {
         if(results){
+<<<<<<< HEAD
             const r = fs.createReadStream(results[0].URL) 
             const ps = new stream.PassThrough()
             stream.pipeline(
@@ -234,6 +238,17 @@ exports.getProfilePicture = async function (req, res,next){
                 if (err) {
                 console.log(err)
                     return res.status(400).json({status: 409, errorMessage: `Error getting image: ${err}`}); 
+=======
+            const r = fs.createReadStream(results[0].URL)
+            const ps = new stream.PassThrough()
+            stream.pipeline(
+            r,
+            ps,
+            (err) => {
+                if (err) {
+                console.log(err)
+                    return res.status(400).json({status: 409, errorMessage: `Error getting image: ${err}`});
+>>>>>>> backend-mccann
                 }
             })
             ps.pipe(res)
@@ -243,7 +258,11 @@ exports.getProfilePicture = async function (req, res,next){
            console.log(err);
            res.status(409).json({status: 409, errorMessage: `Error saving to database: ${err}`});
        });
+<<<<<<< HEAD
 } 
+=======
+}
+>>>>>>> backend-mccann
 
 exports.saveLoginHistory = async function (req, res,next){
     sql.tp.sql(`exec [usp_insertLoginHistory] ${req.body.userId}, '${req.body.date}' , '${req.body.time}', '${req.body.clientIp}'`)
@@ -321,9 +340,29 @@ exports.getAllServices = async function (req, res,next){
   }
 }
 
+exports.getAllCategories = async function (req, res,next){
+  let categoryList = [];
+  categoryList = await sql.getAllCategories();
+  if(categoryList.length > 0){
+      res.status(200).json({status:200, results: categoryList, resultsLength: categoryList.length});
+  }else{
+      res.status(204).send();
+  }
+}
+
 exports.getActiveServices = async function (req, res,next){
+  let serviceList = [];
+  serviceList = await sql.getActiveServices();
+  if(serviceList.length > 0){
+      res.status(200).json({status:200, results: serviceList, resultsLength: serviceList.length});
+  }else{
+      res.status(204).send();
+  }
+}
+
+exports.getActiveRequests = async function (req, res,next){
   let activeList = [];
-  activeList = await sql.getActiveServices();
+  activeList = await sql.getActiveRequests();
   if(activeList.length > 0){
       res.status(200).json({status:200, results: activeList, resultsLength: activeList.length});
   }else{
@@ -341,6 +380,26 @@ exports.getRenderedServices = async function (req, res,next){
   }
 }
 
+exports.getServiceById = async function (req, res,next){
+  let serviceList = [];
+  serviceList = await sql.getServiceById(req.params.serviceId);
+  if(serviceList.length > 0){
+      res.status(200).json({status:200, results: serviceList, resultsLength: serviceList.length});
+  }else{
+      res.status(204).send();
+  }
+}
+
+exports.getRequestById = async function (req, res,next){
+  let requestList = [];
+  requestList = await sql.getRequestById(req.params.serviceId);
+  if(requestList.length > 0){
+      res.status(200).json({status:200, results: requestList, resultsLength: requestList.length});
+  }else{
+      res.status(204).send();
+  }
+}
+
 exports.createNewRequest = async function (req, res,next){
   let rowCount = sql.createNewRequest(req.body);
   console.log(rowCount);
@@ -353,6 +412,77 @@ exports.createNewRequest = async function (req, res,next){
 
 exports.fulfillRequest = async function (req, res,next){
   let rowCount = sql.fulfillRequest(req.body);
+  console.log(rowCount);
+  if(rowCount == 1){
+    res.status(201).json({requestFulfilled: true});
+  }else{
+    res.status(202).send();
+  }
+}
+
+exports.markBusinessNotified = async function (req, res,next){
+  let rowCount = sql.markBusinessNotified(req.body);
+  console.log(rowCount);
+  if(rowCount == 1){
+    res.status(201).json({requestFulfilled: true});
+  }else{
+    res.status(202).send();
+  }
+}
+
+exports.markFamilyNotified = async function (req, res,next){
+  let rowCount = sql.markFamilyNotified(req.body);
+  console.log(rowCount);
+  if(rowCount == 1){
+    res.status(201).json({requestFulfilled: true});
+  }else{
+    res.status(202).send();
+  }
+}
+
+exports.markBusinessFollowedUp = async function (req, res,next){
+  let rowCount = sql.markBusinessFollowedUp(req.body);
+  console.log(rowCount);
+  if(rowCount == 1){
+    res.status(201).json({requestFulfilled: true});
+  }else{
+    res.status(202).send();
+  }
+}
+
+exports.markFamilyFollowedUp = async function (req, res,next){
+  let rowCount = sql.markFamilyFollowedUp(req.body);
+  console.log(rowCount);
+  if(rowCount == 1){
+    res.status(201).json({requestFulfilled: true});
+  }else{
+    res.status(202).send();
+  }
+}
+
+exports.markServiceActive = async function (req, res,next){
+  let rowCount = sql.markServiceActive(req.body);
+  console.log(rowCount);
+  if(rowCount == 1){
+    res.status(201).json({requestFulfilled: true});
+  }else{
+    res.status(202).send();
+  }
+}
+
+exports.markServiceInactive = async function (req, res,next){
+  let rowCount = sql.markServiceInactive(req.body);
+  console.log(rowCount);
+  if(rowCount == 1){
+    res.status(201).json({requestFulfilled: true});
+  }else{
+    res.status(202).send();
+  }
+}
+
+
+exports.deleteRequest = async function (req, res,next){
+  let rowCount = sql.deleteRequest(req.body);
   console.log(rowCount);
   if(rowCount == 1){
     res.status(201).json({requestFulfilled: true});

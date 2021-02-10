@@ -132,6 +132,7 @@ exports.createNewVolunteer = function(userObject) {
     return 1;
 };
 
+<<<<<<< HEAD
 // Use this example for when we need to insert something to DB
 exports.createNewFamily = function(userObject) {
     pool.acquire(function (err, connection) {
@@ -169,6 +170,9 @@ exports.createNewFamily = function(userObject) {
   };
 
 
+=======
+
+>>>>>>> backend-mccann
 exports.getAllVolunteersByStatus = function (status) {
     return new Promise((resolve) => {
         tp.sql("SELECT * FROM [dbo].[Volunteers] where status='" + status + "'").execute().then(function (results) { // console.log(results);
@@ -457,6 +461,19 @@ exports.getAllServices = function() {
   });
 }
 
+exports.getAllCategories = function() {
+  return new Promise( resolve => {
+      tp.sql("SELECT * FROM [dbo].[Categories]")
+      .execute()
+      .then(function(results) {
+          // console.log(results);
+          resolve(results);
+      }).fail(function(err) {
+          console.log(err);
+      });
+  });
+}
+
 exports.getActiveServices = function() {
   return new Promise( resolve => {
       tp.sql("SELECT * FROM [dbo].[Services] WHERE active = 1")
@@ -470,9 +487,48 @@ exports.getActiveServices = function() {
   });
 }
 
+exports.getActiveRequests = function() {
+  return new Promise( resolve => {
+      tp.sql("SELECT * FROM [dbo].[Requests] WHERE active = 1")
+      .execute()
+      .then(function(results) {
+          // console.log(results);
+          resolve(results);
+      }).fail(function(err) {
+          console.log(err);
+      });
+  });
+}
+
 exports.getRenderedServices = function() {
   return new Promise( resolve => {
-      tp.sql("SELECT * FROM [dbo].[Services] WHERE active = 0")
+      tp.sql("SELECT * FROM [dbo].[Requests] WHERE active = 0")
+      .execute()
+      .then(function(results) {
+          // console.log(results);
+          resolve(results);
+      }).fail(function(err) {
+          console.log(err);
+      });
+  });
+}
+
+exports.getServiceById = function(serviceId) {
+  return new Promise( resolve => {
+      tp.sql("SELECT * FROM [dbo].[Services] where id = " + serviceId)
+      .execute()
+      .then(function(results) {
+          // console.log(results);
+          resolve(results);
+      }).fail(function(err) {
+          console.log(err);
+      });
+  });
+}
+
+exports.getRequestById = function(serviceId) {
+  return new Promise( resolve => {
+      tp.sql("SELECT * FROM [dbo].[Requests] where id = " + serviceId)
       .execute()
       .then(function(results) {
           // console.log(results);
@@ -490,9 +546,9 @@ exports.createNewRequest = function(userObject) {
           return;
       }
       // use the connection as normal
-      var request = new Request("INSERT INTO [dbo].[Services] ([family_name], [business_name], [business_category], [date_requested], [date_fulfilled], [notified_business], " +
-      " [notified_family], [followedup_business], [followedup_family], [active]) " +
-      " VALUES (@FAMILY_NAME, @BUSINESS_NAME, @BUSINESS_CATEGORY, @DATE_REQUESTED, @DATE_FULFILLED, @NOTIFIED_BUSINESS, @NOTIFIED_FAMILY, @FOLLOWEDUP_BUSINESS, @FOLLOWEDUP_FAMILY, @ACTIVE)",
+      var request = new Request("INSERT INTO [dbo].[Requests] ([name], [email], [business_name], [business_category], [date_requested], [date_fulfilled], [notified_business], " +
+      " [notified_family], [followedup_business], [followedup_family], [active], [notes]) " +
+      " VALUES (@NAME, @EMAIL, @BUSINESS_NAME, @BUSINESS_CATEGORY, @DATE_REQUESTED, @DATE_FULFILLED, @NOTIFIED_BUSINESS, @NOTIFIED_FAMILY, @FOLLOWEDUP_BUSINESS, @FOLLOWEDUP_FAMILY, @ACTIVE, @NOTES)",
       function(err, rowCount) {
           if (err) {
               console.error(err);
@@ -502,16 +558,21 @@ exports.createNewRequest = function(userObject) {
           connection.release();
       });
 
-      request.addParameter('FAMILY_NAME', TYPES.VarChar, userObject.familyName);
-      request.addParameter('BUSINESS_NAME', TYPES.VarChar, '');
-      request.addParameter('BUSINESS_CATEGORY', TYPES.VarChar, userObject.businessCategory);
-      request.addParameter('DATE_REQUESTED', TYPES.VarChar, userObject.dateRequested);
-      request.addParameter('DATE_FULFILLED', TYPES.VarChar, '');
+      request.addParameter('NAME', TYPES.NVarChar, userObject.name);
+      request.addParameter('EMAIL', TYPES.NVarChar, userObject.email);
+      request.addParameter('BUSINESS_NAME', TYPES.NVarChar, userObject.businessName);
+      request.addParameter('BUSINESS_CATEGORY', TYPES.NVarChar, userObject.businessCategory);
+      request.addParameter('DATE_REQUESTED', TYPES.NVarChar, userObject.dateRequested);
+      request.addParameter('DATE_FULFILLED', TYPES.NVarChar, '');
       request.addParameter('NOTIFIED_BUSINESS', TYPES.Bit, userObject.notifiedBusiness);
       request.addParameter('NOTIFIED_FAMILY', TYPES.Bit, userObject.notifiedFamily);
       request.addParameter('FOLLOWEDUP_BUSINESS', TYPES.Bit, userObject.followedupBusiness);
       request.addParameter('FOLLOWEDUP_FAMILY', TYPES.Bit, userObject.followedupFamily);
       request.addParameter('ACTIVE', TYPES.Bit, 1);
+<<<<<<< HEAD
+=======
+      request.addParameter('NOTES', TYPES.NVarChar, userObject.notes);
+>>>>>>> backend-mccann
       connection.execSql(request);
   });
 
@@ -525,7 +586,7 @@ exports.fulfillRequest = function(userObject) {
           return;
       }
       // use the connection as normal
-      var request = new Request("UPDATE [dbo].[Services] SET [active] = 0 WHERE [family_name] = @FAMILY_NAME AND [date_requested] = @DATE_REQUESTED",
+      var request = new Request("UPDATE [dbo].[Requests] SET [active] = 0, [date_fulfilled] = @DATE_FULFILLED WHERE [id] = @ID",
       function(err, rowCount) {
           if (err) {
               console.error(err);
@@ -535,9 +596,179 @@ exports.fulfillRequest = function(userObject) {
           connection.release();
       });
 
-      request.addParameter('FAMILY_NAME', TYPES.VarChar, userObject.familyName);
-      request.addParameter('DATE_REQUESTED', TYPES.VarChar, userObject.dateRequested);
+      request.addParameter('ID', TYPES.VarChar, userObject.id);
+      request.addParameter('DATE_FULFILLED', TYPES.NVarChar, userObject.dateFulfilled)
       request.addParameter('ACTIVE', TYPES.Bit, 0);
+      connection.execSql(request);
+  });
+
+  return 1;
+}
+
+exports.markBusinessNotified = function(userObject) {
+  pool.acquire(function (err, connection) {
+      if (err) {
+          console.error(err);
+          return;
+      }
+      // use the connection as normal
+      var request = new Request("UPDATE [dbo].[Requests] SET [notified_business] = 1 WHERE [id] = @ID",
+      function(err, rowCount) {
+          if (err) {
+              console.error(err);
+              return;
+          }
+          // release the connection back to the pool when finished
+          connection.release();
+      });
+
+      request.addParameter('ID', TYPES.VarChar, userObject.id);
+      //request.addParameter('ACTIVE', TYPES.Bit, 0);
+      connection.execSql(request);
+  });
+
+  return 1;
+}
+
+exports.markFamilyNotified = function(userObject) {
+  pool.acquire(function (err, connection) {
+      if (err) {
+          console.error(err);
+          return;
+      }
+      // use the connection as normal
+      var request = new Request("UPDATE [dbo].[Requests] SET [notified_family] = 1 WHERE [id] = @ID",
+      function(err, rowCount) {
+          if (err) {
+              console.error(err);
+              return;
+          }
+          // release the connection back to the pool when finished
+          connection.release();
+      });
+
+      request.addParameter('ID', TYPES.VarChar, userObject.id);
+      //request.addParameter('ACTIVE', TYPES.Bit, 0);
+      connection.execSql(request);
+  });
+
+  return 1;
+}
+
+exports.markBusinessFollowedUp = function(userObject) {
+  pool.acquire(function (err, connection) {
+      if (err) {
+          console.error(err);
+          return;
+      }
+      // use the connection as normal
+      var request = new Request("UPDATE [dbo].[Requests] SET [followedup_business] = 1 WHERE [id] = @ID",
+      function(err, rowCount) {
+          if (err) {
+              console.error(err);
+              return;
+          }
+          // release the connection back to the pool when finished
+          connection.release();
+      });
+
+      request.addParameter('ID', TYPES.VarChar, userObject.id);
+      connection.execSql(request);
+  });
+
+  return 1;
+}
+
+exports.markFamilyFollowedUp = function(userObject) {
+  pool.acquire(function (err, connection) {
+      if (err) {
+          console.error(err);
+          return;
+      }
+      // use the connection as normal
+      var request = new Request("UPDATE [dbo].[Requests] SET [followedup_family] = 1 WHERE [id] = @ID",
+      function(err, rowCount) {
+          if (err) {
+              console.error(err);
+              return;
+          }
+          // release the connection back to the pool when finished
+          connection.release();
+      });
+
+      request.addParameter('ID', TYPES.VarChar, userObject.id);
+      connection.execSql(request);
+  });
+
+  return 1;
+}
+
+exports.markServiceActive = function(userObject) {
+  pool.acquire(function (err, connection) {
+      if (err) {
+          console.error(err);
+          return;
+      }
+      // use the connection as normal
+      var request = new Request("UPDATE [dbo].[Services] SET [active] = 1 WHERE [id] = @ID",
+      function(err, rowCount) {
+          if (err) {
+              console.error(err);
+              return;
+          }
+          // release the connection back to the pool when finished
+          connection.release();
+      });
+
+      request.addParameter('ID', TYPES.VarChar, userObject.id);
+      connection.execSql(request);
+  });
+
+  return 1;
+}
+
+exports.markServiceInactive = function(userObject) {
+  pool.acquire(function (err, connection) {
+      if (err) {
+          console.error(err);
+          return;
+      }
+      // use the connection as normal
+      var request = new Request("UPDATE [dbo].[Services] SET [active] = 0 WHERE [id] = @ID",
+      function(err, rowCount) {
+          if (err) {
+              console.error(err);
+              return;
+          }
+          // release the connection back to the pool when finished
+          connection.release();
+      });
+
+      request.addParameter('ID', TYPES.VarChar, userObject.id);
+      connection.execSql(request);
+  });
+
+  return 1;
+}
+
+exports.deleteRequest = function(userObject) {
+  pool.acquire(function (err, connection) {
+      if (err) {
+          console.error(err);
+          return;
+      }
+      // use the connection as normal
+      var request = new Request("DELETE FROM [dbo].[Requests] WHERE [id] = @ID",
+      function(err, rowCount) {
+          if (err) {
+              console.error(err);
+              return;
+          }
+          // release the connection back to the pool when finished
+          connection.release();
+      });
+
+      request.addParameter('ID', TYPES.VarChar, userObject.id);
       connection.execSql(request);
   });
 
