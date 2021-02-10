@@ -132,7 +132,6 @@ exports.createNewVolunteer = function(userObject) {
     return 1;
 };
 
-<<<<<<< HEAD
 // Use this example for when we need to insert something to DB
 exports.createNewFamily = function(userObject) {
     pool.acquire(function (err, connection) {
@@ -170,9 +169,7 @@ exports.createNewFamily = function(userObject) {
   };
 
 
-=======
 
->>>>>>> backend-mccann
 exports.getAllVolunteersByStatus = function (status) {
     return new Promise((resolve) => {
         tp.sql("SELECT * FROM [dbo].[Volunteers] where status='" + status + "'").execute().then(function (results) { // console.log(results);
@@ -569,10 +566,7 @@ exports.createNewRequest = function(userObject) {
       request.addParameter('FOLLOWEDUP_BUSINESS', TYPES.Bit, userObject.followedupBusiness);
       request.addParameter('FOLLOWEDUP_FAMILY', TYPES.Bit, userObject.followedupFamily);
       request.addParameter('ACTIVE', TYPES.Bit, 1);
-<<<<<<< HEAD
-=======
       request.addParameter('NOTES', TYPES.NVarChar, userObject.notes);
->>>>>>> backend-mccann
       connection.execSql(request);
   });
 
