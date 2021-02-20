@@ -512,3 +512,30 @@ exports.fulfillRequest = function(userObject) {
 
   return 1;
 }
+
+
+exports.getThisMonthFamilies = function() {
+    return new Promise( resolve => {
+        tp.sql("SELECT * FROM [dbo].[Family] where DATEDIFF(MONTH, GETDATE(), created_date) < 30")
+        .execute()
+        .then(function(results) {
+            // console.log(results);
+            resolve(results);
+        }).fail(function(err) {
+            console.log(err);
+        });
+    });
+}
+
+exports.getFamiliesToApprove = function() {
+    return new Promise( resolve => {
+        tp.sql("SELECT * FROM [dbo].[Family] where active = 1 and approved_by is null and approved_date is null")
+        .execute()
+        .then(function(results) {
+            // console.log(results);
+            resolve(results);
+        }).fail(function(err) {
+            console.log(err);
+        });
+    });
+}

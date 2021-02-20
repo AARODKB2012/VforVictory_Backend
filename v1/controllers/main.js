@@ -350,3 +350,23 @@ exports.fulfillRequest = async function (req, res,next){
     res.status(202).send();
   }
 }
+
+exports.getThisMonthFamilies = async function (req, res,next){
+    let familyList = [];
+    familyList = await sql.getThisMonthFamilies();
+    if(familyList.length > 0){
+        res.status(200).json({status:200, results: familyList, resultsLength: familyList.length});
+    }else{
+        res.status(204).send();
+    }
+}
+
+exports.getFamiliesToApprove = async function (req, res,next){
+    let familyList = [];
+    familyList = await sql.getFamiliesToApprove();
+    if(familyList.length > 0){
+        res.status(200).json({status:200, results: familyList, resultsLength: familyList.length});
+    }else{
+        res.status(204).send();
+    }
+}
