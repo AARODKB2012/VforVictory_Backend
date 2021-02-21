@@ -370,3 +370,33 @@ exports.getFamiliesToApprove = async function (req, res,next){
         res.status(204).send();
     }
 }
+
+exports.getThisMonthBusinesses = async function (req, res,next){
+    let businessList = [];
+    businessList = await sql.getThisMonthBusinesses();
+    if(businessList.length > 0){
+        res.status(200).json({status:200, results: businessList, resultsLength: businessList.length});
+    }else{
+        res.status(204).send();
+    }
+}
+
+exports.getBusinessesToApprove = async function (req, res,next){
+    let businessList = [];
+    businessList = await sql.getBusinessesToApprove();
+    if(businessList.length > 0){
+        res.status(200).json({status:200, results: businessList, resultsLength: businessList.length});
+    }else{
+        res.status(204).send();
+    }
+}
+
+exports.getThisMonthRequests = async function (req, res,next){
+    let requestList = [];
+    requestList = await sql.getThisMonthRequests();
+    if(requestList.length > 0){
+        res.status(200).json({status:200, results: requestList, resultsLength: requestList.length});
+    }else{
+        res.status(204).send();
+    }
+}

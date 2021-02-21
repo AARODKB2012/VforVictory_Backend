@@ -539,3 +539,42 @@ exports.getFamiliesToApprove = function() {
         });
     });
 }
+
+exports.getThisMonthBusinesses = function() {
+    return new Promise( resolve => {
+        tp.sql(" SELECT * FROM [dbo].[Business] where DATEDIFF(MONTH, GETDATE(), created_date) < 30")
+        .execute()
+        .then(function(results) {
+            // console.log(results);
+            resolve(results);
+        }).fail(function(err) {
+            console.log(err);
+        });
+    });
+}
+
+exports.getBusinessesToApprove = function() {
+    return new Promise( resolve => {
+        tp.sql("SELECT * FROM [dbo].[Business] where approved_by is null and approved_date is null")
+        .execute()
+        .then(function(results) {
+            // console.log(results);
+            resolve(results);
+        }).fail(function(err) {
+            console.log(err);
+        });
+    });
+}
+
+exports.getThisMonthRequests = function() {
+    return new Promise( resolve => {
+        tp.sql("SELECT * FROM [dbo].[Requests] where DATEDIFF(MONTH, GETDATE(), date_requested) < 30")
+        .execute()
+        .then(function(results) {
+            // console.log(results);
+            resolve(results);
+        }).fail(function(err) {
+            console.log(err);
+        });
+    });
+}
