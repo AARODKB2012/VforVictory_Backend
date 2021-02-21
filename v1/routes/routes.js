@@ -22,7 +22,6 @@ app.use(bodyParser.json());
 //Add GET endpoints here
 router.get('/helloWorld',controller.getHelloWorld);
 router.get('/volunteer',controller.getAllVolunteers);
-router.get('/family',controller.getAllFamily);
 router.get('/volunteer/:userName/password/:password',controller.getVolunteerByUserNameAndPassword);
 router.get('/volunteer/current/:username',controller.getCurrentUser);
 router.get('/volunteer/status/:status',controller.getAllVolunteersByStatus);
@@ -46,6 +45,9 @@ router.get('/service/active',controller.getActiveRequests);
 router.get('/service/rendered',controller.getRenderedServices);
 router.get('/service/get/id/:serviceId',controller.getServiceById);
 router.get('/service/id/:serviceId',controller.getRequestById);
+
+router.get('/family/inactive',controller.getInactiveFamily);
+router.get('/family',controller.getAllFamily);
 
 
 //Add POST endpoint here
@@ -71,6 +73,10 @@ router.post('/service/delete',controller.deleteRequest);
 
 
 router.post('/family/new',controller.createNewFamily);
+router.post('/family/markActive',controller.markFamilyActive);
+router.post('/family/markInactive',controller.markFamilyInactive);
+router.post('/family/active',controller.getActiveFamily);
+
 
 // Email Functions
 router.post('/email/send',emailController.sendEmail);

@@ -45,7 +45,7 @@ exports.getAllVolunteers = function () {
 
 exports.getAllFamily = function() {
     return new Promise((resolve) => {
-        tp.sql("SELECT * FROM [dbo].[Family]")
+        tp.sql("SELECT * FROM [dbo].[Family] WHERE active = 1")
         .execute()
         .then(function(results) {
             resolve(results);
@@ -141,9 +141,9 @@ exports.createNewFamily = function(userObject) {
         }
         //use the connection as normal
         var request = new Request("INSERT INTO [dbo].[Family] ([first_name], [last_name], [phone_number], [street_address], [zipcode], [email], [cancer_warrior_name], [work_phone], [relationship_to_warrior]," +
-        "[additional_info], [end_of_treatment_date])" +
+        "[additional_info], [end_of_treatment_date], [active])" +
         "VALUES (@FIRST_NAME, @LAST_NAME, @PHONE_NUMBER, @STREET_ADDRESS, @ZIPCODE, @EMAIL, @CANCER_WARRIOR_NAME, @WORK_PHONE," +
-        "@RELATIONSHIP_TO_WARRIOR, @ADDITIONAL_INFO, @END_OF_TREATMENT_DATE)",
+        "@RELATIONSHIP_TO_WARRIOR, @ADDITIONAL_INFO, @END_OF_TREATMENT_DATE, @ACTIVE)",
         function(err, rowCount) {
             if (err) {
                 console.error(err);
@@ -163,6 +163,7 @@ exports.createNewFamily = function(userObject) {
           request.addParameter("RELATIONSHIP_TO_WARRIOR", TYPES.VarChar, userObject.relationshipTowarrior);
           request.addParameter("ADDITIONAL_INFO", TYPES.VarChar, userObject.additionalInfo);
           request.addParameter("END_OF_TREATMENT_DATE", TYPES.VarChar, userObject.endOftreatmentDate);
+          request.addParameter('ACTIVE', TYPES.Bit, 1);
           connection.execSql(request);
       });
       return 1;
@@ -768,3 +769,78 @@ exports.deleteRequest = function(userObject) {
 
   return 1;
 }
+
+exports.markFamilyActive = function(userObject) {
+    pool.acquire(function (err, connection) {
+        if (err) {
+            console.error(err);
+            return;
+        }
+        // use the connection as normal
+        var request = new Request("UPDATE [dbo].[Family] SET [active] = 1 WHERE [id] = @ID",
+        function(err, rowCount) {
+            if (err) {
+                console.error(err);
+                return;
+            }
+            // release the connection back to the pool when finished
+            connection.release();
+        });
+  
+        request.addParameter('ID', TYPES.VarChar, userObject.id);
+        connection.execSql(request);
+    });
+  
+    return 1;
+  }
+
+  exports.markFamilyInactive = function(userObject) {
+    pool.acquire(function (err, connection) {
+        if (err) {
+            console.error(err);
+            return;
+        }
+        // use the connection as normal
+        var request = new Request("UPDATE [dbo].[Family] SET [active] = 0 WHERE [id] = @ID",
+        function(err, rowCount) {
+            if (err) {
+                console.error(err);
+                return;
+            }
+            // release the connection back to the pool when finished
+            connection.release();
+        });
+  
+        request.addParameter('ID', TYPES.VarChar, userObject.id);
+        connection.execSql(request);
+    });
+  
+    return 1;
+  }
+
+
+  exports.getActiveFamily = function() {
+    return new Promise( resolve => {
+        tp.sql("SELECT * FROM [dbo].[Family] WHERE active = 1")
+        .execute()
+        .then(function(results) {
+            // console.log(results);
+            resolve(results);
+        }).fail(function(err) {
+            console.log(err);
+        });
+    });
+  }
+
+  exports.getInactiveFamily = function() {
+    return new Promise( resolve => {
+        tp.sql("SELECT * FROM [dbo].[Family] WHERE active = 0")
+        .execute()
+        .then(function(results) {
+            // console.log(results);
+            resolve(results);
+        }).fail(function(err) {
+            console.log(err);
+        });
+    });
+  }
