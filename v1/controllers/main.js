@@ -68,6 +68,60 @@ exports.createNewVolunteer = async function (req, res, next) {
     }
 };
 
+exports.getAllVolunteersByStatus = async function (req, res, next) {
+    let volunteerList = [];
+    volunteerList = await sql.getAllVolunteersByStatus(req.params.status);
+    if (volunteerList.length > 0) {
+        res.status(200).json({status: 200, results: volunteerList, resultsLength: volunteerList.length});
+    } else {
+        res.status(204).send();
+    }
+};
+
+exports.getVolunteerByUsername = async function (req, res, next) {
+    let volunteerList = [];
+    volunteerList = await sql.getVolunteerByUsername(req.params.status);
+    if (volunteerList.length > 0) {
+        res.status(200).json({status: 200, results: volunteerList, resultsLength: volunteerList.length});
+    } else {
+        res.status(204).send();
+    }
+};
+
+exports.getAllVolunteersBySearchValue = async function (req, res, next) {
+    let volunteerList = [];
+    volunteerList = await sql.getAllVolunteersBySearchValue(req.params.searchValue);
+    if (volunteerList.length > 0) {
+        res.status(200).json({status: 200, results: volunteerList, resultsLength: volunteerList.length});
+    } else {
+        res.status(204).send();
+    }
+};
+
+exports.getCurrentUser = async function (req, res,next){
+    let volunteerList = [];
+    console.log(req.params.username);
+    volunteerList = await sql.getCurrentUser(req.params.username);
+    console.log(volunteerList);
+    if (volunteerList.length > 0) {
+        res.status(200).json({status: 200, results: volunteerList, resultsLength: volunteerList.length});
+    } else {
+        res.status(204).send();
+    }
+};
+
+
+
+exports.createNewVolunteer = async function (req, res, next) {
+    let rowCount = sql.createNewVolunteer(req.body);
+    console.log(rowCount);
+    if (rowCount == 1) {
+        res.status(201).json({userCreated: true});
+    } else {
+        res.status(202).send();
+    }
+};
+
 exports.createNewFamily = async function (req, res, next) {
     let rowCount = sql.createNewFamily(req.body);
     console.log(rowCount);
@@ -118,6 +172,26 @@ exports.getAllBusinesses = async function (req, res, next) {
     }
 };
 
+exports.getBusinessById = async function (req, res,next){
+  let businessList = [];
+  businessList = await sql.getBusinessById(req.params.businessId);
+  if(businessList.length > 0){
+      res.status(200).json({status:200, results: businessList, resultsLength: businessList.length});
+  }else{
+      res.status(204).send();
+  }
+}
+
+exports.getAllCategories = async function (req, res, next) {
+  let categoryList = [];
+  categoryList = await sql.getAllCategories();
+  if (categoryList.length > 0) {
+      res.status(200).json({status: 200, results: categoryList, resultsLength: categoryList.length});
+  } else {
+      res.status(204).send();
+  }
+};
+
 exports.createNewBusiness = async function (req, res, next) {
     let rowCount = sql.createNewBusiness(req.body);
     console.log(rowCount);
@@ -128,6 +202,46 @@ exports.createNewBusiness = async function (req, res, next) {
     }
 };
 
+
+exports.updateBusiness = async function (req, res,next){
+  let rowCount = sql.updateBusiness(req.body);
+  if(rowCount == 1){
+    res.status(201).json({businessUpdated: true});
+  }else{
+    res.status(202).send();
+  }
+}
+
+exports.getActiveBusinesses = async function (req, res,next){
+  let businessList = [];
+  businessList = await sql.getActiveBusinesses();
+  if(businessList.length > 0){
+      res.status(200).json({status:200, results: businessList, resultsLength: businessList.length});
+  }else{
+      res.status(204).send();
+  }
+}
+
+
+exports.getAllBudgets = async function (req, res, next) {
+    let budgetArray = [];
+    budgetArray = await sql.getAllBudgets();
+    if (budgetArray.length > 0) {
+        res.status(200).json({status: 200, results: budgetArray, resultsLength: budgetArray.length});
+    } else {
+        res.status(204).send();
+    }
+};
+
+exports.createNewBudget = async function(req,res,next){
+    let rowCount = sql.createNewBudget(req.body);
+    console.log(rowCount);
+    if (rowCount == 1) {
+        res.status(201).json({budgetCreated: true});
+    } else {
+        res.status(202).send();
+    }
+};
 
 exports.getAllBudgets = async function (req, res, next) {
     let budgetArray = [];
@@ -472,6 +586,55 @@ exports.deleteRequest = async function (req, res,next){
   }
 }
 
+exports.getThisMonthFamilies = async function (req, res,next){
+    let familyList = [];
+    familyList = await sql.getThisMonthFamilies();
+    if(familyList.length > 0){
+        res.status(200).json({status:200, results: familyList, resultsLength: familyList.length});
+    }else{
+        res.status(204).send();
+    }
+}
+
+exports.getFamiliesToApprove = async function (req, res,next){
+    let familyList = [];
+    familyList = await sql.getFamiliesToApprove();
+    if(familyList.length > 0){
+        res.status(200).json({status:200, results: familyList, resultsLength: familyList.length});
+    }else{
+        res.status(204).send();
+    }
+}
+
+exports.getThisMonthBusinesses = async function (req, res,next){
+    let businessList = [];
+    businessList = await sql.getThisMonthBusinesses();
+    if(businessList.length > 0){
+        res.status(200).json({status:200, results: businessList, resultsLength: businessList.length});
+    }else{
+        res.status(204).send();
+    }
+}
+
+exports.getBusinessesToApprove = async function (req, res,next){
+    let businessList = [];
+    businessList = await sql.getBusinessesToApprove();
+    if(businessList.length > 0){
+        res.status(200).json({status:200, results: businessList, resultsLength: businessList.length});
+    }else{
+        res.status(204).send();
+    }
+}
+
+exports.getThisMonthRequests = async function (req, res,next){
+    let requestList = [];
+    requestList = await sql.getThisMonthRequests();
+    if(requestList.length > 0){
+        res.status(200).json({status:200, results: requestList, resultsLength: requestList.length});
+    }else{
+        res.status(204).send();
+    }
+}
 exports.markFamilyActive = async function (req, res,next){
     let rowCount = sql.markFamilyActive(req.body);
     console.log(rowCount);
