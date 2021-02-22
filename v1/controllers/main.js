@@ -635,3 +635,42 @@ exports.getThisMonthRequests = async function (req, res,next){
         res.status(204).send();
     }
 }
+exports.markFamilyActive = async function (req, res,next){
+    let rowCount = sql.markFamilyActive(req.body);
+    console.log(rowCount);
+    if(rowCount == 1){
+      res.status(201).json({requestFulfilled: true});
+    }else{
+      res.status(202).send();
+    }
+  }
+  
+  exports.markFamilyInactive = async function (req, res,next){
+    let rowCount = sql.markFamilyInactive(req.body);
+    console.log(rowCount);
+    if(rowCount == 1){
+      res.status(201).json({requestFulfilled: true});
+    }else{
+      res.status(202).send();
+    }
+  }
+
+  exports.getActiveFamily = async function (req, res,next){
+    let activeList = [];
+    activeList = await sql.getActiveFamily();
+    if(activeList.length > 0){
+        res.status(200).json({status:200, results: activeList, resultsLength: activeList.length});
+    }else{
+        res.status(204).send();
+    }
+  }
+
+  exports.getInactiveFamily = async function (req, res,next){
+  let renderedList = [];
+  renderedList = await sql.getInactiveFamily();
+  if(renderedList.length > 0){
+      res.status(200).json({status:200, results: renderedList, resultsLength: renderedList.length});
+  }else{
+      res.status(204).send();
+  }
+}
