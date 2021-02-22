@@ -108,6 +108,26 @@ exports.getAllBusinesses = async function (req, res, next) {
     }
 };
 
+exports.getBusinessById = async function (req, res,next){
+  let businessList = [];
+  businessList = await sql.getBusinessById(req.params.businessId);
+  if(businessList.length > 0){
+      res.status(200).json({status:200, results: businessList, resultsLength: businessList.length});
+  }else{
+      res.status(204).send();
+  }
+}
+
+exports.getAllCategories = async function (req, res, next) {
+  let categoryList = [];
+  categoryList = await sql.getAllCategories();
+  if (categoryList.length > 0) {
+      res.status(200).json({status: 200, results: categoryList, resultsLength: categoryList.length});
+  } else {
+      res.status(204).send();
+  }
+};
+
 exports.createNewBusiness = async function (req, res, next) {
     let rowCount = sql.createNewBusiness(req.body);
     console.log(rowCount);
@@ -118,6 +138,24 @@ exports.createNewBusiness = async function (req, res, next) {
     }
 };
 
+exports.updateBusiness = async function (req, res,next){
+  let rowCount = sql.updateBusiness(req.body);
+  if(rowCount == 1){
+    res.status(201).json({businessUpdated: true});
+  }else{
+    res.status(202).send();
+  }
+}
+
+exports.getActiveBusinesses = async function (req, res,next){
+  let businessList = [];
+  businessList = await sql.getActiveBusinesses();
+  if(businessList.length > 0){
+      res.status(200).json({status:200, results: businessList, resultsLength: businessList.length});
+  }else{
+      res.status(204).send();
+  }
+}
 
 exports.getAllBudgets = async function (req, res, next) {
     let budgetArray = [];

@@ -275,12 +275,35 @@ exports.getAllVolunteersByStatus = function(status) {
 
 exports.getAllBusinesses = function () {
     return new Promise((resolve) => {
-        tp.sql("SELECT * FROM [dbo].[Businesses]").execute().then(function (results) { // console.log(results);
+        tp.sql("SELECT * FROM [dbo].[Business]").execute().then(function (results) { // console.log(results);
             resolve(results);
         }).fail(function (err) {
             console.log(err);
         });
     });
+};
+
+exports.getBusinessById = function(businessId) {
+  return new Promise( resolve => {
+      tp.sql("SELECT * FROM [dbo].[Business] where record_id = " + businessId)
+      .execute()
+      .then(function(results) {
+          // console.log(results);
+          resolve(results);
+      }).fail(function(err) {
+          console.log(err);
+      });
+  });
+}
+
+exports.getAllCategories = function () {
+  return new Promise((resolve) => {
+      tp.sql("SELECT * FROM [dbo].[Categories]").execute().then(function (results) { // console.log(results);
+          resolve(results);
+      }).fail(function (err) {
+          console.log(err);
+      });
+  });
 };
 
 exports.createNewBusiness = function (businessObject) {
@@ -291,7 +314,12 @@ exports.createNewBusiness = function (businessObject) {
             return;
         }
         // use the connection as normal
-        var request = new Request("INSERT INTO [dbo].[Businesses] ([business_name],[email],[primary_contact_fName],[primary_contact_lName], " + "[primary_contact_phone_number],[secondary_contact_fName],[secondary_contact_lName],[secondary_contact_phone_number]," + "[address],[Services_Offered],[Service_Area],[Discount_Amount],[Preferred_Method_Contact],[EOY_Receipt]) " + "VALUES (@BUSINESS_NAME, @EMAIL, @PRIMARY_CONTACT_FNAME, @PRIMARY_CONTACT_LNAME, @PRIMARY_CONTACT_PHONE_NUMBER, " + "@SECONDARY_CONTACT_FNAME,@SECONDARY_CONTACT_LNAME, @SECONDARY_CONTACT_PHONE_NUMBER," + "@ADDRESS, @SERVICES_OFFERED, @SERVICE_AREA, @DISCOUNT_AMOUNT, @PREFERRED_METHOD_CONTACT, @EOY_RECEIPT)", function (err, rowCount) {
+        var request = new Request("INSERT INTO [dbo].[Business] ([business_name],[email],[primary_contact_fName],[primary_contact_lName], " +
+        "[primary_contact_phone_number],[secondary_contact_fName],[secondary_contact_lName],[secondary_contact_phone_number]," +
+        "[address],[Services_Offered],[Service_Area],[Discount_Amount],[Preferred_Method_Contact],[EOY_Receipt],[notes],[active]) " +
+        "VALUES (@BUSINESS_NAME, @EMAIL, @PRIMARY_CONTACT_FNAME, @PRIMARY_CONTACT_LNAME, @PRIMARY_CONTACT_PHONE_NUMBER, " +
+        "@SECONDARY_CONTACT_FNAME,@SECONDARY_CONTACT_LNAME, @SECONDARY_CONTACT_PHONE_NUMBER, @ADDRESS, @SERVICES_OFFERED, " +
+        "@SERVICE_AREA, @DISCOUNT_AMOUNT, @PREFERRED_METHOD_CONTACT, @EOY_RECEIPT, @NOTES, @ACTIVE)", function (err, rowCount) {
             if (err) {
                 console.error(err);
                 return;
@@ -299,24 +327,83 @@ exports.createNewBusiness = function (businessObject) {
             // release the connection back to the pool when finished
             connection.release();
         });
-        request.addParameter("BUSINESS_NAME", TYPES.VarChar, businessObject.business_name);
+        request.addParameter("BUSINESS_NAME", TYPES.VarChar, businessObject.businessName);
         request.addParameter("EMAIL", TYPES.VarChar, businessObject.email);
-        request.addParameter("PRIMARY_CONTACT_FNAME", TYPES.VarChar, businessObject.primary_contact_fName);
-        request.addParameter("PRIMARY_CONTACT_LNAME", TYPES.VarChar, businessObject.primary_contact_lName);
-        request.addParameter("PRIMARY_CONTACT_PHONE_NUMBER", TYPES.VarChar, businessObject.primary_contact_phone_number);
-        request.addParameter("SECONDARY_CONTACT_FNAME", TYPES.VarChar, businessObject.secondary_contact_fName);
-        request.addParameter("SECONDARY_CONTACT_LNAME", TYPES.VarChar, businessObject.secondary_contact_lName);
-        request.addParameter("SECONDARY_CONTACT_PHONE_NUMBER", TYPES.VarChar, businessObject.secondary_contact_phone_number);
+        request.addParameter("PRIMARY_CONTACT_FNAME", TYPES.VarChar, businessObject.pContactFName);
+        request.addParameter("PRIMARY_CONTACT_LNAME", TYPES.VarChar, businessObject.pContactLName);
+        request.addParameter("PRIMARY_CONTACT_PHONE_NUMBER", TYPES.VarChar, businessObject.pContactPNum);
+        request.addParameter("SECONDARY_CONTACT_FNAME", TYPES.VarChar, businessObject.sContactFName);
+        request.addParameter("SECONDARY_CONTACT_LNAME", TYPES.VarChar, businessObject.sContactLName);
+        request.addParameter("SECONDARY_CONTACT_PHONE_NUMBER", TYPES.VarChar, businessObject.sContactPNum);
         request.addParameter("ADDRESS", TYPES.VarChar, businessObject.address);
-        request.addParameter("SERVICES_OFFERED", TYPES.VarChar, businessObject.Services_Offered);
-        request.addParameter("SERVICE_AREA", TYPES.VarChar, businessObject.Service_Area);
-        request.addParameter("DISCOUNT_AMOUNT", TYPES.VarChar, businessObject.Discount_Amount);
-        request.addParameter("PREFERRED_METHOD_CONTACT", TYPES.NVarChar, businessObject.Preferred_Method_Contact);
-        request.addParameter("EOY_RECEIPT", TYPES.VarChar, businessObject.EOY_Receipt);
+        request.addParameter("SERVICES_OFFERED", TYPES.VarChar, businessObject.category);
+        request.addParameter("SERVICE_AREA", TYPES.VarChar, businessObject.serviceArea);
+        request.addParameter("DISCOUNT_AMOUNT", TYPES.VarChar, businessObject.discountAmount);
+        request.addParameter("PREFERRED_METHOD_CONTACT", TYPES.NVarChar, businessObject.preferredContact);
+        request.addParameter("EOY_RECEIPT", TYPES.VarChar, businessObject.eoyReceipt);
+        request.addParameter("NOTES", TYPES.NVarChar, businessObject.notes);
+        request.addParameter("ACTIVE", TYPES.Bit, 1);
         connection.execSql(request);
     });
     return 1;
 };
+
+exports.updateBusiness = function(businessObject) {
+  pool.acquire(function (err, connection) {
+      if (err) {
+          console.error(err);
+          return;
+      }
+      //use the connection as normal
+      var request = new Request("UPDATE [dbo].[Business] SET [business_name] = @BUSINESS_NAME,[email] = @EMAIL, [primary_contact_fName] = @PRIMARY_CONTACT_FNAME, " +
+      "[primary_contact_lName] = @PRIMARY_CONTACT_LNAME, [primary_contact_phone_number] = @PRIMARY_CONTACT_PHONE_NUMBER, [secondary_contact_fName] = @SECONDARY_CONTACT_FNAME, " +
+      "[secondary_contact_lName] = @SECONDARY_CONTACT_LNAME,[secondary_contact_phone_number] = @SECONDARY_CONTACT_PHONE_NUMBER, [address] = @ADDRESS, " +
+      "[Services_Offered] = @SERVICES_OFFERED, [Service_Area] = @SERVICE_AREA,[Discount_Amount] = @DISCOUNT_AMOUNT,[Preferred_Method_Contact] = @PREFERRED_METHOD_CONTACT, " +
+      "[EOY_Receipt] = @EOY_RECEIPT, [active] = @ACTIVE WHERE [record_id] = @ID",
+      function(err, rowCount) {
+          if (err) {
+              console.error(err);
+              return;
+          }
+          //release the connection back to the pool when finished
+          connection.release();
+      });
+
+      request.addParameter('ID', TYPES.VarChar, businessObject.id);
+      request.addParameter("BUSINESS_NAME", TYPES.VarChar, businessObject.businessName);
+      request.addParameter("EMAIL", TYPES.VarChar, businessObject.email);
+      request.addParameter("PRIMARY_CONTACT_FNAME", TYPES.VarChar, businessObject.pContactFName);
+      request.addParameter("PRIMARY_CONTACT_LNAME", TYPES.VarChar, businessObject.pContactLName);
+      request.addParameter("PRIMARY_CONTACT_PHONE_NUMBER", TYPES.VarChar, businessObject.pContactPNum);
+      request.addParameter("SECONDARY_CONTACT_FNAME", TYPES.VarChar, businessObject.sContactFName);
+      request.addParameter("SECONDARY_CONTACT_LNAME", TYPES.VarChar, businessObject.sContactLName);
+      request.addParameter("SECONDARY_CONTACT_PHONE_NUMBER", TYPES.VarChar, businessObject.sContactPNum);
+      request.addParameter("ADDRESS", TYPES.VarChar, businessObject.address);
+      request.addParameter("SERVICES_OFFERED", TYPES.VarChar, businessObject.category);
+      request.addParameter("SERVICE_AREA", TYPES.VarChar, businessObject.serviceArea);
+      request.addParameter("DISCOUNT_AMOUNT", TYPES.VarChar, businessObject.discountAmount);
+      request.addParameter("PREFERRED_METHOD_CONTACT", TYPES.NVarChar, businessObject.preferredContact);
+      request.addParameter("EOY_RECEIPT", TYPES.VarChar, businessObject.eoyReceipt);
+      request.addParameter("ACTIVE", TYPES.Bit, 1);
+      connection.execSql(request);
+  });
+
+  // Returning one if no error occurred.
+  return 1;
+}
+
+exports.getActiveBusinesses = function() {
+  return new Promise( resolve => {
+      tp.sql("SELECT * FROM [dbo].[Business] WHERE active = 1")
+      .execute()
+      .then(function(results) {
+          // console.log(results);
+          resolve(results);
+      }).fail(function(err) {
+          console.log(err);
+      });
+  });
+}
 
 exports.getAllBudgets = function () {
     return new Promise((resolve) => {

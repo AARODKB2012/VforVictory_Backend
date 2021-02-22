@@ -33,12 +33,14 @@ router.get('/volunteer/username/:username',controller.getVolunteerByUsername);
 router.get('/volunteer/education/',controller.getAllEducations);
 router.get('/volunteer/role/',controller.getAllRoles);
 router.get('/business', controller.getAllBusinesses);
+router.get('/business/id/:businessId', controller.getBusinessById);
+router.get('/business/category', controller.getAllCategories);
+router.get('/business/active',controller.getActiveBusinesses);
 router.get('/budget',controller.getAllBudgets);
 router.get('/volunteer/education/',controller.getAllEducations);
 router.get('/volunteer/role/',controller.getAllRoles);
 router.get('/volunteer/username/:username/profile/picture',controller.getProfilePicture);
 router.get('/volunteer/login/history/:userId',controller.getLoginHistory);
-
 router.get('/service',controller.getAllServices);
 router.get('/service/category',controller.getAllCategories);
 router.get('/service/list',controller.getActiveServices);
@@ -56,6 +58,7 @@ router.post('/volunteer/picture/:username', upload.single('fileKey'),controller.
 router.post('/volunteer/login/new',controller.saveLoginHistory);
 
 router.post('/business/new', controller.createNewBusiness);
+router.post('/business/edit',controller.updateBusiness);
 router.post('/budget/new', controller.createNewBudget);
 
 router.post('/service/new',controller.createNewRequest);
