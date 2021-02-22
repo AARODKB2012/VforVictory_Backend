@@ -94,10 +94,10 @@ exports.createNewVolunteer = function(userObject) {
       //use the connection as normal
       var request = new Request("INSERT INTO [dbo].[Volunteers] ([first_name], [last_name], [username], [password], [home_phone], [work_phone], [cell_phone], [email], [educational_background], " +
       " [current_licenses], [emergency_contact_name], [emergency_contact_lastname], [emergency_contact_phone], [emergency_contact_email], [emergency_contact_address], [drivers_license], [social_security], " +
-      " [address], [availability], [role], [status]) " +
+      " [address], [availability], [role], [status], [created_by], [created_date]) " +
       " VALUES (@FIRST_NAME, @LAST_NAME, @USER_NAME, HashBytes('MD5', @PASSWORD), @HOME_PHONE, @WORK_PHONE, @CELL_PHONE, @EMAIL, @EDUCATION, @LICENSES," +
       " @EMERGENCY_FIRST_NAME, @EMERGENCY_LAST_NAME, @EMERGENCY_PHONE, @EMERGENCY_EMAIL, @EMERGENCY_ADDRESS, @DRIVER_LICENSE, @SOCIAL_SECURITY, " +
-      " @ADDRESS, @AVAILABILITY, @ROLE, @STATUS)",
+      " @ADDRESS, @AVAILABILITY, @ROLE, @STATUS, @CREATED_BY, @CREATED_DATE)",
       function(err, rowCount) {
           if (err) {
               console.error(err);
@@ -127,6 +127,8 @@ exports.createNewVolunteer = function(userObject) {
         request.addParameter("EMERGENCY_EMAIL", TYPES.VarChar, userObject.emergencyEmail);
         request.addParameter("EMERGENCY_PHONE", TYPES.VarChar, userObject.emergencyPhone);
         request.addParameter("EMERGENCY_ADDRESS", TYPES.VarChar, userObject.emergencyAddress);
+        request.addParameter("CREATED_BY", TYPES.VarChar, userObject.createdBy);
+        request.addParameter("CREATED_DATE", TYPES.Date, new Date);
         connection.execSql(request);
     });
     return 1;
@@ -221,7 +223,8 @@ exports.updateVolunteer = function(userObject) {
         var request = new Request("UPDATE [dbo].[Volunteers] " +
         "SET [first_name] = @FIRST_NAME, [last_name] = @LAST_NAME, [username] = @USER_NAME, [home_phone] = @HOME_PHONE, [work_phone] = @WORK_PHONE, [cell_phone] = @CELL_PHONE, " +
         "[email] = @EMAIL, [address] = @ADDRESS ,[educational_background] = @EDUCATION, [current_licenses] = @LICENSES, [availability] = @AVAILABILITY, [role] = @ROLE, [status] = @STATUS, " +
-        "[emergency_contact_name] = @EMERGENCY_FIRST_NAME,[emergency_contact_lastname] = @EMERGENCY_LAST_NAME, [emergency_contact_phone] = @EMERGENCY_PHONE, [emergency_contact_email] = @EMERGENCY_EMAIL, [emergency_contact_address] = @EMERGENCY_ADDRESS " +
+        "[emergency_contact_name] = @EMERGENCY_FIRST_NAME,[emergency_contact_lastname] = @EMERGENCY_LAST_NAME, [emergency_contact_phone] = @EMERGENCY_PHONE, [emergency_contact_email] = @EMERGENCY_EMAIL," + 
+        "[emergency_contact_address] = @EMERGENCY_ADDRESS, [updated_by] = @UPDATED_BY, [updated_date] = @UPDATED_DATE " +
         "WHERE [record_id] = @ID",
         function(err, rowCount) {
             if (err) {
@@ -254,6 +257,8 @@ exports.updateVolunteer = function(userObject) {
         request.addParameter('EMERGENCY_EMAIL', TYPES.VarChar, userObject.emergencyEmail);
         request.addParameter('EMERGENCY_PHONE', TYPES.VarChar, userObject.emergencyPhone);
         request.addParameter('EMERGENCY_ADDRESS', TYPES.VarChar, userObject.emergencyAddress);
+        request.addParameter("UPDATED_BY", TYPES.VarChar, userObject.updatedBy);
+        request.addParameter("UPDATED_DATE", TYPES.Date, new Date);
         connection.execSql(request);
     });
 
@@ -542,4 +547,70 @@ exports.fulfillRequest = function(userObject) {
   });
 
   return 1;
+}
+
+
+exports.getThisMonthFamilies = function() {
+    return new Promise( resolve => {
+        tp.sql("SELECT * FROM [dbo].[Family] where DATEDIFF(MONTH, GETDATE(), created_date) < 30")
+        .execute()
+        .then(function(results) {
+            // console.log(results);
+            resolve(results);
+        }).fail(function(err) {
+            console.log(err);
+        });
+    });
+}
+
+exports.getFamiliesToApprove = function() {
+    return new Promise( resolve => {
+        tp.sql("SELECT * FROM [dbo].[Family] where active = 1 and approved_by is null and approved_date is null")
+        .execute()
+        .then(function(results) {
+            // console.log(results);
+            resolve(results);
+        }).fail(function(err) {
+            console.log(err);
+        });
+    });
+}
+
+exports.getThisMonthBusinesses = function() {
+    return new Promise( resolve => {
+        tp.sql(" SELECT * FROM [dbo].[Business] where DATEDIFF(MONTH, GETDATE(), created_date) < 30")
+        .execute()
+        .then(function(results) {
+            // console.log(results);
+            resolve(results);
+        }).fail(function(err) {
+            console.log(err);
+        });
+    });
+}
+
+exports.getBusinessesToApprove = function() {
+    return new Promise( resolve => {
+        tp.sql("SELECT * FROM [dbo].[Business] where approved_by is null and approved_date is null")
+        .execute()
+        .then(function(results) {
+            // console.log(results);
+            resolve(results);
+        }).fail(function(err) {
+            console.log(err);
+        });
+    });
+}
+
+exports.getThisMonthRequests = function() {
+    return new Promise( resolve => {
+        tp.sql("SELECT * FROM [dbo].[Requests] where DATEDIFF(MONTH, GETDATE(), date_requested) < 30")
+        .execute()
+        .then(function(results) {
+            // console.log(results);
+            resolve(results);
+        }).fail(function(err) {
+            console.log(err);
+        });
+    });
 }

@@ -42,6 +42,12 @@ router.get('/volunteer/login/history/:userId',controller.getLoginHistory);
 router.get('/service',controller.getAllServices);
 router.get('/service/active',controller.getActiveServices);
 router.get('/service/rendered',controller.getRenderedServices);
+router.get('/family/month',controller.getThisMonthFamilies);
+router.get('/family/unapproved',controller.getFamiliesToApprove);
+router.get('/service/requested/month',controller.getThisMonthRequests);
+
+router.get('/business/month',controller.getThisMonthBusinesses);
+router.get('/business/unapproved',controller.getBusinessesToApprove);
 
 //Add POST endpoint here
 router.post('/volunteer/new',controller.createNewVolunteer);
