@@ -170,7 +170,6 @@ exports.createNewFamily = function(userObject) {
       return 1;
   };
 
-
 exports.getAllVolunteersByStatus = function (status) {
     return new Promise((resolve) => {
         tp.sql("SELECT * FROM [dbo].[Volunteers] where status='" + status + "'").execute().then(function (results) { // console.log(results);
@@ -316,7 +315,7 @@ exports.getAllVolunteersByStatus = function(status) {
 
 exports.getAllBusinesses = function () {
     return new Promise((resolve) => {
-        tp.sql("SELECT * FROM [dbo].[Businesses]").execute().then(function (results) { // console.log(results);
+        tp.sql("SELECT * FROM [dbo].[Business]").execute().then(function (results) { // console.log(results);
             resolve(results);
         }).fail(function (err) {
             console.log(err);
@@ -358,6 +357,167 @@ exports.createNewBusiness = function (businessObject) {
     });
     return 1;
 };
+
+exports.getAllBudgets = function () {
+    return new Promise((resolve) => {
+        tp.sql("SELECT * FROM [dbo].[Budget]").execute().then(function (results) { // console.log(results);
+            resolve(results);
+        }).fail(function (err) {
+            console.log(err);
+        });
+    });
+};
+
+exports.createNewBudget = function (budgetObj) {
+console.log(budgetObj);
+pool.acquire(function (err, connection) {
+    if (err) {
+        console.error(err);
+        return;
+    }
+    // use the connection as normal
+    var request = new Request("INSERT INTO [dbo].[Budget] ([id],[amount],[start_date],[finish_date],[family_id],[current_balance]) " + "VALUES (@ID ,@AMOUNT ,@START_DATE ,@FINISH_DATE ,@FAMILY_ID ,@CURRENT_BALANCE);", function (err, rowCount) {
+        if (err) {
+            console.error(err);
+            return;
+        }
+        // release the connection back to the pool when finished
+        connection.release();
+    });
+    request.addParameter("ID", TYPES.Int, budgetObj.id);
+    request.addParameter("AMOUNT", TYPES.Float, budgetObj.amount);
+    request.addParameter("START_DATE", TYPES.Date, budgetObj.start_date);
+    request.addParameter("FINISH_DATE", TYPES.Date, budgetObj.finish_date);
+    request.addParameter("FAMILY_ID", TYPES.Int, budgetObj.family_id);
+    request.addParameter("CURRENT_BALANCE", TYPES.Float, budgetObj.current_balance);
+    connection.execSql(request);
+  });
+
+  return 1;
+};
+
+exports.getBusinessById = function(businessId) {
+  return new Promise( resolve => {
+      tp.sql("SELECT * FROM [dbo].[Business] where record_id = " + businessId)
+      .execute()
+      .then(function(results) {
+          // console.log(results);
+          resolve(results);
+      }).fail(function(err) {
+          console.log(err);
+      });
+  });
+};
+
+
+exports.getAllCategories = function () {
+  return new Promise((resolve) => {
+      tp.sql("SELECT * FROM [dbo].[Categories]").execute().then(function (results) { // console.log(results);
+          resolve(results);
+      }).fail(function (err) {
+          console.log(err);
+      });
+  });
+};
+
+exports.createNewBusiness = function (businessObject) {
+    console.log(businessObject);
+    pool.acquire(function (err, connection) {
+        if (err) {
+            console.error(err);
+            return;
+        }
+        // use the connection as normal
+        var request = new Request("INSERT INTO [dbo].[Business] ([business_name],[email],[primary_contact_fName],[primary_contact_lName], " +
+        "[primary_contact_phone_number],[secondary_contact_fName],[secondary_contact_lName],[secondary_contact_phone_number]," +
+        "[address],[Services_Offered],[Service_Area],[Discount_Amount],[Preferred_Method_Contact],[EOY_Receipt],[notes],[active]) " +
+        "VALUES (@BUSINESS_NAME, @EMAIL, @PRIMARY_CONTACT_FNAME, @PRIMARY_CONTACT_LNAME, @PRIMARY_CONTACT_PHONE_NUMBER, " +
+        "@SECONDARY_CONTACT_FNAME,@SECONDARY_CONTACT_LNAME, @SECONDARY_CONTACT_PHONE_NUMBER, @ADDRESS, @SERVICES_OFFERED, " +
+        "@SERVICE_AREA, @DISCOUNT_AMOUNT, @PREFERRED_METHOD_CONTACT, @EOY_RECEIPT, @NOTES, @ACTIVE)", function (err, rowCount) {
+            if (err) {
+                console.error(err);
+                return;
+            }
+            // release the connection back to the pool when finished
+            connection.release();
+        });
+        request.addParameter("BUSINESS_NAME", TYPES.VarChar, businessObject.businessName);
+        request.addParameter("EMAIL", TYPES.VarChar, businessObject.email);
+        request.addParameter("PRIMARY_CONTACT_FNAME", TYPES.VarChar, businessObject.pContactFName);
+        request.addParameter("PRIMARY_CONTACT_LNAME", TYPES.VarChar, businessObject.pContactLName);
+        request.addParameter("PRIMARY_CONTACT_PHONE_NUMBER", TYPES.VarChar, businessObject.pContactPNum);
+        request.addParameter("SECONDARY_CONTACT_FNAME", TYPES.VarChar, businessObject.sContactFName);
+        request.addParameter("SECONDARY_CONTACT_LNAME", TYPES.VarChar, businessObject.sContactLName);
+        request.addParameter("SECONDARY_CONTACT_PHONE_NUMBER", TYPES.VarChar, businessObject.sContactPNum);
+        request.addParameter("ADDRESS", TYPES.VarChar, businessObject.address);
+        request.addParameter("SERVICES_OFFERED", TYPES.VarChar, businessObject.category);
+        request.addParameter("SERVICE_AREA", TYPES.VarChar, businessObject.serviceArea);
+        request.addParameter("DISCOUNT_AMOUNT", TYPES.VarChar, businessObject.discountAmount);
+        request.addParameter("PREFERRED_METHOD_CONTACT", TYPES.NVarChar, businessObject.preferredContact);
+        request.addParameter("EOY_RECEIPT", TYPES.VarChar, businessObject.eoyReceipt);
+        request.addParameter("NOTES", TYPES.NVarChar, businessObject.notes);
+        request.addParameter("ACTIVE", TYPES.Bit, 1);
+        connection.execSql(request);
+    });
+    return 1;
+};
+
+exports.updateBusiness = function(businessObject) {
+  pool.acquire(function (err, connection) {
+      if (err) {
+          console.error(err);
+          return;
+      }
+      //use the connection as normal
+      var request = new Request("UPDATE [dbo].[Business] SET [business_name] = @BUSINESS_NAME,[email] = @EMAIL, [primary_contact_fName] = @PRIMARY_CONTACT_FNAME, " +
+      "[primary_contact_lName] = @PRIMARY_CONTACT_LNAME, [primary_contact_phone_number] = @PRIMARY_CONTACT_PHONE_NUMBER, [secondary_contact_fName] = @SECONDARY_CONTACT_FNAME, " +
+      "[secondary_contact_lName] = @SECONDARY_CONTACT_LNAME,[secondary_contact_phone_number] = @SECONDARY_CONTACT_PHONE_NUMBER, [address] = @ADDRESS, " +
+      "[Services_Offered] = @SERVICES_OFFERED, [Service_Area] = @SERVICE_AREA,[Discount_Amount] = @DISCOUNT_AMOUNT,[Preferred_Method_Contact] = @PREFERRED_METHOD_CONTACT, " +
+      "[EOY_Receipt] = @EOY_RECEIPT, [active] = @ACTIVE WHERE [record_id] = @ID",
+      function(err, rowCount) {
+          if (err) {
+              console.error(err);
+              return;
+          }
+          //release the connection back to the pool when finished
+          connection.release();
+      });
+
+      request.addParameter('ID', TYPES.VarChar, businessObject.id);
+      request.addParameter("BUSINESS_NAME", TYPES.VarChar, businessObject.businessName);
+      request.addParameter("EMAIL", TYPES.VarChar, businessObject.email);
+      request.addParameter("PRIMARY_CONTACT_FNAME", TYPES.VarChar, businessObject.pContactFName);
+      request.addParameter("PRIMARY_CONTACT_LNAME", TYPES.VarChar, businessObject.pContactLName);
+      request.addParameter("PRIMARY_CONTACT_PHONE_NUMBER", TYPES.VarChar, businessObject.pContactPNum);
+      request.addParameter("SECONDARY_CONTACT_FNAME", TYPES.VarChar, businessObject.sContactFName);
+      request.addParameter("SECONDARY_CONTACT_LNAME", TYPES.VarChar, businessObject.sContactLName);
+      request.addParameter("SECONDARY_CONTACT_PHONE_NUMBER", TYPES.VarChar, businessObject.sContactPNum);
+      request.addParameter("ADDRESS", TYPES.VarChar, businessObject.address);
+      request.addParameter("SERVICES_OFFERED", TYPES.VarChar, businessObject.category);
+      request.addParameter("SERVICE_AREA", TYPES.VarChar, businessObject.serviceArea);
+      request.addParameter("DISCOUNT_AMOUNT", TYPES.VarChar, businessObject.discountAmount);
+      request.addParameter("PREFERRED_METHOD_CONTACT", TYPES.NVarChar, businessObject.preferredContact);
+      request.addParameter("EOY_RECEIPT", TYPES.VarChar, businessObject.eoyReceipt);
+      request.addParameter("ACTIVE", TYPES.Bit, 1);
+      connection.execSql(request);
+  });
+
+  // Returning one if no error occurred.
+  return 1;
+}
+
+exports.getActiveBusinesses = function() {
+  return new Promise( resolve => {
+      tp.sql("SELECT * FROM [dbo].[Business] WHERE active = 1")
+      .execute()
+      .then(function(results) {
+          // console.log(results);
+          resolve(results);
+      }).fail(function(err) {
+          console.log(err);
+      });
+  });
+}
 
 exports.getAllBudgets = function () {
     return new Promise((resolve) => {
@@ -462,6 +622,19 @@ exports.getAllServices = function() {
   });
 }
 
+exports.getAllCategories = function() {
+  return new Promise( resolve => {
+      tp.sql("SELECT * FROM [dbo].[Categories]")
+      .execute()
+      .then(function(results) {
+          // console.log(results);
+          resolve(results);
+      }).fail(function(err) {
+          console.log(err);
+      });
+  });
+}
+
 exports.getActiveServices = function() {
   return new Promise( resolve => {
       tp.sql("SELECT * FROM [dbo].[Services] WHERE active = 1")
@@ -475,9 +648,48 @@ exports.getActiveServices = function() {
   });
 }
 
+exports.getActiveRequests = function() {
+  return new Promise( resolve => {
+      tp.sql("SELECT * FROM [dbo].[Requests] WHERE active = 1")
+      .execute()
+      .then(function(results) {
+          // console.log(results);
+          resolve(results);
+      }).fail(function(err) {
+          console.log(err);
+      });
+  });
+}
+
 exports.getRenderedServices = function() {
   return new Promise( resolve => {
-      tp.sql("SELECT * FROM [dbo].[Services] WHERE active = 0")
+      tp.sql("SELECT * FROM [dbo].[Requests] WHERE active = 0")
+      .execute()
+      .then(function(results) {
+          // console.log(results);
+          resolve(results);
+      }).fail(function(err) {
+          console.log(err);
+      });
+  });
+}
+
+exports.getServiceById = function(serviceId) {
+  return new Promise( resolve => {
+      tp.sql("SELECT * FROM [dbo].[Services] where id = " + serviceId)
+      .execute()
+      .then(function(results) {
+          // console.log(results);
+          resolve(results);
+      }).fail(function(err) {
+          console.log(err);
+      });
+  });
+}
+
+exports.getRequestById = function(serviceId) {
+  return new Promise( resolve => {
+      tp.sql("SELECT * FROM [dbo].[Requests] where id = " + serviceId)
       .execute()
       .then(function(results) {
           // console.log(results);
@@ -495,9 +707,9 @@ exports.createNewRequest = function(userObject) {
           return;
       }
       // use the connection as normal
-      var request = new Request("INSERT INTO [dbo].[Services] ([family_name], [business_name], [business_category], [date_requested], [date_fulfilled], [notified_business], " +
-      " [notified_family], [followedup_business], [followedup_family], [active]) " +
-      " VALUES (@FAMILY_NAME, @BUSINESS_NAME, @BUSINESS_CATEGORY, @DATE_REQUESTED, @DATE_FULFILLED, @NOTIFIED_BUSINESS, @NOTIFIED_FAMILY, @FOLLOWEDUP_BUSINESS, @FOLLOWEDUP_FAMILY, @ACTIVE)",
+      var request = new Request("INSERT INTO [dbo].[Requests] ([name], [email], [business_name], [business_category], [date_requested], [date_fulfilled], [notified_business], " +
+      " [notified_family], [followedup_business], [followedup_family], [active], [notes]) " +
+      " VALUES (@NAME, @EMAIL, @BUSINESS_NAME, @BUSINESS_CATEGORY, @DATE_REQUESTED, @DATE_FULFILLED, @NOTIFIED_BUSINESS, @NOTIFIED_FAMILY, @FOLLOWEDUP_BUSINESS, @FOLLOWEDUP_FAMILY, @ACTIVE, @NOTES)",
       function(err, rowCount) {
           if (err) {
               console.error(err);
@@ -507,16 +719,19 @@ exports.createNewRequest = function(userObject) {
           connection.release();
       });
 
-      request.addParameter('FAMILY_NAME', TYPES.VarChar, userObject.familyName);
-      request.addParameter('BUSINESS_NAME', TYPES.VarChar, '');
-      request.addParameter('BUSINESS_CATEGORY', TYPES.VarChar, userObject.businessCategory);
-      request.addParameter('DATE_REQUESTED', TYPES.VarChar, userObject.dateRequested);
-      request.addParameter('DATE_FULFILLED', TYPES.VarChar, '');
+      request.addParameter('NAME', TYPES.NVarChar, userObject.name);
+      request.addParameter('EMAIL', TYPES.NVarChar, userObject.email);
+      request.addParameter('BUSINESS_NAME', TYPES.NVarChar, userObject.businessName);
+      request.addParameter('BUSINESS_CATEGORY', TYPES.NVarChar, userObject.businessCategory);
+      request.addParameter('DATE_REQUESTED', TYPES.NVarChar, userObject.dateRequested);
+      request.addParameter('DATE_FULFILLED', TYPES.NVarChar, '');
       request.addParameter('NOTIFIED_BUSINESS', TYPES.Bit, userObject.notifiedBusiness);
       request.addParameter('NOTIFIED_FAMILY', TYPES.Bit, userObject.notifiedFamily);
       request.addParameter('FOLLOWEDUP_BUSINESS', TYPES.Bit, userObject.followedupBusiness);
       request.addParameter('FOLLOWEDUP_FAMILY', TYPES.Bit, userObject.followedupFamily);
       request.addParameter('ACTIVE', TYPES.Bit, 1);
+      request.addParameter('NOTES', TYPES.NVarChar, userObject.notes);
+
       connection.execSql(request);
   });
 
@@ -530,7 +745,7 @@ exports.fulfillRequest = function(userObject) {
           return;
       }
       // use the connection as normal
-      var request = new Request("UPDATE [dbo].[Services] SET [active] = 0 WHERE [family_name] = @FAMILY_NAME AND [date_requested] = @DATE_REQUESTED",
+      var request = new Request("UPDATE [dbo].[Requests] SET [active] = 0, [date_fulfilled] = @DATE_FULFILLED WHERE [id] = @ID",
       function(err, rowCount) {
           if (err) {
               console.error(err);
@@ -540,8 +755,8 @@ exports.fulfillRequest = function(userObject) {
           connection.release();
       });
 
-      request.addParameter('FAMILY_NAME', TYPES.VarChar, userObject.familyName);
-      request.addParameter('DATE_REQUESTED', TYPES.VarChar, userObject.dateRequested);
+      request.addParameter('ID', TYPES.VarChar, userObject.id);
+      request.addParameter('DATE_FULFILLED', TYPES.NVarChar, userObject.dateFulfilled)
       request.addParameter('ACTIVE', TYPES.Bit, 0);
       connection.execSql(request);
   });
@@ -549,6 +764,175 @@ exports.fulfillRequest = function(userObject) {
   return 1;
 }
 
+exports.markBusinessNotified = function(userObject) {
+  pool.acquire(function (err, connection) {
+      if (err) {
+          console.error(err);
+          return;
+      }
+      // use the connection as normal
+      var request = new Request("UPDATE [dbo].[Requests] SET [notified_business] = 1 WHERE [id] = @ID",
+      function(err, rowCount) {
+          if (err) {
+              console.error(err);
+              return;
+          }
+          // release the connection back to the pool when finished
+          connection.release();
+      });
+
+      request.addParameter('ID', TYPES.VarChar, userObject.id);
+      //request.addParameter('ACTIVE', TYPES.Bit, 0);
+      connection.execSql(request);
+  });
+
+  return 1;
+}
+
+exports.markFamilyNotified = function(userObject) {
+  pool.acquire(function (err, connection) {
+      if (err) {
+          console.error(err);
+          return;
+      }
+      // use the connection as normal
+      var request = new Request("UPDATE [dbo].[Requests] SET [notified_family] = 1 WHERE [id] = @ID",
+      function(err, rowCount) {
+          if (err) {
+              console.error(err);
+              return;
+          }
+          // release the connection back to the pool when finished
+          connection.release();
+      });
+
+      request.addParameter('ID', TYPES.VarChar, userObject.id);
+      //request.addParameter('ACTIVE', TYPES.Bit, 0);
+      connection.execSql(request);
+  });
+
+  return 1;
+}
+
+exports.markBusinessFollowedUp = function(userObject) {
+  pool.acquire(function (err, connection) {
+      if (err) {
+          console.error(err);
+          return;
+      }
+      // use the connection as normal
+      var request = new Request("UPDATE [dbo].[Requests] SET [followedup_business] = 1 WHERE [id] = @ID",
+      function(err, rowCount) {
+          if (err) {
+              console.error(err);
+              return;
+          }
+          // release the connection back to the pool when finished
+          connection.release();
+      });
+
+      request.addParameter('ID', TYPES.VarChar, userObject.id);
+      connection.execSql(request);
+  });
+
+  return 1;
+}
+
+exports.markFamilyFollowedUp = function(userObject) {
+  pool.acquire(function (err, connection) {
+      if (err) {
+          console.error(err);
+          return;
+      }
+      // use the connection as normal
+      var request = new Request("UPDATE [dbo].[Requests] SET [followedup_family] = 1 WHERE [id] = @ID",
+      function(err, rowCount) {
+          if (err) {
+              console.error(err);
+              return;
+          }
+          // release the connection back to the pool when finished
+          connection.release();
+      });
+
+      request.addParameter('ID', TYPES.VarChar, userObject.id);
+      connection.execSql(request);
+  });
+
+  return 1;
+}
+
+exports.markServiceActive = function(userObject) {
+  pool.acquire(function (err, connection) {
+      if (err) {
+          console.error(err);
+          return;
+      }
+      // use the connection as normal
+      var request = new Request("UPDATE [dbo].[Services] SET [active] = 1 WHERE [id] = @ID",
+      function(err, rowCount) {
+          if (err) {
+              console.error(err);
+              return;
+          }
+          // release the connection back to the pool when finished
+          connection.release();
+      });
+
+      request.addParameter('ID', TYPES.VarChar, userObject.id);
+      connection.execSql(request);
+  });
+
+  return 1;
+}
+
+exports.markServiceInactive = function(userObject) {
+  pool.acquire(function (err, connection) {
+      if (err) {
+          console.error(err);
+          return;
+      }
+      // use the connection as normal
+      var request = new Request("UPDATE [dbo].[Services] SET [active] = 0 WHERE [id] = @ID",
+      function(err, rowCount) {
+          if (err) {
+              console.error(err);
+              return;
+          }
+          // release the connection back to the pool when finished
+          connection.release();
+      });
+
+      request.addParameter('ID', TYPES.VarChar, userObject.id);
+      connection.execSql(request);
+  });
+
+  return 1;
+}
+
+exports.deleteRequest = function(userObject) {
+  pool.acquire(function (err, connection) {
+      if (err) {
+          console.error(err);
+          return;
+      }
+      // use the connection as normal
+      var request = new Request("DELETE FROM [dbo].[Requests] WHERE [id] = @ID",
+      function(err, rowCount) {
+          if (err) {
+              console.error(err);
+              return;
+          }
+          // release the connection back to the pool when finished
+          connection.release();
+      });
+
+      request.addParameter('ID', TYPES.VarChar, userObject.id);
+      connection.execSql(request);
+  });
+
+  return 1;
+}
 
 exports.getThisMonthFamilies = function() {
     return new Promise( resolve => {

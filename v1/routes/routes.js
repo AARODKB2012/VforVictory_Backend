@@ -33,6 +33,11 @@ router.get('/volunteer/username/:username',controller.getVolunteerByUsername);
 router.get('/volunteer/education/',controller.getAllEducations);
 router.get('/volunteer/role/',controller.getAllRoles);
 router.get('/business', controller.getAllBusinesses);
+
+router.get('/business/id/:businessId', controller.getBusinessById);
+router.get('/business/category', controller.getAllCategories);
+router.get('/business/active',controller.getActiveBusinesses);
+
 router.get('/budget',controller.getAllBudgets);
 router.get('/volunteer/education/',controller.getAllEducations);
 router.get('/volunteer/role/',controller.getAllRoles);
@@ -40,8 +45,13 @@ router.get('/volunteer/username/:username/profile/picture',controller.getProfile
 router.get('/volunteer/login/history/:userId',controller.getLoginHistory);
 
 router.get('/service',controller.getAllServices);
-router.get('/service/active',controller.getActiveServices);
+router.get('/service/category',controller.getAllCategories);
+router.get('/service/list',controller.getActiveServices);
+router.get('/service/active',controller.getActiveRequests);
 router.get('/service/rendered',controller.getRenderedServices);
+router.get('/service/get/id/:serviceId',controller.getServiceById);
+router.get('/service/id/:serviceId',controller.getRequestById);
+
 router.get('/family/month',controller.getThisMonthFamilies);
 router.get('/family/unapproved',controller.getFamiliesToApprove);
 router.get('/service/requested/month',controller.getThisMonthRequests);
@@ -57,10 +67,21 @@ router.post('/volunteer/picture/:username', upload.single('fileKey'),controller.
 router.post('/volunteer/login/new',controller.saveLoginHistory);
 
 router.post('/business/new', controller.createNewBusiness);
+router.post('/business/edit',controller.updateBusiness);
+
 router.post('/budget/new', controller.createNewBudget);
 
 router.post('/service/new',controller.createNewRequest);
 router.post('/service/fulfill',controller.fulfillRequest);
+router.post('/service/notifyBusiness',controller.markBusinessNotified);
+router.post('/service/notifyFamily',controller.markFamilyNotified);
+router.post('/service/followupBusiness',controller.markBusinessFollowedUp);
+router.post('/service/followupFamily',controller.markFamilyFollowedUp);
+router.post('/service/markActive',controller.markServiceActive);
+router.post('/service/markInactive',controller.markServiceInactive);
+router.post('/service/delete',controller.deleteRequest);
+
+
 
 router.post('/family/new',controller.createNewFamily);
 
