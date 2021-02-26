@@ -169,7 +169,7 @@ exports.createNewFamily = function(userObject) {
           connection.execSql(request);
       });
       return 1;
-  };
+};
 
 exports.getAllVolunteersByStatus = function (status) {
     return new Promise((resolve) => {
@@ -531,29 +531,29 @@ exports.getAllBudgets = function () {
 };
 
 exports.createNewBudget = function (budgetObj) {
-console.log(budgetObj);
-pool.acquire(function (err, connection) {
-    if (err) {
-        console.error(err);
-        return;
-    }
-    // use the connection as normal
-    var request = new Request("INSERT INTO [dbo].[Budget] ([id],[amount],[start_date],[finish_date],[family_id],[current_balance]) " + "VALUES (@ID ,@AMOUNT ,@START_DATE ,@FINISH_DATE ,@FAMILY_ID ,@CURRENT_BALANCE);", function (err, rowCount) {
+    console.log(budgetObj);
+    pool.acquire(function (err, connection) {
         if (err) {
             console.error(err);
             return;
         }
-        // release the connection back to the pool when finished
-        connection.release();
+        // use the connection as normal
+        var request = new Request("INSERT INTO [dbo].[Budget] ([id],[amount],[start_date],[finish_date],[family_id],[current_balance]) " + "VALUES (@ID ,@AMOUNT ,@START_DATE ,@FINISH_DATE ,@FAMILY_ID ,@CURRENT_BALANCE);", function (err, rowCount) {
+            if (err) {
+                console.error(err);
+                return;
+            }
+            // release the connection back to the pool when finished
+            connection.release();
+        });
+        request.addParameter("ID", TYPES.Int, budgetObj.id);
+        request.addParameter("AMOUNT", TYPES.Float, budgetObj.amount);
+        request.addParameter("START_DATE", TYPES.Date, budgetObj.start_date);
+        request.addParameter("FINISH_DATE", TYPES.Date, budgetObj.finish_date);
+        request.addParameter("FAMILY_ID", TYPES.Int, budgetObj.family_id);
+        request.addParameter("CURRENT_BALANCE", TYPES.Float, budgetObj.current_balance);
+        connection.execSql(request);
     });
-    request.addParameter("ID", TYPES.Int, budgetObj.id);
-    request.addParameter("AMOUNT", TYPES.Float, budgetObj.amount);
-    request.addParameter("START_DATE", TYPES.Date, budgetObj.start_date);
-    request.addParameter("FINISH_DATE", TYPES.Date, budgetObj.finish_date);
-    request.addParameter("FAMILY_ID", TYPES.Int, budgetObj.family_id);
-    request.addParameter("CURRENT_BALANCE", TYPES.Float, budgetObj.current_balance);
-    connection.execSql(request);
-  });
 
   return 1;
 };
@@ -985,6 +985,7 @@ exports.getBusinessesToApprove = function() {
             console.log(err);
         });
     });
+}
 
 exports.getThisMonthRequests = function() {
     return new Promise( resolve => {
@@ -1012,7 +1013,7 @@ exports.getActiveFamily = function() {
     });
 }
       
-  exports.getInactiveFamily = function() {
+exports.getInactiveFamily = function() {
     return new Promise( resolve => {
         tp.sql("SELECT * FROM [dbo].[Family] WHERE active = 0")  
     .execute()
@@ -1025,7 +1026,7 @@ exports.getActiveFamily = function() {
     });
 }
   
-  exports.markFamilyActive = function(userObject) {
+exports.markFamilyActive = function(userObject) {
     pool.acquire(function (err, connection) {
         if (err) {
             console.error(err);
@@ -1041,15 +1042,15 @@ exports.getActiveFamily = function() {
             // release the connection back to the pool when finished
             connection.release();
         });
-  
+
         request.addParameter('ID', TYPES.VarChar, userObject.id);
         connection.execSql(request);
     });
-  
-    return 1;
-  }
 
-  exports.markFamilyInactive = function(userObject) {
+    return 1;
+}
+
+exports.markFamilyInactive = function(userObject) {
     pool.acquire(function (err, connection) {
         if (err) {
             console.error(err);
@@ -1065,10 +1066,10 @@ exports.getActiveFamily = function() {
             // release the connection back to the pool when finished
             connection.release();
         });
-  
+
         request.addParameter('ID', TYPES.VarChar, userObject.id);
         connection.execSql(request);
     });
-  
+
     return 1;
-  }
+}
