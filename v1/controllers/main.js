@@ -186,6 +186,7 @@ exports.getAllCategories = async function (req, res, next) {
   let categoryList = [];
   categoryList = await sql.getAllCategories();
   if (categoryList.length > 0) {
+      console.log(categoryList)
       res.status(200).json({status: 200, results: categoryList, resultsLength: categoryList.length});
   } else {
       res.status(204).send();
