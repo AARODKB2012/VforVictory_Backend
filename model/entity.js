@@ -1111,3 +1111,27 @@ exports.getServicesRendered = function(businessName) {
         });
     });
 }
+
+exports.approveBusiness = function (businessId, approver) {
+    pool.acquire(function (err, connection) {
+        if (err) {
+            console.error(err);
+            return;
+        }
+        // use the connection as normal
+        var request = new Request("update [dbo].[Business] set [approved_by] = @APPROVED_BY, [approved_date] = @APPROVED_DATE where [record_id] = @ID", 
+        function (err, rowCount) {
+            if (err) {
+                console.error(err);
+                return;
+            }
+            // release the connection back to the pool when finished
+            connection.release();
+        });
+        request.addParameter("ID", TYPES.VarChar, businessId);
+        request.addParameter("APPROVED_BY", TYPES.VarChar, approver);
+        request.addParameter("APPROVED_DATE", TYPES.Date, new Date);
+        connection.execSql(request);
+    });
+    return 1;
+};

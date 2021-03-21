@@ -77,6 +77,7 @@ router.post('/business/edit',controller.updateBusiness);
 router.post('/business/category/new', controller.createNewCategory);
 router.post('/business/category/update', controller.updateCategory);
 router.post('/business/picture/:businessName', upload.single('fileKey'), controller.updateBusinessLogo);
+router.post('/business/:businessId/approve/:approvedBy', controller.approveBusiness);
 
 
 router.post('/budget/new', controller.createNewBudget);

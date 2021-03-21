@@ -762,3 +762,17 @@ exports.getServicesRendered = async function (req, res,next){
         res.status(204).send();
     }
 }
+
+exports.approveBusiness = async function (req, res,next){
+    sql.tp.sql(`exec [usp_approveBusiness] ${req.params.businessId}, '${req.params.approvedBy}'`)
+    .execute()
+    .then(function(result) {
+        console.log(result)
+        if(result){
+            res.status(200).json({businessApproved: true});
+        }
+    }).fail(function(err) {
+        console.log(err);
+        res.status(409).json({status: 409, errorMessage: `Error saving to database: ${err}`});
+    });
+} 
