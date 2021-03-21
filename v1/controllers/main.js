@@ -645,7 +645,7 @@ exports.markFamilyActive = async function (req, res,next){
     }
   }
   
-  exports.markFamilyInactive = async function (req, res,next){
+exports.markFamilyInactive = async function (req, res,next){
     let rowCount = sql.markFamilyInactive(req.body);
     console.log(rowCount);
     if(rowCount == 1){
@@ -655,7 +655,7 @@ exports.markFamilyActive = async function (req, res,next){
     }
   }
 
-  exports.getActiveFamily = async function (req, res,next){
+exports.getActiveFamily = async function (req, res,next){
     let activeList = [];
     activeList = await sql.getActiveFamily();
     if(activeList.length > 0){
@@ -665,7 +665,7 @@ exports.markFamilyActive = async function (req, res,next){
     }
   }
 
-  exports.getInactiveFamily = async function (req, res,next){
+exports.getInactiveFamily = async function (req, res,next){
   let renderedList = [];
   renderedList = await sql.getInactiveFamily();
   if(renderedList.length > 0){
@@ -674,3 +674,14 @@ exports.markFamilyActive = async function (req, res,next){
       res.status(204).send();
   }
 }
+
+exports.modifyBudget = async function (req, res, next) {
+    let rowCount = sql.modifyBudget(req.body);
+    if(rowCount == 1){
+        res.status(201).json({message: 'Updated budget!' , budgetUpdated: true})
+    }else{
+        res.status(202).send({message: 'Unable to modify budget'});  
+    }
+}
+
+

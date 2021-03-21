@@ -74,6 +74,8 @@ router.post('/business/edit',controller.updateBusiness);
 
 router.post('/budget/new', controller.createNewBudget);
 
+
+
 router.post('/service/new',controller.createNewRequest);
 router.post('/service/fulfill',controller.fulfillRequest);
 router.post('/service/notifyBusiness',controller.markBusinessNotified);
@@ -91,6 +93,7 @@ router.post('/family/markActive',controller.markFamilyActive);
 router.post('/family/markInactive',controller.markFamilyInactive);
 router.post('/family/active',controller.getActiveFamily);
 
+router.patch('/budget/modify',controller.modifyBudget);
 
 // Email Functions
 router.post('/email/send',emailController.sendEmail);

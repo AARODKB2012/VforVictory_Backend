@@ -377,7 +377,7 @@ pool.acquire(function (err, connection) {
         return;
     }
     // use the connection as normal
-    var request = new Request("INSERT INTO [dbo].[Budget] ([id],[amount],[start_date],[finish_date],[family_id],[current_balance]) " + "VALUES (@ID ,@AMOUNT ,@START_DATE ,@FINISH_DATE ,@FAMILY_ID ,@CURRENT_BALANCE);", function (err, rowCount) {
+    var request = new Request("INSERT INTO [dbo].[Budget] ([id],[amount],[start_date],[finish_date],[current_balance],[family_id]) " + "VALUES (@ID ,@AMOUNT ,@START_DATE ,@FINISH_DATE ,@CURRENT_BALANCE, @FAMILY_ID);", function (err, rowCount) {
         if (err) {
             console.error(err);
             return;
@@ -389,8 +389,8 @@ pool.acquire(function (err, connection) {
     request.addParameter("AMOUNT", TYPES.Float, budgetObj.amount);
     request.addParameter("START_DATE", TYPES.Date, budgetObj.start_date);
     request.addParameter("FINISH_DATE", TYPES.Date, budgetObj.finish_date);
-    request.addParameter("FAMILY_ID", TYPES.Int, budgetObj.family_id);
     request.addParameter("CURRENT_BALANCE", TYPES.Float, budgetObj.current_balance);
+    request.addParameter("FAMILY_ID", TYPES.Int, budgetObj.family_id);
     connection.execSql(request);
   });
 
@@ -530,33 +530,7 @@ exports.getAllBudgets = function () {
     });
 };
 
-exports.createNewBudget = function (budgetObj) {
-    console.log(budgetObj);
-    pool.acquire(function (err, connection) {
-        if (err) {
-            console.error(err);
-            return;
-        }
-        // use the connection as normal
-        var request = new Request("INSERT INTO [dbo].[Budget] ([id],[amount],[start_date],[finish_date],[family_id],[current_balance]) " + "VALUES (@ID ,@AMOUNT ,@START_DATE ,@FINISH_DATE ,@FAMILY_ID ,@CURRENT_BALANCE);", function (err, rowCount) {
-            if (err) {
-                console.error(err);
-                return;
-            }
-            // release the connection back to the pool when finished
-            connection.release();
-        });
-        request.addParameter("ID", TYPES.Int, budgetObj.id);
-        request.addParameter("AMOUNT", TYPES.Float, budgetObj.amount);
-        request.addParameter("START_DATE", TYPES.Date, budgetObj.start_date);
-        request.addParameter("FINISH_DATE", TYPES.Date, budgetObj.finish_date);
-        request.addParameter("FAMILY_ID", TYPES.Int, budgetObj.family_id);
-        request.addParameter("CURRENT_BALANCE", TYPES.Float, budgetObj.current_balance);
-        connection.execSql(request);
-    });
 
-  return 1;
-};
 
 exports.getVolunteerById = function(volunteerId) {
     return new Promise( resolve => {
@@ -1073,3 +1047,47 @@ exports.markFamilyInactive = function(userObject) {
 
     return 1;
 }
+
+exports.modifyBudget = function (budgetObj) {
+    console.log(budgetObj);
+    pool.acquire(function (err, connection) {
+        if (err) {
+            console.error(err);
+            return;
+        }
+        //use the connection as normal
+        var request = new Request("UPDATE [dbo].[Budget] SET [amount] = @AMOUNT, [start_date] = @START_DATE, [finish_date] = @FINISH_DATE, " + 
+        "[current_balance] = @CURRENT_BALANCE, [familyId] = @FAMILY_ID WHERE [id] = @ID",
+        function(err, rowCount) {
+            if (err) {
+                console.error(err);
+                return;
+            }
+            //release the connection back to the pool when finished
+            connection.release();
+        });
+  
+        request.addParameter("ID", TYPES.Int, budgetObj.id);
+        request.addParameter("AMOUNT", TYPES.Float, budgetObj.amount);
+        request.addParameter("START_DATE", TYPES.Date, budgetObj.start_date);
+        request.addParameter("FINISH_DATE", TYPES.Date, budgetObj.finish_date);
+        request.addParameter("CURRENT_BALANCE", TYPES.Float, budgetObj.current_balance);
+        request.addParameter("FAMILY_ID", TYPES.Int, budgetObj.family_id);
+        
+        connection.execSql(request);
+    });
+    return 1;
+}
+
+exports.getBudgetByID = function (budgetObj) {
+    return new Promise(resolve => {
+        tp.sql("SELECT * FROM [dbo].[Budget] where id = " + id)
+        .execute()
+        .then(function(results){
+            resolve(results);
+        }).fail(function(err){
+            console.log(err);
+        });
+    });
+}
+
