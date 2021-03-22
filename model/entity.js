@@ -1077,7 +1077,7 @@ console.log(expenseObj);
         return;
     }
      // use the connection as normal
-    var request = new Request("INSERT INTO [dbo].[Expense] ([id],[description],[date],[amount],[comment],[budget_id]) " + "VALUES (@ID, @DESCRIPTION, @DATE, @AMOUNT, @COMMENT, @BUDGET_ID)",
+    var request = new Request("INSERT INTO [dbo].[Expense] ([id],[description],[charge_date],[amount],[comment],[budget_id]) " + "VALUES (@ID, @DESCRIPTION, @CHARGE_DATE, @AMOUNT, @COMMENT, @BUDGET_ID)",
         function(err, rowCount) {
             if (err) {
                 console.error(err);
@@ -1088,7 +1088,7 @@ console.log(expenseObj);
         });
         request.addParameter("ID", TYPES.Int, expenseObj.id);
         request.addParameter("DESCRIPTION", TYPES.Text, expenseObj.description);
-        request.addParameter("DATE", TYPES.Date, expenseObj.date);
+        request.addParameter("CHARGE_DATE", TYPES.Date, expenseObj.charge_date);
         request.addParameter("AMOUNT", TYPES.Float, expenseObj.amount);
         request.addParameter("COMMENT", TYPES.Text, expenseObj.comment);
         request.addParameter("BUDGET_ID", TYPES.Int, expenseObj.budget_id);
@@ -1117,7 +1117,7 @@ exports.modifyExpense = function (expenseObj) {
             return;
         }
         //use the connection as normal
-        var request = new Request("UPDATE [dbo].[Expense] SET [description] = @DESCRIPTION,[date] = @DATE, [amount] = @AMOUNT," + 
+        var request = new Request("UPDATE [dbo].[Expense] SET [description] = @DESCRIPTION,[charge_date] = @CHARGE_DATE, [amount] = @AMOUNT," + 
         "[comment] = @COMMENT, [budget_id] = @BUDGET_ID WHERE [id] = @ID",
         function(err, rowCount) {
             if (err) {
@@ -1129,7 +1129,7 @@ exports.modifyExpense = function (expenseObj) {
         });
         request.addParameter("ID", TYPES.Int, expenseObj.id);
         request.addParameter("DESCRIPTION", TYPES.Text, expenseObj.description);
-        request.addParameter("DATE", TYPES.Date, expenseObj.date);
+        request.addParameter("CHARGE_DATE", TYPES.Date, expenseObj.charge_date);
         request.addParameter("AMOUNT", TYPES.Float, expenseObj.amount);
         request.addParameter("COMMENT", TYPES.Text, expenseObj.comment);
         request.addParameter("BUDGET_ID", TYPES.Int, expenseObj.budget_id);
@@ -1219,3 +1219,28 @@ exports.modifyVPizzaCard = function(pizzaCardObj){
     });
     return 1;
 };
+
+exports.getBudgetByFamilyID = function(familyId) {
+    return new Promise( resolve => {
+        tp.sql("SELECT * FROM [dbo].[Budget] where familyId = " + familyId)
+    .execute()
+        .then(function(results){
+            resolve(results);
+        }).fail(function(err){
+            console.log(err);
+        });
+    });
+}
+
+exports.getThisMonthExpenses = function() {
+    return new Promise( resolve => {
+        tp.sql("SELECT * FROM [dbo].[Expense] WHERE DATEDIFF(day,charge_date,GETDATE()) between 0 and 30")
+        .execute()
+        .then(function(results) {
+            // console.log(results);
+            resolve(results);
+        }).fail(function(err) {
+            console.log(err);
+        });
+    });
+}

@@ -623,7 +623,7 @@ exports.markFamilyActive = async function (req, res,next){
     }else{
       res.status(202).send();
     }
-  }
+}
   
 exports.markFamilyInactive = async function (req, res,next){
     let rowCount = sql.markFamilyInactive(req.body);
@@ -633,7 +633,7 @@ exports.markFamilyInactive = async function (req, res,next){
     }else{
       res.status(202).send();
     }
-  }
+}
 
 exports.getActiveFamily = async function (req, res,next){
     let activeList = [];
@@ -643,7 +643,7 @@ exports.getActiveFamily = async function (req, res,next){
     }else{
         res.status(204).send();
     }
-  }
+}
 
 exports.getInactiveFamily = async function (req, res,next){
   let renderedList = [];
@@ -685,9 +685,9 @@ exports.createNewExpense = async function(req,res,next){
 }
 
 exports.getAllExpenses = async function(req,res,next){
-    let expensesList = await sql.getAllExpenses();
-    if(expensesList.length > 0){
-        res.status(200).json({status:200, results: expensesList, resultsLength: expensesList.length});
+    let renderedList = await sql.getAllExpenses();
+    if(renderedList.length > 0){
+        res.status(200).json({status:200, results: renderedList, resultsLength: renderedList.length});
     }else{
         res.status(204).send();
     }
@@ -703,10 +703,10 @@ exports.modifyExpense = async function(req,res,next){
 }
 
 exports.getExpenseByID = async function(req,res,next){
-    let expensesList = [];
-    expensesList = await sql.getExpenseByID(req.params.id);
-    if(expensesList.length > 0){
-        res.status(200).send({status:200, results: expensesList, resultsLength: expensesList.length})
+    let renderedList = [];
+    renderedList = await sql.getExpenseByID(req.params.id);
+    if(renderedList.length > 0){
+        res.status(200).send({status:200, results: renderedList, resultsLength: renderedList.length})
     }else{
         res.status(204).send();
     }
@@ -737,5 +737,25 @@ exports.modifyVPizzaGC = async function(req,res,next){
         res.status(201).json({message: 'Updated GiftCard' , giftCardUpdated: true , results:req.body})
     }else{
         res.status(202).send({message: 'Unable to modify GiftCard'});  
+    }
+}
+
+exports.getThisMonthExpenses = async function(req,res,next){
+    let requestList = [];
+    requestList = await sql.getThisMonthExpenses();
+    if(requestList.length > 0){
+        res.status(200).json({status:200, results: requestList, resultsLength: requestList.length});
+    }else{
+        res.status(204).send();
+    }
+}
+
+exports.getBudgetByFamilyID = async function(req,res,next){
+    let renderedList = [];
+    renderedList = await sql.getBudgetByFamilyID(req.params.familyId);
+    if(renderedList.length > 0){
+        res.status(200).send({status:200, results: renderedList, resultsLength: renderedList.length})
+    }else{
+        res.status(204).send();
     }
 }

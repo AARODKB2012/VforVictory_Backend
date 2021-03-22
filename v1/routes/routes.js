@@ -65,8 +65,8 @@ router.get('/budget/id/:id',controller.getBudgetByID);
 router.get('/expense',controller.getAllExpenses);
 router.get('/expense/id/:id', controller.getExpenseByID);
 router.get('/VPizzaGC', controller.getAllVGiftCards);
-
-
+router.get('/budget/familyId/:familyId', controller.getBudgetByFamilyID);
+router.get('/expense/month', controller.getThisMonthExpenses);
 
 //Add POST endpoint here
 router.post('/volunteer/new',controller.createNewVolunteer);
