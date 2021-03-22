@@ -61,6 +61,12 @@ router.get('/service/requested/month',controller.getThisMonthRequests);
 router.get('/business/month',controller.getThisMonthBusinesses);
 router.get('/business/unapproved',controller.getBusinessesToApprove);
 
+router.get('/budget/id/:id',controller.getBudgetByID);
+router.get('/expense',controller.getAllExpenses);
+router.get('/expense/id/:id', controller.getExpenseByID);
+router.get('/VPizzaGC', controller.getAllVGiftCards);
+
+
 
 //Add POST endpoint here
 router.post('/volunteer/new',controller.createNewVolunteer);
@@ -93,7 +99,14 @@ router.post('/family/markActive',controller.markFamilyActive);
 router.post('/family/markInactive',controller.markFamilyInactive);
 router.post('/family/active',controller.getActiveFamily);
 
-router.patch('/budget/modify',controller.modifyBudget);
+router.post('/budget/edit',controller.modifyBudget);
+router.post('/expense/new',controller.createNewExpense);
+router.post('/expense/edit', controller.modifyExpense);
+router.post('/VPizzaGC/new', controller.createNewVPizzaCard);
+router.post('/VPizzaGC/edit', controller.modifyVPizzaGC);
+
+
+
 
 // Email Functions
 router.post('/email/send',emailController.sendEmail);

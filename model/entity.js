@@ -359,42 +359,33 @@ exports.createNewBusiness = function (businessObject) {
     return 1;
 };
 
-exports.getAllBudgets = function () {
-    return new Promise((resolve) => {
-        tp.sql("SELECT * FROM [dbo].[Budget]").execute().then(function (results) { // console.log(results);
-            resolve(results);
-        }).fail(function (err) {
-            console.log(err);
-        });
-    });
-};
-
 exports.createNewBudget = function (budgetObj) {
-console.log(budgetObj);
-pool.acquire(function (err, connection) {
-    if (err) {
-        console.error(err);
-        return;
-    }
-    // use the connection as normal
-    var request = new Request("INSERT INTO [dbo].[Budget] ([id],[amount],[start_date],[finish_date],[current_balance],[family_id]) " + "VALUES (@ID ,@AMOUNT ,@START_DATE ,@FINISH_DATE ,@CURRENT_BALANCE, @FAMILY_ID);", function (err, rowCount) {
+    console.log(budgetObj);
+    pool.acquire(function (err, connection) {
         if (err) {
             console.error(err);
             return;
         }
-        // release the connection back to the pool when finished
-        connection.release();
-    });
-    request.addParameter("ID", TYPES.Int, budgetObj.id);
-    request.addParameter("AMOUNT", TYPES.Float, budgetObj.amount);
-    request.addParameter("START_DATE", TYPES.Date, budgetObj.start_date);
-    request.addParameter("FINISH_DATE", TYPES.Date, budgetObj.finish_date);
-    request.addParameter("CURRENT_BALANCE", TYPES.Float, budgetObj.current_balance);
-    request.addParameter("FAMILY_ID", TYPES.Int, budgetObj.family_id);
-    connection.execSql(request);
-  });
+        // use the connection as normal
+        var request = new Request("INSERT INTO [dbo].[Budget] ([id],[amount],[start_date],[finish_date],[current_balance],[familyId])" +
+         "VALUES (@ID ,@AMOUNT,@START_DATE ,@FINISH_DATE ,@CURRENT_BALANCE, @FAMILYID)", function (err, rowCount) {
+            if (err) {
+                console.error(err);
+                return;
+            }
+            // release the connection back to the pool when finished
+            connection.release();
+        });
 
-  return 1;
+        request.addParameter("ID", TYPES.Int, budgetObj.id);
+        request.addParameter("AMOUNT", TYPES.Float, budgetObj.amount);
+        request.addParameter("START_DATE", TYPES.Date, budgetObj.start_date);
+        request.addParameter("FINISH_DATE", TYPES.Date, budgetObj.finish_date);
+        request.addParameter("CURRENT_BALANCE", TYPES.Float, budgetObj.current_balance);
+        request.addParameter("FAMILYID", TYPES.Int, budgetObj.familyId);
+        connection.execSql(request);
+    });
+    return 1;
 };
 
 exports.getBusinessById = function(businessId) {
@@ -519,18 +510,6 @@ exports.getActiveBusinesses = function() {
       });
   });
 }
-
-exports.getAllBudgets = function () {
-    return new Promise((resolve) => {
-        tp.sql("SELECT * FROM [dbo].[Budget]").execute().then(function (results) { // console.log(results);
-            resolve(results);
-        }).fail(function (err) {
-            console.log(err);
-        });
-    });
-};
-
-
 
 exports.getVolunteerById = function(volunteerId) {
     return new Promise( resolve => {
@@ -1057,7 +1036,7 @@ exports.modifyBudget = function (budgetObj) {
         }
         //use the connection as normal
         var request = new Request("UPDATE [dbo].[Budget] SET [amount] = @AMOUNT, [start_date] = @START_DATE, [finish_date] = @FINISH_DATE, " + 
-        "[current_balance] = @CURRENT_BALANCE, [familyId] = @FAMILY_ID WHERE [id] = @ID",
+        "[current_balance] = @CURRENT_BALANCE, [familyId] = @FAMILYID WHERE [id] = @ID",
         function(err, rowCount) {
             if (err) {
                 console.error(err);
@@ -1072,17 +1051,16 @@ exports.modifyBudget = function (budgetObj) {
         request.addParameter("START_DATE", TYPES.Date, budgetObj.start_date);
         request.addParameter("FINISH_DATE", TYPES.Date, budgetObj.finish_date);
         request.addParameter("CURRENT_BALANCE", TYPES.Float, budgetObj.current_balance);
-        request.addParameter("FAMILY_ID", TYPES.Int, budgetObj.family_id);
-        
+        request.addParameter("FAMILYID", TYPES.Int, budgetObj.familyId);
         connection.execSql(request);
     });
     return 1;
 }
 
-exports.getBudgetByID = function (budgetObj) {
-    return new Promise(resolve => {
+exports.getBudgetByID = function(id) {
+    return new Promise( resolve => {
         tp.sql("SELECT * FROM [dbo].[Budget] where id = " + id)
-        .execute()
+    .execute()
         .then(function(results){
             resolve(results);
         }).fail(function(err){
@@ -1091,3 +1069,153 @@ exports.getBudgetByID = function (budgetObj) {
     });
 }
 
+exports.createNewExpense = function(expenseObj){
+console.log(expenseObj);
+    pool.acquire(function (err, connection) {
+    if (err) {
+        console.error(err);
+        return;
+    }
+     // use the connection as normal
+    var request = new Request("INSERT INTO [dbo].[Expense] ([id],[description],[date],[amount],[comment],[budget_id]) " + "VALUES (@ID, @DESCRIPTION, @DATE, @AMOUNT, @COMMENT, @BUDGET_ID)",
+        function(err, rowCount) {
+            if (err) {
+                console.error(err);
+                return;
+            }
+                //release the connection back to the pool when finished
+                connection.release();
+        });
+        request.addParameter("ID", TYPES.Int, expenseObj.id);
+        request.addParameter("DESCRIPTION", TYPES.Text, expenseObj.description);
+        request.addParameter("DATE", TYPES.Date, expenseObj.date);
+        request.addParameter("AMOUNT", TYPES.Float, expenseObj.amount);
+        request.addParameter("COMMENT", TYPES.Text, expenseObj.comment);
+        request.addParameter("BUDGET_ID", TYPES.Int, expenseObj.budget_id);
+        connection.execSql(request);
+    });
+    return 1;
+};
+
+exports.getAllExpenses = function(){
+    return new Promise( resolve => {
+        tp.sql("SELECT * FROM [dbo].[EXPENSE]")
+    .execute()
+        .then(function(results){
+            resolve(results);
+        }).fail(function(err){
+            console.log(err);
+        });
+    });
+}
+
+exports.modifyExpense = function (expenseObj) {
+    console.log(expenseObj);
+    pool.acquire(function (err, connection) {
+        if (err) {
+            console.error(err);
+            return;
+        }
+        //use the connection as normal
+        var request = new Request("UPDATE [dbo].[Expense] SET [description] = @DESCRIPTION,[date] = @DATE, [amount] = @AMOUNT," + 
+        "[comment] = @COMMENT, [budget_id] = @BUDGET_ID WHERE [id] = @ID",
+        function(err, rowCount) {
+            if (err) {
+                console.error(err);
+                return;
+            }
+            //release the connection back to the pool when finished
+            connection.release();
+        });
+        request.addParameter("ID", TYPES.Int, expenseObj.id);
+        request.addParameter("DESCRIPTION", TYPES.Text, expenseObj.description);
+        request.addParameter("DATE", TYPES.Date, expenseObj.date);
+        request.addParameter("AMOUNT", TYPES.Float, expenseObj.amount);
+        request.addParameter("COMMENT", TYPES.Text, expenseObj.comment);
+        request.addParameter("BUDGET_ID", TYPES.Int, expenseObj.budget_id);
+        connection.execSql(request);
+    });
+    return 1;
+}
+
+exports.getExpenseByID = function(id) {
+    return new Promise( resolve => {
+        tp.sql("SELECT * FROM [dbo].[Expense] where id = " + id)
+    .execute()
+        .then(function(results){
+            resolve(results);
+        }).fail(function(err){
+            console.log(err);
+        });
+    });
+}
+
+exports.createNewVPizzaCard = function(pizzaCardObj){
+    console.log(pizzaCardObj);
+        pool.acquire(function (err, connection) {
+        if (err) {
+            console.error(err);
+            return;
+        }
+         // use the connection as normal
+        var request = new Request("INSERT INTO [dbo].[VPizza_Card] ([id],[description],[amount],[familyId],[currentBalance],[lastRefillDate]) " + 
+        "VALUES (@ID, @DESCRIPTION, @AMOUNT, @FAMILYID, @CURRENTBALANCE, @LASTREFILLDATE)",
+        function(err, rowCount) {
+            if (err) {
+                console.error(err);
+                return;
+            }
+            //release the connection back to the pool when finished
+            connection.release();
+        });
+        request.addParameter("ID", TYPES.Int, pizzaCardObj.id);
+        request.addParameter("DESCRIPTION", TYPES.Text, pizzaCardObj.description);
+        request.addParameter("AMOUNT", TYPES.Float, pizzaCardObj.amount);
+        request.addParameter("FAMILYID", TYPES.Int, pizzaCardObj.familyId);
+        request.addParameter("CURRENTBALANCE", TYPES.Float, pizzaCardObj.currentBalance);
+        request.addParameter("LASTREFILLDATE", TYPES.Date, pizzaCardObj.lastRefillDate);
+        connection.execSql(request);
+    });
+    return 1;
+};
+
+exports.getAllVGiftCards = function(){
+    return new Promise( resolve => {
+        tp.sql("SELECT * FROM [dbo].[VPizza_Card]")
+    .execute()
+        .then(function(results){
+            resolve(results);
+        }).fail(function(err){
+            console.log(err);
+        });
+    });
+}
+
+exports.modifyVPizzaCard = function(pizzaCardObj){
+    console.log(pizzaCardObj);
+        pool.acquire(function (err, connection) {
+        if (err) {
+            console.error(err);
+            return;
+        }
+         //use the connection as normal
+         var request = new Request("UPDATE [dbo].[VPizza_Card] SET [description] = @DESCRIPTION,[amount] = @AMOUNT,[familyId] = @FAMILYID, " + 
+         "[currentBalance] = @CURRENTBALANCE, [lastRefillDate] = @LASTREFILLDATE) WHERE [id] = @ID",
+        function(err, rowCount) {
+            if (err) {
+                console.error(err);
+                return;
+            }
+            //release the connection back to the pool when finished
+            connection.release();
+        });
+        request.addParameter("ID", TYPES.Int, pizzaCardObj.id);
+        request.addParameter("DESCRIPTION", TYPES.Text, pizzaCardObj.description);
+        request.addParameter("AMOUNT", TYPES.Float, pizzaCardObj.amount);
+        request.addParameter("FAMILYID", TYPES.Int, pizzaCardObj.familyId);
+        request.addParameter("CURRENTBALANCE", TYPES.Float, pizzaCardObj.currentBalance);
+        request.addParameter("LASTREFILLDATE", TYPES.Date, pizzaCardObj.lastRefillDate);
+        connection.execSql(request);
+    });
+    return 1;
+};

@@ -3,7 +3,8 @@ const nodemailer = require('nodemailer');
 require('dotenv').config();
 const fs = require('fs');
 const path = require('path')
-const stream = require('stream')
+const stream = require('stream');
+const { SlowBuffer } = require('buffer');
 
 exports.getNotFound = function (req, res, next) {
     res.status(404).send();
@@ -220,27 +221,6 @@ exports.getActiveBusinesses = async function (req, res,next){
   }else{
       res.status(204).send();
   }
-}
-
-
-exports.getAllBudgets = async function (req, res, next) {
-    let budgetArray = [];
-    budgetArray = await sql.getAllBudgets();
-    if (budgetArray.length > 0) {
-        res.status(200).json({status: 200, results: budgetArray, resultsLength: budgetArray.length});
-    } else {
-        res.status(204).send();
-    }
-};
-
-exports.createNewBudget = async function(req,res,next){
-    let rowCount = sql.createNewBudget(req.body);
-    console.log(rowCount);
-    if (rowCount == 1) {
-        res.status(201).json({budgetCreated: true});
-    } else {
-        res.status(202).send();
-    }
 };
 
 exports.getAllBudgets = async function (req, res, next) {
@@ -684,4 +664,78 @@ exports.modifyBudget = async function (req, res, next) {
     }
 }
 
+exports.getBudgetByID = async function(req,res,next) {
+    let budgetList = [];
+    budgetList = await sql.getBudgetByID(req.params.id);
+    if(budgetList.length > 0){
+        res.status(200).send({status:200, results: budgetList, resultsLength: budgetList.length})
+    }else{
+        res.status(204).send({message: 'Unable to get Budget'});
+    }
+}
 
+exports.createNewExpense = async function(req,res,next){
+    let rowCount = sql.createNewExpense(req.body);
+    console.log(rowCount);
+    if (rowCount == 1) {
+        res.status(201).json({expenseCreated: true, results:req.body});
+    } else {
+        res.status(202).send();
+    }
+}
+
+exports.getAllExpenses = async function(req,res,next){
+    let expensesList = await sql.getAllExpenses();
+    if(expensesList.length > 0){
+        res.status(200).json({status:200, results: expensesList, resultsLength: expensesList.length});
+    }else{
+        res.status(204).send();
+    }
+}
+
+exports.modifyExpense = async function(req,res,next){
+    let rowCount = sql.modifyExpense(req.body);
+    if(rowCount == 1){
+        res.status(201).json({message: 'Updated Expense' , budgetUpdated: true , results:req.body})
+    }else{
+        res.status(202).send({message: 'Unable to modify Expense'});  
+    }
+}
+
+exports.getExpenseByID = async function(req,res,next){
+    let expensesList = [];
+    expensesList = await sql.getExpenseByID(req.params.id);
+    if(expensesList.length > 0){
+        res.status(200).send({status:200, results: expensesList, resultsLength: expensesList.length})
+    }else{
+        res.status(204).send();
+    }
+}
+
+exports.createNewVPizzaCard = async function(req,res,next){
+    let rowCount = sql.createNewVPizzaCard(req.body);
+    console.log(rowCount);
+    if (rowCount == 1) {
+        res.status(201).json({giftCardCreated: true, results:req.body});
+    } else {
+        res.status(202).send();
+    }
+}
+
+exports.getAllVGiftCards = async function(req,res,next){
+    let renderedList = await sql.getAllVGiftCards();
+    if(renderedList.length > 0){
+        res.status(200).json({status:200, results: renderedList, resultsLength: renderedList.length});
+    }else{
+        res.status(204).send();
+    }
+}
+
+exports.modifyVPizzaGC = async function(req,res,next){
+    let rowCount = sql.modifyVPizzaCard(req.body)
+    if(rowCount == 1){
+        res.status(201).json({message: 'Updated GiftCard' , giftCardUpdated: true , results:req.body})
+    }else{
+        res.status(202).send({message: 'Unable to modify GiftCard'});  
+    }
+}
