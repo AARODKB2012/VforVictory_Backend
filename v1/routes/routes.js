@@ -67,6 +67,7 @@ router.get('/expense/id/:id', controller.getExpenseByID);
 router.get('/VPizzaGC', controller.getAllVGiftCards);
 router.get('/budget/familyId/:familyId', controller.getBudgetByFamilyID);
 router.get('/expense/month', controller.getThisMonthExpenses);
+router.get('/family/id/:id', controller.getFamilyByID);
 
 //Add POST endpoint here
 router.post('/volunteer/new',controller.createNewVolunteer);
@@ -80,8 +81,6 @@ router.post('/business/edit',controller.updateBusiness);
 
 router.post('/budget/new', controller.createNewBudget);
 
-
-
 router.post('/service/new',controller.createNewRequest);
 router.post('/service/fulfill',controller.fulfillRequest);
 router.post('/service/notifyBusiness',controller.markBusinessNotified);
@@ -91,8 +90,6 @@ router.post('/service/followupFamily',controller.markFamilyFollowedUp);
 router.post('/service/markActive',controller.markServiceActive);
 router.post('/service/markInactive',controller.markServiceInactive);
 router.post('/service/delete',controller.deleteRequest);
-
-
 
 router.post('/family/new',controller.createNewFamily);
 router.post('/family/markActive',controller.markFamilyActive);
@@ -104,7 +101,7 @@ router.post('/expense/new',controller.createNewExpense);
 router.post('/expense/edit', controller.modifyExpense);
 router.post('/VPizzaGC/new', controller.createNewVPizzaCard);
 router.post('/VPizzaGC/edit', controller.modifyVPizzaGC);
-
+router.post('/family/edit', controller.modifyFamilyByID);
 
 
 

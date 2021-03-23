@@ -127,7 +127,7 @@ exports.createNewFamily = async function (req, res, next) {
     let rowCount = sql.createNewFamily(req.body);
     console.log(rowCount);
     if (rowCount == 1) {
-        res.status(201).json({familyCreated: true});
+        res.status(201).json({familyCreated: true, results: req.body});
     } else {
         res.status(202).send();
     }
@@ -757,5 +757,24 @@ exports.getBudgetByFamilyID = async function(req,res,next){
         res.status(200).send({status:200, results: renderedList, resultsLength: renderedList.length})
     }else{
         res.status(204).send();
+    }
+}
+
+exports.getFamilyByID = async function(req,res,next){
+    let renderedList = [];
+    renderedList = await sql.getFamilyByID(req.params.id);
+    if(renderedList.length > 0){
+        res.status(200).send({status:200, results: renderedList, resultsLength: renderedList.length})
+    }else{
+        res.status(204).send();
+    }
+}
+
+exports.modifyFamilyByID = async function (req, res, next) {
+    let rowCount = sql.modifyFamilyByID(req.body);
+    if(rowCount == 1){
+        res.status(201).json({message: 'Updated Family' , familyUpdated: true})
+    }else{
+        res.status(202).send();  
     }
 }
