@@ -98,6 +98,70 @@ exports.getAllVolunteersBySearchValue = async function (req, res, next) {
     }
 };
 
+exports.getCurrentUser = async function (req, res,next){
+    let volunteerList = [];
+    console.log(req.params.username);
+    volunteerList = await sql.getCurrentUser(req.params.username);
+    console.log(volunteerList);
+    if (volunteerList.length > 0) {
+        res.status(200).json({status: 200, results: volunteerList, resultsLength: volunteerList.length});
+    } else {
+        res.status(204).send();
+    }
+};
+
+
+
+exports.createNewVolunteer = async function (req, res, next) {
+    let rowCount = sql.createNewVolunteer(req.body);
+    console.log(rowCount);
+    if (rowCount == 1) {
+        res.status(201).json({userCreated: true});
+    } else {
+        res.status(202).send();
+    }
+};
+
+exports.createNewFamily = async function (req, res, next) {
+    let rowCount = sql.createNewFamily(req.body);
+    console.log(rowCount);
+    if (rowCount == 1) {
+        res.status(201).json({familyCreated: true});
+    } else {
+        res.status(202).send();
+    }
+};
+
+exports.getAllVolunteersByStatus = async function (req, res, next) {
+    let volunteerList = [];
+    volunteerList = await sql.getAllVolunteersByStatus(req.params.status);
+    if (volunteerList.length > 0) {
+        res.status(200).json({status: 200, results: volunteerList, resultsLength: volunteerList.length});
+    } else {
+        res.status(204).send();
+    }
+};
+
+exports.getVolunteerByUsername = async function (req, res, next) {
+    let volunteerList = [];
+    volunteerList = await sql.getVolunteerByUsername(req.params.status);
+    if (volunteerList.length > 0) {
+        res.status(200).json({status: 200, results: volunteerList, resultsLength: volunteerList.length});
+    } else {
+        res.status(204).send();
+    }
+};
+
+exports.getAllVolunteersBySearchValue = async function (req, res, next) {
+    let volunteerList = [];
+    volunteerList = await sql.getAllVolunteersBySearchValue(req.params.searchValue);
+    if (volunteerList.length > 0) {
+        res.status(200).json({status: 200, results: volunteerList, resultsLength: volunteerList.length});
+    } else {
+        res.status(204).send();
+    }
+};
+
 exports.getAllBusinesses = async function (req, res, next) {
     let businessesArray = [];
     businessesArray = await sql.getAllBusinesses();
@@ -138,6 +202,7 @@ exports.createNewBusiness = async function (req, res, next) {
     }
 };
 
+
 exports.updateBusiness = async function (req, res,next){
   let rowCount = sql.updateBusiness(req.body);
   if(rowCount == 1){
@@ -156,6 +221,27 @@ exports.getActiveBusinesses = async function (req, res,next){
       res.status(204).send();
   }
 }
+
+
+exports.getAllBudgets = async function (req, res, next) {
+    let budgetArray = [];
+    budgetArray = await sql.getAllBudgets();
+    if (budgetArray.length > 0) {
+        res.status(200).json({status: 200, results: budgetArray, resultsLength: budgetArray.length});
+    } else {
+        res.status(204).send();
+    }
+};
+
+exports.createNewBudget = async function(req,res,next){
+    let rowCount = sql.createNewBudget(req.body);
+    console.log(rowCount);
+    if (rowCount == 1) {
+        res.status(201).json({budgetCreated: true});
+    } else {
+        res.status(202).send();
+    }
+};
 
 exports.getAllBudgets = async function (req, res, next) {
     let budgetArray = [];
@@ -497,5 +583,114 @@ exports.deleteRequest = async function (req, res,next){
     res.status(201).json({requestFulfilled: true});
   }else{
     res.status(202).send();
+  }
+}
+
+exports.getThisMonthFamilies = async function (req, res,next){
+    let familyList = [];
+    familyList = await sql.getThisMonthFamilies();
+    if(familyList.length > 0){
+        res.status(200).json({status:200, results: familyList, resultsLength: familyList.length});
+    }else{
+        res.status(204).send();
+    }
+}
+
+exports.getFamiliesToApprove = async function (req, res,next){
+    let familyList = [];
+    familyList = await sql.getFamiliesToApprove();
+    if(familyList.length > 0){
+        res.status(200).json({status:200, results: familyList, resultsLength: familyList.length});
+    }else{
+        res.status(204).send();
+    }
+}
+
+exports.getThisMonthBusinesses = async function (req, res,next){
+    let businessList = [];
+    businessList = await sql.getThisMonthBusinesses();
+    if(businessList.length > 0){
+        res.status(200).json({status:200, results: businessList, resultsLength: businessList.length});
+    }else{
+        res.status(204).send();
+    }
+}
+
+exports.getBusinessesToApprove = async function (req, res,next){
+    let businessList = [];
+    businessList = await sql.getBusinessesToApprove();
+    if(businessList.length > 0){
+        res.status(200).json({status:200, results: businessList, resultsLength: businessList.length});
+    }else{
+        res.status(204).send();
+    }
+}
+
+exports.getThisMonthRequests = async function (req, res,next){
+    let requestList = [];
+    requestList = await sql.getThisMonthRequests();
+    if(requestList.length > 0){
+        res.status(200).json({status:200, results: requestList, resultsLength: requestList.length});
+    }else{
+        res.status(204).send();
+    }
+}
+exports.markFamilyActive = async function (req, res,next){
+    let rowCount = sql.markFamilyActive(req.body);
+    console.log(rowCount);
+    if(rowCount == 1){
+      res.status(201).json({requestFulfilled: true});
+    }else{
+      res.status(202).send();
+    }
+  }
+
+  exports.markFamilyInactive = async function (req, res,next){
+    let rowCount = sql.markFamilyInactive(req.body);
+    console.log(rowCount);
+    if(rowCount == 1){
+      res.status(201).json({requestFulfilled: true});
+    }else{
+      res.status(202).send();
+    }
+  }
+
+  exports.getActiveFamily = async function (req, res,next){
+    let activeList = [];
+    activeList = await sql.getActiveFamily();
+    if(activeList.length > 0){
+        res.status(200).json({status:200, results: activeList, resultsLength: activeList.length});
+    }else{
+        res.status(204).send();
+    }
+  }
+
+  exports.getInactiveFamily = async function (req, res,next){
+  let renderedList = [];
+  renderedList = await sql.getInactiveFamily();
+  if(renderedList.length > 0){
+      res.status(200).json({status:200, results: renderedList, resultsLength: renderedList.length});
+  }else{
+      res.status(204).send();
+  }
+}
+
+exports.getFamilyByEmail = async function (req, res,next){
+  let familyList = [];
+  familyList = await sql.getFamilyByEmail(req.params.familyEmail);
+  if(familyList.length > 0){
+      res.status(200).json({status:200, results: familyList, resultsLength: familyList.length});
+  }else{
+      res.status(204).send();
+  }
+}
+
+exports.getFamilyById = async function (req, res,next){
+  let familyList = [];
+  familyList = await sql.getFamilyById(req.params.familyId);
+  if(familyList.length > 0){
+      res.status(200).json({status:200, results: familyList, resultsLength: familyList.length});
+  }else{
+      res.status(204).send();
   }
 }
