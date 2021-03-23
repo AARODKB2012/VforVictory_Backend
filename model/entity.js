@@ -398,10 +398,11 @@ exports.createNewBusiness = function (businessObject) {
         // use the connection as normal
         var request = new Request("INSERT INTO [dbo].[Business] ([business_name],[email],[primary_contact_fName],[primary_contact_lName], " +
         "[primary_contact_phone_number],[secondary_contact_fName],[secondary_contact_lName],[secondary_contact_phone_number]," +
-        "[address],[Services_Offered],[Service_Area],[Discount_Amount],[Preferred_Method_Contact],[EOY_Receipt],[notes],[active], [created_by], [created_date]) " +
+        "[address],[Services_Offered],[Service_Area],[Discount_Amount],[Preferred_Method_Contact],[EOY_Receipt], [facebook_url], [twiter_url], [instagram_url]," +
+        "[notes],[active], [created_by], [created_date]) " +
         "VALUES (@BUSINESS_NAME, @EMAIL, @PRIMARY_CONTACT_FNAME, @PRIMARY_CONTACT_LNAME, @PRIMARY_CONTACT_PHONE_NUMBER, " +
         "@SECONDARY_CONTACT_FNAME,@SECONDARY_CONTACT_LNAME, @SECONDARY_CONTACT_PHONE_NUMBER, @ADDRESS, @SERVICES_OFFERED, " +
-        "@SERVICE_AREA, @DISCOUNT_AMOUNT, @PREFERRED_METHOD_CONTACT, @EOY_RECEIPT, @NOTES, @ACTIVE,@CREATED_BY, @CREATED_DATE)", 
+        "@SERVICE_AREA, @DISCOUNT_AMOUNT, @PREFERRED_METHOD_CONTACT, @EOY_RECEIPT, @FACEBOOK, @TWITTER, @INSTAGRAM, @NOTES, @ACTIVE,@CREATED_BY, @CREATED_DATE)", 
         function (err, rowCount) {
             if (err) {
                 console.error(err);
@@ -424,6 +425,9 @@ exports.createNewBusiness = function (businessObject) {
         request.addParameter("DISCOUNT_AMOUNT", TYPES.VarChar, businessObject.discountAmount);
         request.addParameter("PREFERRED_METHOD_CONTACT", TYPES.NVarChar, businessObject.preferredContact);
         request.addParameter("EOY_RECEIPT", TYPES.VarChar, businessObject.eoyReceipt);
+        request.addParameter("FACEBOOK", TYPES.VarChar, businessObject.facebookUrl);
+        request.addParameter("TWITTER", TYPES.VarChar, businessObject.twitterUrl);
+        request.addParameter("INSTAGRAM", TYPES.VarChar, businessObject.instagramUrl);
         request.addParameter("NOTES", TYPES.NVarChar, businessObject.notes);
         request.addParameter("ACTIVE", TYPES.Bit, 1);
         request.addParameter("CREATED_BY", TYPES.VarChar, businessObject.createdBy);
@@ -444,7 +448,8 @@ exports.updateBusiness = function(businessObject) {
       "[primary_contact_lName] = @PRIMARY_CONTACT_LNAME, [primary_contact_phone_number] = @PRIMARY_CONTACT_PHONE_NUMBER, [secondary_contact_fName] = @SECONDARY_CONTACT_FNAME, " +
       "[secondary_contact_lName] = @SECONDARY_CONTACT_LNAME,[secondary_contact_phone_number] = @SECONDARY_CONTACT_PHONE_NUMBER, [address] = @ADDRESS, " +
       "[Services_Offered] = @SERVICES_OFFERED, [Service_Area] = @SERVICE_AREA,[Discount_Amount] = @DISCOUNT_AMOUNT,[Preferred_Method_Contact] = @PREFERRED_METHOD_CONTACT, " +
-      "[EOY_Receipt] = @EOY_RECEIPT, [updated_by] = @UPDATED_BY, [updated_date] = @UPDATED_DATE, [active] = @ACTIVE WHERE [record_id] = @ID",
+      "[EOY_Receipt] = @EOY_RECEIPT, [updated_by] = @UPDATED_BY, [updated_date] = @UPDATED_DATE, [active] = @ACTIVE, [facebook_url] = @FACEBOOK, [twiter_url] = @TWITTER, [instagram_url] = @INSTAGRAM "+
+      " WHERE [record_id] = @ID",
       function(err, rowCount) {
           if (err) {
               console.error(err);
@@ -472,6 +477,9 @@ exports.updateBusiness = function(businessObject) {
       request.addParameter("UPDATED_BY", TYPES.VarChar, businessObject.updatedBy);
       request.addParameter("UPDATED_DATE", TYPES.Date, new Date);
       request.addParameter("ACTIVE", TYPES.Bit, 1);
+      request.addParameter("FACEBOOK", TYPES.VarChar, businessObject.facebookUrl);
+      request.addParameter("TWITTER", TYPES.VarChar, businessObject.twitterUrl);
+      request.addParameter("INSTAGRAM", TYPES.VarChar, businessObject.instagramUrl);
       connection.execSql(request);
   });
 
