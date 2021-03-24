@@ -708,7 +708,7 @@ exports.createNewRequest = function(userObject) {
           return;
       }
       // use the connection as normal
-      var request = new Request("INSERT INTO [dbo].[Request] ([family_id], [business_id], [pending], [requested_date], [notified_business], [notified_family], [notes], [active],) " +
+      var request = new Request("INSERT INTO [dbo].[Request] ([family_id], [business_id], [pending], [requested_date], [notified_business], [notified_family], [notes], [active]) " +
       " VALUES (@FAMILY_ID, @BUSINESS_ID, @PENDING, @REQUESTED_DATE, @NOTIFIED_BUSINESS, @NOTIFIED_FAMILY, @NOTES, @ACTIVE)",
       function(err, rowCount) {
           if (err) {
@@ -722,7 +722,7 @@ exports.createNewRequest = function(userObject) {
       request.addParameter('FAMILY_ID', TYPES.NVarChar, userObject.familyId);
       request.addParameter('BUSINESS_ID', TYPES.NVarChar, userObject.businessId);
       request.addParameter('PENDING', TYPES.Bit, 1);
-      request.addParameter('REQUESTED_DATE', TYPES.NVarChar, userObject.dateRequested);
+      request.addParameter('REQUESTED_DATE', TYPES.Date, new Date);
       request.addParameter('NOTIFIED_BUSINESS', TYPES.Bit, 0);
       request.addParameter('NOTIFIED_FAMILY', TYPES.Bit, 0);
       request.addParameter('NOTES', TYPES.NVarChar, userObject.notes);
@@ -740,7 +740,7 @@ exports.fulfillRequest = function(userObject) {
           return;
       }
       // use the connection as normal
-      var request = new Request("UPDATE [dbo].[Request] SET [pending] = @PENDING, [approved] = @APPROVED, [fulfilled_date] = @FULFILLED_DATE, " +
+      var request = new Request("UPDATE [dbo].[Request] SET [pending] = @PENDING, [approved] = @APPROVED, [fulfilled_date] = @FULFILLED_DATE, [fulfilled_by] = @FULFILLED_BY, " +
       "[followedup_business] = @FOLLOWEDUP_BUSINESS, [followedup_family] = @FOLLOWEDUP_FAMILY WHERE [record_id] = @ID",
       function(err, rowCount) {
           if (err) {
@@ -752,7 +752,8 @@ exports.fulfillRequest = function(userObject) {
       });
 
       request.addParameter('ID', TYPES.VarChar, userObject.id);
-      request.addParameter('FULFILLED_DATE', TYPES.NVarChar, userObject.dateFulfilled)
+      request.addParameter('FULFILLED_DATE', TYPES.Date, new Date);
+      request.addParameter('FULFILLED_BY', TYPES.NVarChar, userObject.currentUser);
       request.addParameter('APPROVED', TYPES.Bit, userObject.approved);
       request.addParameter('PENDING', TYPES.Bit, 0);
       request.addParameter('FOLLOWEDUP_BUSINESS', TYPES.Bit, userObject.followedUpB);
