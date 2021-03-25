@@ -186,6 +186,7 @@ exports.getAllCategories = async function (req, res, next) {
   let categoryList = [];
   categoryList = await sql.getAllCategories();
   if (categoryList.length > 0) {
+      console.log(categoryList)
       res.status(200).json({status: 200, results: categoryList, resultsLength: categoryList.length});
   } else {
       res.status(204).send();
@@ -694,3 +695,249 @@ exports.getFamilyById = async function (req, res,next){
       res.status(204).send();
   }
 }
+
+exports.createNewCategory = async function (req, res, next) {
+    let rowCount = sql.createNewCategory(req.body);
+    console.log(rowCount);
+    if (rowCount == 1) {
+        res.status(201).json({categoryCreated: true});
+    } else {
+        res.status(202).send();
+    }
+};
+
+exports.getCategoryById = async function (req, res,next){
+    let categoryList = [];
+    categoryList = await sql.getCategoryById(req.params.categoryId);
+    if(categoryList.length > 0){
+        res.status(200).json({status:200, results: categoryList, resultsLength: categoryList.length});
+    }else{
+        res.status(204).send();
+    }
+}
+
+exports.updateCategory = async function (req, res, next) {
+    let rowCount = sql.updateCategory(req.body);
+    console.log(rowCount);
+    if (rowCount == 1) {
+        res.status(201).json({categoryUpdated: true});
+    } else {
+        res.status(202).send();
+    }
+};
+
+exports.updateBusinessLogo = async function (req, res,next){
+    //let rowCount = sql.updateVolunteer(req.body);
+    //console.log(req.file);
+    var fileExtension = path.extname('uploads/'+req.file.originalname);
+    var newFileName = 'uploads/'+req.params.businessName + fileExtension;
+    fs.rename('uploads/'+req.file.originalname, newFileName, function(err) {
+        if ( err ) console.log('ERROR: ' + err);
+    });
+
+    sql.tp.sql(`exec [usp_updateProfilePictureURLByBusinessName] '${req.params.businessName}', '${newFileName}'`)
+        .returnRowCount()
+        .execute()
+        .then(function(rowCount) {
+            if(rowCount > 0){
+                res.status(201).json({businessUpdated: true});
+            }
+        }).fail(function(err) {
+            console.log(err);
+            res.status(409).json({status: 409, errorMessage: `Error saving to database: ${err}`});
+    });
+}
+
+exports.getBusinessLogo = async function (req, res,next){
+    sql.tp.sql(`exec [usp_getBusinessLogoURL] '${req.params.businessName}'`)
+    .execute()
+    .then(function(results) {
+        if(results){
+            const r = fs.createReadStream(results[0].URL) 
+            const ps = new stream.PassThrough()
+            stream.pipeline(
+            r,
+            ps, 
+            (err) => {
+                if (err) {
+                console.log(err)
+                    return res.status(400).json({status: 409, errorMessage: `Error getting image: ${err}`}); 
+                }
+            })
+            ps.pipe(res)
+            //res.status(201).json({status: 201, successMessage: `Profile URL is ${results[0].URL}`});
+        }
+       }).fail(function(err) {
+           console.log(err);
+           res.status(409).json({status: 409, errorMessage: `Error saving to database: ${err}`});
+       });
+} 
+
+exports.getServicesRendered = async function (req, res,next){
+    let servicesRenderedList = [];
+    servicesRenderedList = await sql.getServicesRendered(req.params.businessName);
+    if(servicesRenderedList.length > 0){
+        res.status(200).json({status:200, results: servicesRenderedList, resultsLength: servicesRenderedList.length});
+    }else{
+        res.status(204).send();
+    }
+}
+
+exports.approveBusiness = async function (req, res,next){
+    sql.tp.sql(`exec [usp_approveBusiness] ${req.params.businessId}, '${req.params.approvedBy}'`)
+    .execute()
+    .then(function(result) {
+        console.log(result)
+        if(result){
+            res.status(200).json({businessApproved: true});
+        }
+    }).fail(function(err) {
+        console.log(err);
+        res.status(409).json({status: 409, errorMessage: `Error saving to database: ${err}`});
+    });
+} 
+
+exports.modifyBudget = async function (req, res, next) {
+    let rowCount = sql.modifyBudget(req.body);
+    if(rowCount == 1){
+        res.status(201).json({message: 'Updated budget!' , budgetUpdated: true})
+    }else{
+        res.status(202).send({message: 'Unable to modify budget'});  
+    }
+}
+
+exports.getBudgetByID = async function(req,res,next) {
+    let budgetList = [];
+    budgetList = await sql.getBudgetByID(req.params.id);
+    if(budgetList.length > 0){
+        res.status(200).send({status:200, results: budgetList, resultsLength: budgetList.length})
+    }else{
+        res.status(204).send({message: 'Unable to get Budget'});
+    }
+}
+
+exports.createNewExpense = async function(req,res,next){
+    let rowCount = sql.createNewExpense(req.body);
+    console.log(rowCount);
+    if (rowCount == 1) {
+        res.status(201).json({expenseCreated: true, results:req.body});
+    } else {
+        res.status(202).send();
+    }
+}
+
+exports.getAllExpenses = async function(req,res,next){
+    let renderedList = await sql.getAllExpenses();
+    if(renderedList.length > 0){
+        res.status(200).json({status:200, results: renderedList, resultsLength: renderedList.length});
+    }else{
+        res.status(204).send();
+    }
+}
+
+exports.modifyExpense = async function(req,res,next){
+    let rowCount = sql.modifyExpense(req.body);
+    if(rowCount == 1){
+        res.status(201).json({message: 'Updated Expense' , budgetUpdated: true , results:req.body})
+    }else{
+        res.status(202).send({message: 'Unable to modify Expense'});  
+    }
+}
+
+exports.getExpenseByID = async function(req,res,next){
+    let renderedList = [];
+    renderedList = await sql.getExpenseByID(req.params.id);
+    if(renderedList.length > 0){
+        res.status(200).send({status:200, results: renderedList, resultsLength: renderedList.length})
+    }else{
+        res.status(204).send();
+    }
+}
+
+exports.createNewVPizzaCard = async function(req,res,next){
+    let rowCount = sql.createNewVPizzaCard(req.body);
+    console.log(rowCount);
+    if (rowCount == 1) {
+        res.status(201).json({giftCardCreated: true, results:req.body});
+    } else {
+        res.status(202).send();
+    }
+}
+
+exports.getAllVGiftCards = async function(req,res,next){
+    let renderedList = await sql.getAllVGiftCards();
+    if(renderedList.length > 0){
+        res.status(200).json({status:200, results: renderedList, resultsLength: renderedList.length});
+    }else{
+        res.status(204).send();
+    }
+}
+
+exports.modifyVPizzaGC = async function(req,res,next){
+    let rowCount = sql.modifyVPizzaCard(req.body)
+    if(rowCount == 1){
+        res.status(201).json({message: 'Updated GiftCard' , giftCardUpdated: true , results:req.body})
+    }else{
+        res.status(202).send({message: 'Unable to modify GiftCard'});  
+    }
+}
+
+exports.getThisMonthExpenses = async function(req,res,next){
+    let requestList = [];
+    requestList = await sql.getThisMonthExpenses();
+    if(requestList.length > 0){
+        res.status(200).json({status:200, results: requestList, resultsLength: requestList.length});
+    }else{
+        res.status(204).send();
+    }
+}
+
+exports.getBudgetByFamilyID = async function(req,res,next){
+    let renderedList = [];
+    renderedList = await sql.getBudgetByFamilyID(req.params.familyId);
+    if(renderedList.length > 0){
+        res.status(200).send({status:200, results: renderedList, resultsLength: renderedList.length})
+    }else{
+        res.status(204).send();
+    }
+}
+
+exports.getFamilyByID = async function(req,res,next){
+    let renderedList = [];
+    renderedList = await sql.getFamilyByID(req.params.id);
+    if(renderedList.length > 0){
+        res.status(200).send({status:200, results: renderedList, resultsLength: renderedList.length})
+    }else{
+        res.status(204).send();
+    }
+}
+
+exports.modifyFamilyByID = async function (req, res, next) {
+    let rowCount = sql.modifyFamilyByID(req.body);
+    if(rowCount == 1){
+        res.status(201).json({message: 'Updated Family' , familyUpdated: true})
+    }else{
+        res.status(202).send();  
+    }
+}
+
+exports.getThisMonthFamiliesApproved = async function(req,res,next){
+    let requestList = [];
+    requestList = await sql.getThisMonthFamiliesApproved();
+    if(requestList.length > 0){
+        res.status(200).json({status:200, results: requestList, resultsLength: requestList.length});
+    }else{
+        res.status(204).send();
+    }
+}
+
+exports.getThisMonthFamiliesCreated = async function(req,res,next){
+    let requestList = [];
+    requestList = await sql.getThisMonthFamiliesCreated();
+    if(requestList.length > 0){
+        res.status(200).json({status:200, results: requestList, resultsLength: requestList.length});
+    }else{
+        res.status(204).send();
+    }
+}
+

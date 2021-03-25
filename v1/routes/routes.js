@@ -60,6 +60,19 @@ router.get('/service/requested/month',controller.getThisMonthRequests);
 
 router.get('/business/month',controller.getThisMonthBusinesses);
 router.get('/business/unapproved',controller.getBusinessesToApprove);
+router.get('/business/category/:categoryId',controller.getCategoryById);
+router.get('/business/name/:businessName/logo',controller.getBusinessLogo);
+router.get('/business/services/rendered/:businessName',controller.getServicesRendered);
+
+router.get('/budget/id/:id',controller.getBudgetByID);
+router.get('/expense',controller.getAllExpenses);
+router.get('/expense/id/:id', controller.getExpenseByID);
+router.get('/VPizzaGC', controller.getAllVGiftCards);
+router.get('/budget/familyId/:familyId', controller.getBudgetByFamilyID);
+router.get('/expense/month', controller.getThisMonthExpenses);
+router.get('/family/id/:id', controller.getFamilyByID);
+router.get('/family/approved/month', controller.getThisMonthFamiliesApproved);
+router.get('/family/created/month', controller.getThisMonthFamiliesCreated);
 
 router.get('/family/email/:familyEmail',controller.getFamilyByEmail);
 router.get('/family/id/:familyId',controller.getFamilyById);
@@ -75,6 +88,11 @@ router.post('/volunteer/login/new',controller.saveLoginHistory);
 
 router.post('/business/new', controller.createNewBusiness);
 router.post('/business/edit',controller.updateBusiness);
+router.post('/business/category/new', controller.createNewCategory);
+router.post('/business/category/update', controller.updateCategory);
+router.post('/business/picture/:businessName', upload.single('fileKey'), controller.updateBusinessLogo);
+router.post('/business/:businessId/approve/:approvedBy', controller.approveBusiness);
+
 
 router.post('/budget/new', controller.createNewBudget);
 
@@ -88,12 +106,24 @@ router.post('/service/markActive',controller.markServiceActive);
 router.post('/service/markInactive',controller.markServiceInactive);
 router.post('/service/delete',controller.deleteRequest);
 
+router.post('/family/new',controller.createNewFamily);
+router.post('/family/markActive',controller.markFamilyActive);
+router.post('/family/markInactive',controller.markFamilyInactive);
+router.post('/family/active',controller.getActiveFamily);
+
+router.post('/budget/edit',controller.modifyBudget);
+router.post('/expense/new',controller.createNewExpense);
+router.post('/expense/edit', controller.modifyExpense);
+router.post('/VPizzaGC/new', controller.createNewVPizzaCard);
+router.post('/VPizzaGC/edit', controller.modifyVPizzaGC);
+router.post('/family/edit', controller.modifyFamilyByID);
 
 
 router.post('/family/new',controller.createNewFamily);
 router.post('/family/markActive',controller.markFamilyActive);
 router.post('/family/markInactive',controller.markFamilyInactive);
 router.post('/family/active',controller.getActiveFamily);
+
 
 
 // Email Functions
