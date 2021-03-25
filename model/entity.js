@@ -1313,3 +1313,29 @@ exports.modifyFamilyByID = function(familyObj) {
     // Returning one if no error occurred.
     return 1;
 }
+
+exports.getThisMonthFamiliesApproved = function() {
+    return new Promise( resolve => {
+        tp.sql("SELECT * FROM [dbo].[Family] WHERE DATEDIFF(day,approved_date,GETDATE()) between 0 and 30")
+        .execute()
+        .then(function(results) {
+            // console.log(results);
+            resolve(results);
+        }).fail(function(err) {
+            console.log(err);
+        });
+    });
+}
+
+exports.getThisMonthFamiliesCreated = function() {
+    return new Promise( resolve => {
+        tp.sql("SELECT * FROM [dbo].[Family] WHERE DATEDIFF(day,created_date,GETDATE()) between 0 and 30")
+        .execute()
+        .then(function(results) {
+            // console.log(results);
+            resolve(results);
+        }).fail(function(err) {
+            console.log(err);
+        });
+    });
+}

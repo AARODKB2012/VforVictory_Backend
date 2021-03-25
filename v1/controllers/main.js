@@ -778,3 +778,24 @@ exports.modifyFamilyByID = async function (req, res, next) {
         res.status(202).send();  
     }
 }
+
+exports.getThisMonthFamiliesApproved = async function(req,res,next){
+    let requestList = [];
+    requestList = await sql.getThisMonthFamiliesApproved();
+    if(requestList.length > 0){
+        res.status(200).json({status:200, results: requestList, resultsLength: requestList.length});
+    }else{
+        res.status(204).send();
+    }
+}
+
+exports.getThisMonthFamiliesCreated = async function(req,res,next){
+    let requestList = [];
+    requestList = await sql.getThisMonthFamiliesCreated();
+    if(requestList.length > 0){
+        res.status(200).json({status:200, results: requestList, resultsLength: requestList.length});
+    }else{
+        res.status(204).send();
+    }
+}
+
