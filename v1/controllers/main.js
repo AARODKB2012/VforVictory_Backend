@@ -340,15 +340,15 @@ exports.getProfilePicture = async function (req, res,next){
     .execute()
     .then(function(results) {
         if(results){
-            const r = fs.createReadStream(results[0].URL) 
+            const r = fs.createReadStream(results[0].URL)
             const ps = new stream.PassThrough()
             stream.pipeline(
             r,
-            ps, 
+            ps,
             (err) => {
                 if (err) {
                 console.log(err)
-                    return res.status(400).json({status: 409, errorMessage: `Error getting image: ${err}`}); 
+                    return res.status(400).json({status: 409, errorMessage: `Error getting image: ${err}`});
                 }
             })
             ps.pipe(res)
@@ -358,7 +358,7 @@ exports.getProfilePicture = async function (req, res,next){
            console.log(err);
            res.status(409).json({status: 409, errorMessage: `Error saving to database: ${err}`});
        });
-} 
+}
 
 exports.saveLoginHistory = async function (req, res,next){
     sql.tp.sql(`exec [usp_insertLoginHistory] ${req.body.userId}, '${req.body.date}' , '${req.body.time}', '${req.body.clientIp}'`)
@@ -645,7 +645,7 @@ exports.markFamilyActive = async function (req, res,next){
       res.status(202).send();
     }
   }
-  
+
   exports.markFamilyInactive = async function (req, res,next){
     let rowCount = sql.markFamilyInactive(req.body);
     console.log(rowCount);
@@ -666,14 +666,34 @@ exports.markFamilyActive = async function (req, res,next){
     }
   }
 
-exports.getInactiveFamily = async function (req, res,next){
-    let renderedList = [];
-    renderedList = await sql.getInactiveFamily();
-    if(renderedList.length > 0){
-        res.status(200).json({status:200, results: renderedList, resultsLength: renderedList.length});
-    }else{
-        res.status(204).send();
-    }
+  exports.getInactiveFamily = async function (req, res,next){
+  let renderedList = [];
+  renderedList = await sql.getInactiveFamily();
+  if(renderedList.length > 0){
+      res.status(200).json({status:200, results: renderedList, resultsLength: renderedList.length});
+  }else{
+      res.status(204).send();
+  }
+}
+
+exports.getFamilyByEmail = async function (req, res,next){
+  let familyList = [];
+  familyList = await sql.getFamilyByEmail(req.params.familyEmail);
+  if(familyList.length > 0){
+      res.status(200).json({status:200, results: familyList, resultsLength: familyList.length});
+  }else{
+      res.status(204).send();
+  }
+}
+
+exports.getFamilyById = async function (req, res,next){
+  let familyList = [];
+  familyList = await sql.getFamilyById(req.params.familyId);
+  if(familyList.length > 0){
+      res.status(200).json({status:200, results: familyList, resultsLength: familyList.length});
+  }else{
+      res.status(204).send();
+  }
 }
 
 exports.createNewCategory = async function (req, res, next) {
@@ -920,3 +940,4 @@ exports.getThisMonthFamiliesCreated = async function(req,res,next){
         res.status(204).send();
     }
 }
+

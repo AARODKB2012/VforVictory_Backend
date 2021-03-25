@@ -74,6 +74,11 @@ router.get('/family/id/:id', controller.getFamilyByID);
 router.get('/family/approved/month', controller.getThisMonthFamiliesApproved);
 router.get('/family/created/month', controller.getThisMonthFamiliesCreated);
 
+router.get('/family/email/:familyEmail',controller.getFamilyByEmail);
+router.get('/family/id/:familyId',controller.getFamilyById);
+
+
+
 //Add POST endpoint here
 router.post('/volunteer/new',controller.createNewVolunteer);
 router.post('/volunteer/edit',controller.updateVolunteer);
@@ -112,6 +117,12 @@ router.post('/expense/edit', controller.modifyExpense);
 router.post('/VPizzaGC/new', controller.createNewVPizzaCard);
 router.post('/VPizzaGC/edit', controller.modifyVPizzaGC);
 router.post('/family/edit', controller.modifyFamilyByID);
+
+
+router.post('/family/new',controller.createNewFamily);
+router.post('/family/markActive',controller.markFamilyActive);
+router.post('/family/markInactive',controller.markFamilyInactive);
+router.post('/family/active',controller.getActiveFamily);
 
 
 

@@ -135,7 +135,6 @@ exports.createNewVolunteer = function(userObject) {
 };
 
 // Use this example for when we need to insert something to DB
-
 exports.getAllVolunteersByStatus = function (status) {
     return new Promise((resolve) => {
         tp.sql("SELECT * FROM [dbo].[Volunteers] where status='" + status + "'").execute().then(function (results) { // console.log(results);
@@ -188,7 +187,7 @@ exports.updateVolunteer = function(userObject) {
         var request = new Request("UPDATE [dbo].[Volunteers] " +
         "SET [first_name] = @FIRST_NAME, [last_name] = @LAST_NAME, [username] = @USER_NAME, [home_phone] = @HOME_PHONE, [work_phone] = @WORK_PHONE, [cell_phone] = @CELL_PHONE, " +
         "[email] = @EMAIL, [address] = @ADDRESS ,[educational_background] = @EDUCATION, [current_licenses] = @LICENSES, [availability] = @AVAILABILITY, [role] = @ROLE, [status] = @STATUS, " +
-        "[emergency_contact_name] = @EMERGENCY_FIRST_NAME,[emergency_contact_lastname] = @EMERGENCY_LAST_NAME, [emergency_contact_phone] = @EMERGENCY_PHONE, [emergency_contact_email] = @EMERGENCY_EMAIL," + 
+        "[emergency_contact_name] = @EMERGENCY_FIRST_NAME,[emergency_contact_lastname] = @EMERGENCY_LAST_NAME, [emergency_contact_phone] = @EMERGENCY_PHONE, [emergency_contact_email] = @EMERGENCY_EMAIL," +
         "[emergency_contact_address] = @EMERGENCY_ADDRESS, [updated_by] = @UPDATED_BY, [updated_date] = @UPDATED_DATE " +
         "WHERE [record_id] = @ID",
         function(err, rowCount) {
@@ -454,7 +453,7 @@ exports.updateBusiness = function(businessObject) {
 
 exports.getActiveBusinesses = function() {
   return new Promise( resolve => {
-      tp.sql("SELECT * FROM [dbo].[Business] WHERE active = 1")
+      tp.sql("SELECT * FROM [dbo].[Business] WHERE active = 1 and approved_by is not null")
       .execute()
       .then(function(results) {
           // console.log(results);
@@ -584,7 +583,7 @@ exports.getActiveServices = function() {
 
 exports.getActiveRequests = function() {
   return new Promise( resolve => {
-      tp.sql("SELECT * FROM [dbo].[Requests] WHERE active = 1")
+      tp.sql("SELECT * FROM [dbo].[Request] WHERE pending = 1 and active = 1")
       .execute()
       .then(function(results) {
           // console.log(results);
@@ -597,7 +596,7 @@ exports.getActiveRequests = function() {
 
 exports.getRenderedServices = function() {
   return new Promise( resolve => {
-      tp.sql("SELECT * FROM [dbo].[Requests] WHERE active = 0")
+      tp.sql("SELECT * FROM [dbo].[Request] WHERE pending = 0 and active = 1")
       .execute()
       .then(function(results) {
           // console.log(results);
@@ -641,9 +640,8 @@ exports.createNewRequest = function(userObject) {
           return;
       }
       // use the connection as normal
-      var request = new Request("INSERT INTO [dbo].[Requests] ([name], [email], [business_name], [business_category], [date_requested], [date_fulfilled], [notified_business], " +
-      " [notified_family], [followedup_business], [followedup_family], [active], [notes]) " +
-      " VALUES (@NAME, @EMAIL, @BUSINESS_NAME, @BUSINESS_CATEGORY, @DATE_REQUESTED, @DATE_FULFILLED, @NOTIFIED_BUSINESS, @NOTIFIED_FAMILY, @FOLLOWEDUP_BUSINESS, @FOLLOWEDUP_FAMILY, @ACTIVE, @NOTES)",
+      var request = new Request("INSERT INTO [dbo].[Request] ([family_id], [business_id], [pending], [requested_date], [notified_business], [notified_family], [notes], [active]) " +
+      " VALUES (@FAMILY_ID, @BUSINESS_ID, @PENDING, @REQUESTED_DATE, @NOTIFIED_BUSINESS, @NOTIFIED_FAMILY, @NOTES, @ACTIVE)",
       function(err, rowCount) {
           if (err) {
               console.error(err);
@@ -653,18 +651,14 @@ exports.createNewRequest = function(userObject) {
           connection.release();
       });
 
-      request.addParameter('NAME', TYPES.NVarChar, userObject.name);
-      request.addParameter('EMAIL', TYPES.NVarChar, userObject.email);
-      request.addParameter('BUSINESS_NAME', TYPES.NVarChar, userObject.businessName);
-      request.addParameter('BUSINESS_CATEGORY', TYPES.NVarChar, userObject.businessCategory);
-      request.addParameter('DATE_REQUESTED', TYPES.NVarChar, userObject.dateRequested);
-      request.addParameter('DATE_FULFILLED', TYPES.NVarChar, '');
-      request.addParameter('NOTIFIED_BUSINESS', TYPES.Bit, userObject.notifiedBusiness);
-      request.addParameter('NOTIFIED_FAMILY', TYPES.Bit, userObject.notifiedFamily);
-      request.addParameter('FOLLOWEDUP_BUSINESS', TYPES.Bit, userObject.followedupBusiness);
-      request.addParameter('FOLLOWEDUP_FAMILY', TYPES.Bit, userObject.followedupFamily);
-      request.addParameter('ACTIVE', TYPES.Bit, 1);
+      request.addParameter('FAMILY_ID', TYPES.NVarChar, userObject.familyId);
+      request.addParameter('BUSINESS_ID', TYPES.NVarChar, userObject.businessId);
+      request.addParameter('PENDING', TYPES.Bit, 1);
+      request.addParameter('REQUESTED_DATE', TYPES.Date, new Date);
+      request.addParameter('NOTIFIED_BUSINESS', TYPES.Bit, 0);
+      request.addParameter('NOTIFIED_FAMILY', TYPES.Bit, 0);
       request.addParameter('NOTES', TYPES.NVarChar, userObject.notes);
+      request.addParameter('ACTIVE', TYPES.Bit, 1);
       connection.execSql(request);
   });
 
@@ -678,7 +672,8 @@ exports.fulfillRequest = function(userObject) {
           return;
       }
       // use the connection as normal
-      var request = new Request("UPDATE [dbo].[Requests] SET [active] = 0, [date_fulfilled] = @DATE_FULFILLED WHERE [id] = @ID",
+      var request = new Request("UPDATE [dbo].[Request] SET [pending] = @PENDING, [approved] = @APPROVED, [fulfilled_date] = @FULFILLED_DATE, [fulfilled_by] = @FULFILLED_BY, " +
+      "[followedup_business] = @FOLLOWEDUP_BUSINESS, [followedup_family] = @FOLLOWEDUP_FAMILY WHERE [record_id] = @ID",
       function(err, rowCount) {
           if (err) {
               console.error(err);
@@ -689,8 +684,12 @@ exports.fulfillRequest = function(userObject) {
       });
 
       request.addParameter('ID', TYPES.VarChar, userObject.id);
-      request.addParameter('DATE_FULFILLED', TYPES.NVarChar, userObject.dateFulfilled)
-      request.addParameter('ACTIVE', TYPES.Bit, 0);
+      request.addParameter('FULFILLED_DATE', TYPES.Date, new Date);
+      request.addParameter('FULFILLED_BY', TYPES.NVarChar, userObject.currentUser);
+      request.addParameter('APPROVED', TYPES.Bit, userObject.approved);
+      request.addParameter('PENDING', TYPES.Bit, 0);
+      request.addParameter('FOLLOWEDUP_BUSINESS', TYPES.Bit, userObject.followedUpB);
+      request.addParameter('FOLLOWEDUP_FAMILY', TYPES.Bit, userObject.followedUpF);
       connection.execSql(request);
   });
 
@@ -704,7 +703,7 @@ exports.markBusinessNotified = function(userObject) {
           return;
       }
       // use the connection as normal
-      var request = new Request("UPDATE [dbo].[Requests] SET [notified_business] = 1 WHERE [id] = @ID",
+      var request = new Request("UPDATE [dbo].[Request] SET [notified_business] = @TOGGLE WHERE [record_id] = @ID",
       function(err, rowCount) {
           if (err) {
               console.error(err);
@@ -715,7 +714,7 @@ exports.markBusinessNotified = function(userObject) {
       });
 
       request.addParameter('ID', TYPES.VarChar, userObject.id);
-      //request.addParameter('ACTIVE', TYPES.Bit, 0);
+      request.addParameter('TOGGLE', TYPES.Bit, userObject.toggle);
       connection.execSql(request);
   });
 
@@ -729,7 +728,7 @@ exports.markFamilyNotified = function(userObject) {
           return;
       }
       // use the connection as normal
-      var request = new Request("UPDATE [dbo].[Requests] SET [notified_family] = 1 WHERE [id] = @ID",
+      var request = new Request("UPDATE [dbo].[Request] SET [notified_family] = @TOGGLE WHERE [record_id] = @ID",
       function(err, rowCount) {
           if (err) {
               console.error(err);
@@ -740,7 +739,7 @@ exports.markFamilyNotified = function(userObject) {
       });
 
       request.addParameter('ID', TYPES.VarChar, userObject.id);
-      //request.addParameter('ACTIVE', TYPES.Bit, 0);
+      request.addParameter('TOGGLE', TYPES.Bit, userObject.toggle);
       connection.execSql(request);
   });
 
@@ -754,7 +753,7 @@ exports.markBusinessFollowedUp = function(userObject) {
           return;
       }
       // use the connection as normal
-      var request = new Request("UPDATE [dbo].[Requests] SET [followedup_business] = 1 WHERE [id] = @ID",
+      var request = new Request("UPDATE [dbo].[Request] SET [followedup_business] = @TOGGLE WHERE [record_id] = @ID",
       function(err, rowCount) {
           if (err) {
               console.error(err);
@@ -765,6 +764,7 @@ exports.markBusinessFollowedUp = function(userObject) {
       });
 
       request.addParameter('ID', TYPES.VarChar, userObject.id);
+      request.addParameter('TOGGLE', TYPES.Bit, userObject.toggle);
       connection.execSql(request);
   });
 
@@ -778,7 +778,7 @@ exports.markFamilyFollowedUp = function(userObject) {
           return;
       }
       // use the connection as normal
-      var request = new Request("UPDATE [dbo].[Requests] SET [followedup_family] = 1 WHERE [id] = @ID",
+      var request = new Request("UPDATE [dbo].[Request] SET [followedup_family] = 1 WHERE [record_id] = @ID",
       function(err, rowCount) {
           if (err) {
               console.error(err);
@@ -789,6 +789,7 @@ exports.markFamilyFollowedUp = function(userObject) {
       });
 
       request.addParameter('ID', TYPES.VarChar, userObject.id);
+      request.addParameter('TOGGLE', TYPES.Bit, userObject.toggle);
       connection.execSql(request);
   });
 
@@ -850,7 +851,7 @@ exports.deleteRequest = function(userObject) {
           return;
       }
       // use the connection as normal
-      var request = new Request("DELETE FROM [dbo].[Requests] WHERE [id] = @ID",
+      var request = new Request("UPDATE [dbo].[Request] SET [active] = 0 WHERE [record_id] = @ID",
       function(err, rowCount) {
           if (err) {
               console.error(err);
@@ -958,7 +959,7 @@ exports.getInactiveFamily = function() {
         });
     });
 }
-  
+
 exports.markFamilyActive = function(userObject) {
     pool.acquire(function (err, connection) {
         if (err) {
@@ -1006,6 +1007,34 @@ exports.markFamilyInactive = function(userObject) {
 
     return 1;
 }
+
+
+exports.getFamilyByEmail = function(familyEmail) {
+  return new Promise( resolve => {
+      tp.sql("SELECT * FROM [dbo].[Family] where email = '" + familyEmail + "'")
+      .execute()
+      .then(function(results) {
+          // console.log(results);
+          resolve(results);
+      }).fail(function(err) {
+          console.log(err);
+      });
+  });
+}
+
+exports.getFamilyById = function(familyId) {
+  return new Promise( resolve => {
+      tp.sql("SELECT * FROM [dbo].[Family] where id = " + familyId)
+      .execute()
+      .then(function(results) {
+          // console.log(results);
+          resolve(results);
+      }).fail(function(err) {
+          console.log(err);
+      });
+  });
+}
+
 
 exports.modifyBudget = function (budgetObj) {
     console.log(budgetObj);
@@ -1460,3 +1489,4 @@ exports.approveBusiness = function (businessId, approver) {
     });
     return 1;
 };
+
