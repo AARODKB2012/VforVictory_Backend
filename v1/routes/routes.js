@@ -60,6 +60,9 @@ router.get('/service/requested/month',controller.getThisMonthRequests);
 
 router.get('/business/month',controller.getThisMonthBusinesses);
 router.get('/business/unapproved',controller.getBusinessesToApprove);
+router.get('/business/category/:categoryId',controller.getCategoryById);
+router.get('/business/name/:businessName/logo',controller.getBusinessLogo);
+router.get('/business/services/rendered/:businessName',controller.getServicesRendered);
 
 router.get('/budget/id/:id',controller.getBudgetByID);
 router.get('/expense',controller.getAllExpenses);
@@ -80,6 +83,11 @@ router.post('/volunteer/login/new',controller.saveLoginHistory);
 
 router.post('/business/new', controller.createNewBusiness);
 router.post('/business/edit',controller.updateBusiness);
+router.post('/business/category/new', controller.createNewCategory);
+router.post('/business/category/update', controller.updateCategory);
+router.post('/business/picture/:businessName', upload.single('fileKey'), controller.updateBusinessLogo);
+router.post('/business/:businessId/approve/:approvedBy', controller.approveBusiness);
+
 
 router.post('/budget/new', controller.createNewBudget);
 
