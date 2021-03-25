@@ -135,41 +135,6 @@ exports.createNewVolunteer = function(userObject) {
 };
 
 // Use this example for when we need to insert something to DB
-exports.createNewFamily = function(userObject) {
-    pool.acquire(function (err, connection) {
-        if (err) {
-            console.error(err);
-            return;
-        }
-        //use the connection as normal
-        var request = new Request("INSERT INTO [dbo].[Family] ([first_name], [last_name], [phone_number], [street_address], [zipcode], [email], [cancer_warrior_name], [work_phone], [relationship_to_warrior]," +
-        "[additional_info], [end_of_treatment_date], [active])" +
-        "VALUES (@FIRST_NAME, @LAST_NAME, @PHONE_NUMBER, @STREET_ADDRESS, @ZIPCODE, @EMAIL, @CANCER_WARRIOR_NAME, @WORK_PHONE," +
-        "@RELATIONSHIP_TO_WARRIOR, @ADDITIONAL_INFO, @END_OF_TREATMENT_DATE, @ACTIVE)",
-        function(err, rowCount) {
-            if (err) {
-                console.error(err);
-                return;
-            }
-            //release the connection back to the pool when finished
-            connection.release();
-        });
-          request.addParameter("FIRST_NAME", TYPES.VarChar, userObject.firstName);
-          request.addParameter("LAST_NAME", TYPES.VarChar, userObject.lastName);
-          request.addParameter("PHONE_NUMBER", TYPES.VarChar, userObject.phoneNumber);
-          request.addParameter("STREET_ADDRESS", TYPES.VarChar, userObject.streetAddress);
-          request.addParameter("ZIPCODE", TYPES.VarChar, userObject.zipcode);
-          request.addParameter("EMAIL", TYPES.VarChar, userObject.email);
-          request.addParameter("CANCER_WARRIOR_NAME", TYPES.VarChar, userObject.cancerWarriorname);
-          request.addParameter("WORK_PHONE", TYPES.VarChar, userObject.workPhone);
-          request.addParameter("RELATIONSHIP_TO_WARRIOR", TYPES.VarChar, userObject.relationshipTowarrior);
-          request.addParameter("ADDITIONAL_INFO", TYPES.VarChar, userObject.additionalInfo);
-          request.addParameter("END_OF_TREATMENT_DATE", TYPES.VarChar, userObject.endOftreatmentDate);
-          request.addParameter('ACTIVE', TYPES.Bit, 1);
-          connection.execSql(request);
-      });
-      return 1;
-};
 
 exports.getAllVolunteersByStatus = function (status) {
     return new Promise((resolve) => {
@@ -1041,6 +1006,358 @@ exports.markFamilyInactive = function(userObject) {
 
     return 1;
 }
+
+exports.modifyBudget = function (budgetObj) {
+    console.log(budgetObj);
+    pool.acquire(function (err, connection) {
+        if (err) {
+            console.error(err);
+            return;
+        }
+        //use the connection as normal
+        var request = new Request("UPDATE [dbo].[Budget] SET [amount] = @AMOUNT, [start_date] = @START_DATE, [finish_date] = @FINISH_DATE, " + 
+        "[current_balance] = @CURRENT_BALANCE, [familyId] = @FAMILYID WHERE [id] = @ID",
+        function(err, rowCount) {
+            if (err) {
+                console.error(err);
+                return;
+            }
+            //release the connection back to the pool when finished
+            connection.release();
+        });
+  
+        request.addParameter("ID", TYPES.Int, budgetObj.id);
+        request.addParameter("AMOUNT", TYPES.Float, budgetObj.amount);
+        request.addParameter("START_DATE", TYPES.Date, budgetObj.start_date);
+        request.addParameter("FINISH_DATE", TYPES.Date, budgetObj.finish_date);
+        request.addParameter("CURRENT_BALANCE", TYPES.Float, budgetObj.current_balance);
+        request.addParameter("FAMILYID", TYPES.Int, budgetObj.familyId);
+        connection.execSql(request);
+    });
+    return 1;
+}
+
+exports.getBudgetByID = function(id) {
+    return new Promise( resolve => {
+        tp.sql("SELECT * FROM [dbo].[Budget] where id = " + id)
+    .execute()
+        .then(function(results){
+            resolve(results);
+        }).fail(function(err){
+            console.log(err);
+        });
+    });
+}
+
+exports.createNewExpense = function(expenseObj){
+console.log(expenseObj);
+    pool.acquire(function (err, connection) {
+    if (err) {
+        console.error(err);
+        return;
+    }
+     // use the connection as normal
+    var request = new Request("INSERT INTO [dbo].[Expense] ([id],[description],[charge_date],[amount],[comment],[budget_id]) " + "VALUES (@ID, @DESCRIPTION, @CHARGE_DATE, @AMOUNT, @COMMENT, @BUDGET_ID)",
+        function(err, rowCount) {
+            if (err) {
+                console.error(err);
+                return;
+            }
+                //release the connection back to the pool when finished
+                connection.release();
+        });
+        request.addParameter("ID", TYPES.Int, expenseObj.id);
+        request.addParameter("DESCRIPTION", TYPES.Text, expenseObj.description);
+        request.addParameter("CHARGE_DATE", TYPES.Date, new Date);
+        request.addParameter("AMOUNT", TYPES.Float, expenseObj.amount);
+        request.addParameter("COMMENT", TYPES.Text, expenseObj.comment);
+        request.addParameter("BUDGET_ID", TYPES.Int, expenseObj.budget_id);
+        connection.execSql(request);
+    });
+    return 1;
+};
+
+exports.getAllExpenses = function(){
+    return new Promise( resolve => {
+        tp.sql("SELECT * FROM [dbo].[EXPENSE]")
+    .execute()
+        .then(function(results){
+            resolve(results);
+        }).fail(function(err){
+            console.log(err);
+        });
+    });
+}
+
+exports.modifyExpense = function (expenseObj) {
+    console.log(expenseObj);
+    pool.acquire(function (err, connection) {
+        if (err) {
+            console.error(err);
+            return;
+        }
+        //use the connection as normal
+        var request = new Request("UPDATE [dbo].[Expense] SET [description] = @DESCRIPTION,[charge_date] = @CHARGE_DATE, [amount] = @AMOUNT," + 
+        "[comment] = @COMMENT, [budget_id] = @BUDGET_ID WHERE [id] = @ID",
+        function(err, rowCount) {
+            if (err) {
+                console.error(err);
+                return;
+            }
+            //release the connection back to the pool when finished
+            connection.release();
+        });
+        request.addParameter("ID", TYPES.Int, expenseObj.id);
+        request.addParameter("DESCRIPTION", TYPES.Text, expenseObj.description);
+        request.addParameter("CHARGE_DATE", TYPES.Date, expenseObj.charge_date);
+        request.addParameter("AMOUNT", TYPES.Float, expenseObj.amount);
+        request.addParameter("COMMENT", TYPES.Text, expenseObj.comment);
+        request.addParameter("BUDGET_ID", TYPES.Int, expenseObj.budget_id);
+        connection.execSql(request);
+    });
+    return 1;
+}
+
+exports.getExpenseByID = function(id) {
+    return new Promise( resolve => {
+        tp.sql("SELECT * FROM [dbo].[Expense] where id = " + id)
+    .execute()
+        .then(function(results){
+            resolve(results);
+        }).fail(function(err){
+            console.log(err);
+        });
+    });
+}
+
+exports.createNewVPizzaCard = function(pizzaCardObj){
+    console.log(pizzaCardObj);
+        pool.acquire(function (err, connection) {
+        if (err) {
+            console.error(err);
+            return;
+        }
+         // use the connection as normal
+        var request = new Request("INSERT INTO [dbo].[VPizza_Card] ([id],[description],[amount],[familyId],[currentBalance],[lastRefillDate]) " + 
+        "VALUES (@ID, @DESCRIPTION, @AMOUNT, @FAMILYID, @CURRENTBALANCE, @LASTREFILLDATE)",
+        function(err, rowCount) {
+            if (err) {
+                console.error(err);
+                return;
+            }
+            //release the connection back to the pool when finished
+            connection.release();
+        });
+        request.addParameter("ID", TYPES.Int, pizzaCardObj.id);
+        request.addParameter("DESCRIPTION", TYPES.Text, pizzaCardObj.description);
+        request.addParameter("AMOUNT", TYPES.Float, pizzaCardObj.amount);
+        request.addParameter("FAMILYID", TYPES.Int, pizzaCardObj.familyId);
+        request.addParameter("CURRENTBALANCE", TYPES.Float, pizzaCardObj.currentBalance);
+        request.addParameter("LASTREFILLDATE", TYPES.Date, pizzaCardObj.lastRefillDate);
+        connection.execSql(request);
+    });
+    return 1;
+};
+
+exports.getAllVGiftCards = function(){
+    return new Promise( resolve => {
+        tp.sql("SELECT * FROM [dbo].[VPizza_Card]")
+    .execute()
+        .then(function(results){
+            resolve(results);
+        }).fail(function(err){
+            console.log(err);
+        });
+    });
+}
+
+exports.modifyVPizzaCard = function(pizzaCardObj){
+    console.log(pizzaCardObj);
+        pool.acquire(function (err, connection) {
+        if (err) {
+            console.error(err);
+            return;
+        }
+         //use the connection as normal
+         var request = new Request("UPDATE [dbo].[VPizza_Card] SET [description] = @DESCRIPTION,[amount] = @AMOUNT,[familyId] = @FAMILYID, " + 
+         "[currentBalance] = @CURRENTBALANCE, [lastRefillDate] = @LASTREFILLDATE) WHERE [id] = @ID",
+        function(err, rowCount) {
+            if (err) {
+                console.error(err);
+                return;
+            }
+            //release the connection back to the pool when finished
+            connection.release();
+        });
+        request.addParameter("ID", TYPES.Int, pizzaCardObj.id);
+        request.addParameter("DESCRIPTION", TYPES.Text, pizzaCardObj.description);
+        request.addParameter("AMOUNT", TYPES.Float, pizzaCardObj.amount);
+        request.addParameter("FAMILYID", TYPES.Int, pizzaCardObj.familyId);
+        request.addParameter("CURRENTBALANCE", TYPES.Float, pizzaCardObj.currentBalance);
+        request.addParameter("LASTREFILLDATE", TYPES.Date, pizzaCardObj.lastRefillDate);
+        connection.execSql(request);
+    });
+    return 1;
+};
+
+exports.getBudgetByFamilyID = function(familyId) {
+    return new Promise( resolve => {
+        tp.sql("SELECT * FROM [dbo].[Budget] where familyId = " + familyId)
+    .execute()
+        .then(function(results){
+            resolve(results);
+        }).fail(function(err){
+            console.log(err);
+        });
+    });
+}
+
+exports.getThisMonthExpenses = function() {
+    return new Promise( resolve => {
+        tp.sql("SELECT * FROM [dbo].[Expense] WHERE DATEDIFF(day,charge_date,GETDATE()) between 0 and 30")
+        .execute()
+        .then(function(results) {
+            // console.log(results);
+            resolve(results);
+        }).fail(function(err) {
+            console.log(err);
+        });
+    });
+}
+
+exports.createNewFamily = function(familyObj){
+    console.log(familyObj);
+        pool.acquire(function (err, connection) {
+        if (err) {
+            console.error(err);
+            return;
+        }
+
+        var request = new Request("INSERT INTO [dbo].[Family] ([first_name], [last_name], [phone_number], [street_address], [zipcode], [email], [cancer_warrior_name], " + 
+        "[work_phone], [relationship_to_warrior], [additional_info], [end_of_treatment_date], [active], [created_date], [created_by], " +
+        "[updated_date], [updated_by], [deleted_date], [deleted_by], [approved_date], [approved_by]) " +
+        "VALUES (@FIRST_NAME, @LAST_NAME, @PHONE_NUMBER, @STREET_ADDRESS, @ZIPCODE, @EMAIL, @CANCER_WARRIOR_NAME, @WORK_PHONE," +
+        "@RELATIONSHIP_TO_WARRIOR, @ADDITIONAL_INFO, @END_OF_TREATMENT_DATE,@ACTIVE, @CREATED_DATE, @CREATED_BY, " +
+        "@UPDATED_DATE, @UPDATED_BY, @DELETED_DATE, @DELETED_BY, @APPROVED_DATE, @APPROVED_BY)",
+        function(err, rowCount) {
+            if (err) {
+                console.error(err);
+                return;
+            }
+            //release the connection back to the pool when finished
+            connection.release();
+        });
+        request.addParameter("FIRST_NAME", TYPES.VarChar, familyObj.firstName);
+        request.addParameter("LAST_NAME", TYPES.VarChar, familyObj.lastName);
+        request.addParameter("PHONE_NUMBER", TYPES.VarChar, familyObj.phoneNumber);
+        request.addParameter("STREET_ADDRESS", TYPES.VarChar, familyObj.streetAddress);
+        request.addParameter("ZIPCODE", TYPES.VarChar, familyObj.zipcode);
+        request.addParameter("EMAIL", TYPES.VarChar, familyObj.email);
+        request.addParameter("CANCER_WARRIOR_NAME", TYPES.VarChar, familyObj.cancerWarriorname);
+        request.addParameter("WORK_PHONE", TYPES.VarChar, familyObj.workPhone);
+        request.addParameter("RELATIONSHIP_TO_WARRIOR", TYPES.VarChar, familyObj.relationshipTowarrior);
+        request.addParameter("ADDITIONAL_INFO", TYPES.VarChar, familyObj.additionalInfo);
+        request.addParameter("END_OF_TREATMENT_DATE", TYPES.VarChar, familyObj.endOftreatmentDate);
+       // request.addParameter("ID", TYPES.VarChar, familyObj.id);
+        request.addParameter("ACTIVE", TYPES.Bit, 1);
+        request.addParameter("CREATED_DATE", TYPES.Date, new Date);
+        request.addParameter("CREATED_BY", TYPES.VarChar, familyObj.created_by);
+        request.addParameter("UPDATED_DATE", TYPES.Date, familyObj.updated_date);
+        request.addParameter("UPDATED_BY", TYPES.VarChar, familyObj.updated_by);
+        request.addParameter("DELETED_DATE", TYPES.Date, familyObj.deleted_date);
+        request.addParameter("DELETED_BY", TYPES.VarChar, familyObj.deleted_by);
+        request.addParameter("APPROVED_DATE", TYPES.Date, familyObj.approved_date);
+        request.addParameter("APPROVED_BY", TYPES.VarChar, familyObj.approved_by);
+        connection.execSql(request);
+    });
+    return 1;
+}
+
+exports.getFamilyByID = function(id) {
+    return new Promise( resolve => {
+        tp.sql("SELECT * FROM [dbo].[Family] where id = " + id)
+    .execute()
+        .then(function(results){
+            resolve(results);
+        }).fail(function(err){
+            console.log(err);
+        });
+    });
+}
+
+exports.modifyFamilyByID = function(familyObj) {
+    console.log(familyObj);
+    pool.acquire(function (err, connection) {
+        if (err) {
+            console.error(err);
+            return;
+        }
+        //use the connection as normal
+        var request = new Request("UPDATE [dbo].[Family] SET [first_name] = @FIRST_NAME, [last_name] = @LAST_NAME, [phone_number] = PHONE_NUMBER, [street_address] = @STREET_ADDRESS, " +
+        "[zipcode] = @ZIPCODE, [email] = @EMAIL, [cancer_warrior_name] = @CANCER_WARRIOR_NAME ,[work_phone] = @WORK_PHONE, [relationship_to_warrior] = @RELATIONSHIP_TO_WARRIOR, [additional_info] = @ADDITIONAL_INFO , [end_of_treatment_date] = @END_OF_TREATMENT_DATE, " +
+        "[active] = @ACTIVE, [created_date] = @CREATED_DATE , [created_by] = @CREATED_BY ,[updated_date] = @UPDATED_DATE, [updated_by] = @UPDATED_BY, " +
+        "[deleted_date] = @DELETED_DATE, [deleted_by] = @DELETED_BY, [approved_date] = @APPROVED_DATE, [approved_by] = @APPROVED_BY WHERE [id] = @ID",
+        function(err, rowCount) {
+            if (err) {
+                console.error(err);
+                return;
+            }
+            //release the connection back to the pool when finished
+            connection.release();
+        });
+        request.addParameter("FIRST_NAME", TYPES.VarChar, familyObj.firstName);
+        request.addParameter("LAST_NAME", TYPES.VarChar, familyObj.lastName);
+        request.addParameter("PHONE_NUMBER", TYPES.VarChar, familyObj.phoneNumber);
+        request.addParameter("STREET_ADDRESS", TYPES.VarChar, familyObj.streetAddress);
+        request.addParameter("ZIPCODE", TYPES.VarChar, familyObj.zipcode);
+        request.addParameter("EMAIL", TYPES.VarChar, familyObj.email);
+        request.addParameter("CANCER_WARRIOR_NAME", TYPES.VarChar, familyObj.cancerWarriorname);
+        request.addParameter("WORK_PHONE", TYPES.VarChar, familyObj.workPhone);
+        request.addParameter("RELATIONSHIP_TO_WARRIOR", TYPES.VarChar, familyObj.relationshipTowarrior);
+        request.addParameter("ADDITIONAL_INFO", TYPES.VarChar, familyObj.additionalInfo);
+        request.addParameter("END_OF_TREATMENT_DATE", TYPES.VarChar, familyObj.endOftreatmentDate);
+        request.addParameter("ID", TYPES.Int, familyObj.id);
+        request.addParameter("ACTIVE", TYPES.Bit, 1);
+        request.addParameter("CREATED_DATE", TYPES.Date, familyObj.created_date);
+        request.addParameter("CREATED_BY", TYPES.VarChar, familyObj.created_by);
+        request.addParameter("UPDATED_DATE", TYPES.Date, familyObj.updated_date);
+        request.addParameter("UPDATED_BY", TYPES.VarChar, familyObj.updated_by);
+        request.addParameter("DELETED_DATE", TYPES.Date, familyObj.deleted_date);
+        request.addParameter("DELETED_BY", TYPES.VarChar, familyObj.deleted_by);
+        request.addParameter("APPROVED_DATE", TYPES.Date, familyObj.approved_date);
+        request.addParameter("APPROVED_BY", TYPES.VarChar, familyObj.approved_by);
+        connection.execSql(request);
+    });
+    // Returning one if no error occurred.
+    return 1;
+}
+
+exports.getThisMonthFamiliesApproved = function() {
+    return new Promise( resolve => {
+        tp.sql("SELECT * FROM [dbo].[Family] WHERE DATEDIFF(day,approved_date,GETDATE()) between 0 and 30")
+        .execute()
+        .then(function(results) {
+            // console.log(results);
+            resolve(results);
+        }).fail(function(err) {
+            console.log(err);
+        });
+    });
+}
+
+exports.getThisMonthFamiliesCreated = function() {
+    return new Promise( resolve => {
+        tp.sql("SELECT * FROM [dbo].[Family] WHERE DATEDIFF(day,created_date,GETDATE()) between 0 and 30")
+        .execute()
+        .then(function(results) {
+            // console.log(results);
+            resolve(results);
+        }).fail(function(err) {
+            console.log(err);
+        });
+    });
+}
+
 
 exports.createNewCategory = function (businessObject) {
     console.log(businessObject);

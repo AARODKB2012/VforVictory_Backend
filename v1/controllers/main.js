@@ -776,3 +776,147 @@ exports.approveBusiness = async function (req, res,next){
         res.status(409).json({status: 409, errorMessage: `Error saving to database: ${err}`});
     });
 } 
+
+exports.modifyBudget = async function (req, res, next) {
+    let rowCount = sql.modifyBudget(req.body);
+    if(rowCount == 1){
+        res.status(201).json({message: 'Updated budget!' , budgetUpdated: true})
+    }else{
+        res.status(202).send({message: 'Unable to modify budget'});  
+    }
+}
+
+exports.getBudgetByID = async function(req,res,next) {
+    let budgetList = [];
+    budgetList = await sql.getBudgetByID(req.params.id);
+    if(budgetList.length > 0){
+        res.status(200).send({status:200, results: budgetList, resultsLength: budgetList.length})
+    }else{
+        res.status(204).send({message: 'Unable to get Budget'});
+    }
+}
+
+exports.createNewExpense = async function(req,res,next){
+    let rowCount = sql.createNewExpense(req.body);
+    console.log(rowCount);
+    if (rowCount == 1) {
+        res.status(201).json({expenseCreated: true, results:req.body});
+    } else {
+        res.status(202).send();
+    }
+}
+
+exports.getAllExpenses = async function(req,res,next){
+    let renderedList = await sql.getAllExpenses();
+    if(renderedList.length > 0){
+        res.status(200).json({status:200, results: renderedList, resultsLength: renderedList.length});
+    }else{
+        res.status(204).send();
+    }
+}
+
+exports.modifyExpense = async function(req,res,next){
+    let rowCount = sql.modifyExpense(req.body);
+    if(rowCount == 1){
+        res.status(201).json({message: 'Updated Expense' , budgetUpdated: true , results:req.body})
+    }else{
+        res.status(202).send({message: 'Unable to modify Expense'});  
+    }
+}
+
+exports.getExpenseByID = async function(req,res,next){
+    let renderedList = [];
+    renderedList = await sql.getExpenseByID(req.params.id);
+    if(renderedList.length > 0){
+        res.status(200).send({status:200, results: renderedList, resultsLength: renderedList.length})
+    }else{
+        res.status(204).send();
+    }
+}
+
+exports.createNewVPizzaCard = async function(req,res,next){
+    let rowCount = sql.createNewVPizzaCard(req.body);
+    console.log(rowCount);
+    if (rowCount == 1) {
+        res.status(201).json({giftCardCreated: true, results:req.body});
+    } else {
+        res.status(202).send();
+    }
+}
+
+exports.getAllVGiftCards = async function(req,res,next){
+    let renderedList = await sql.getAllVGiftCards();
+    if(renderedList.length > 0){
+        res.status(200).json({status:200, results: renderedList, resultsLength: renderedList.length});
+    }else{
+        res.status(204).send();
+    }
+}
+
+exports.modifyVPizzaGC = async function(req,res,next){
+    let rowCount = sql.modifyVPizzaCard(req.body)
+    if(rowCount == 1){
+        res.status(201).json({message: 'Updated GiftCard' , giftCardUpdated: true , results:req.body})
+    }else{
+        res.status(202).send({message: 'Unable to modify GiftCard'});  
+    }
+}
+
+exports.getThisMonthExpenses = async function(req,res,next){
+    let requestList = [];
+    requestList = await sql.getThisMonthExpenses();
+    if(requestList.length > 0){
+        res.status(200).json({status:200, results: requestList, resultsLength: requestList.length});
+    }else{
+        res.status(204).send();
+    }
+}
+
+exports.getBudgetByFamilyID = async function(req,res,next){
+    let renderedList = [];
+    renderedList = await sql.getBudgetByFamilyID(req.params.familyId);
+    if(renderedList.length > 0){
+        res.status(200).send({status:200, results: renderedList, resultsLength: renderedList.length})
+    }else{
+        res.status(204).send();
+    }
+}
+
+exports.getFamilyByID = async function(req,res,next){
+    let renderedList = [];
+    renderedList = await sql.getFamilyByID(req.params.id);
+    if(renderedList.length > 0){
+        res.status(200).send({status:200, results: renderedList, resultsLength: renderedList.length})
+    }else{
+        res.status(204).send();
+    }
+}
+
+exports.modifyFamilyByID = async function (req, res, next) {
+    let rowCount = sql.modifyFamilyByID(req.body);
+    if(rowCount == 1){
+        res.status(201).json({message: 'Updated Family' , familyUpdated: true})
+    }else{
+        res.status(202).send();  
+    }
+}
+
+exports.getThisMonthFamiliesApproved = async function(req,res,next){
+    let requestList = [];
+    requestList = await sql.getThisMonthFamiliesApproved();
+    if(requestList.length > 0){
+        res.status(200).json({status:200, results: requestList, resultsLength: requestList.length});
+    }else{
+        res.status(204).send();
+    }
+}
+
+exports.getThisMonthFamiliesCreated = async function(req,res,next){
+    let requestList = [];
+    requestList = await sql.getThisMonthFamiliesCreated();
+    if(requestList.length > 0){
+        res.status(200).json({status:200, results: requestList, resultsLength: requestList.length});
+    }else{
+        res.status(204).send();
+    }
+}
