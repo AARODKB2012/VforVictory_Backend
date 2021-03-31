@@ -776,3 +776,17 @@ exports.approveBusiness = async function (req, res,next){
         res.status(409).json({status: 409, errorMessage: `Error saving to database: ${err}`});
     });
 } 
+
+exports.disableBusiness = async function (req, res,next){
+    sql.tp.sql(`exec [usp_disableBusiness] ${req.params.businessId}, '${req.params.disabledBy}'`)
+    .execute()
+    .then(function(result) {
+        console.log(result)
+        if(result){
+            res.status(200).json({businessDisabled: true});
+        }
+    }).fail(function(err) {
+        console.log(err);
+        res.status(409).json({status: 409, errorMessage: `Error saving to database: ${err}`});
+    });
+}

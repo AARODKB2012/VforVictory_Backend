@@ -477,7 +477,7 @@ exports.updateBusiness = function(businessObject) {
       request.addParameter("EOY_RECEIPT", TYPES.VarChar, businessObject.eoyReceipt);
       request.addParameter("UPDATED_BY", TYPES.VarChar, businessObject.updatedBy);
       request.addParameter("UPDATED_DATE", TYPES.Date, new Date);
-      request.addParameter("ACTIVE", TYPES.Bit, 1);
+      request.addParameter("ACTIVE", TYPES.Bit, businessObject.active);
       request.addParameter("FACEBOOK", TYPES.VarChar, businessObject.facebookUrl);
       request.addParameter("TWITTER", TYPES.VarChar, businessObject.twitterUrl);
       request.addParameter("INSTAGRAM", TYPES.VarChar, businessObject.instagramUrl);
