@@ -102,7 +102,7 @@ router.post('/family/active',controller.getActiveFamily);
 
 
 // Email Functions
-router.post('/email/send',emailController.sendEmail);
+router.post('/email/send',emailController.sendGridEmail);
 
 // Will catch all not defined routes
 router.get('*', controller.getNotFound);
