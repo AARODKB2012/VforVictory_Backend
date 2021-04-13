@@ -1263,11 +1263,11 @@ exports.createNewFamily = function(familyObj){
         }
 
         var request = new Request("INSERT INTO [dbo].[Family] ([first_name], [last_name], [phone_number], [street_address], [zipcode], [email], [cancer_warrior_name], " + 
-        "[work_phone], [relationship_to_warrior], [additional_info], [end_of_treatment_date], [active], [created_date], [created_by], " +
-        "[updated_date], [updated_by], [deleted_date], [deleted_by], [approved_date], [approved_by]) " +
+        "[work_phone], [relationship_to_warrior], [additional_info], [end_of_treatment_date], [active], [created_date], [created_by]," +
+        "[updated_date], [updated_by], [deleted_date], [deleted_by], [approved_date], [approved_by], [familySize], [hearAbout], [welcomeLetter], [treamentLetter], [subscriberList], [facebookGroup]) " +
         "VALUES (@FIRST_NAME, @LAST_NAME, @PHONE_NUMBER, @STREET_ADDRESS, @ZIPCODE, @EMAIL, @CANCER_WARRIOR_NAME, @WORK_PHONE," +
         "@RELATIONSHIP_TO_WARRIOR, @ADDITIONAL_INFO, @END_OF_TREATMENT_DATE,@ACTIVE, @CREATED_DATE, @CREATED_BY, " +
-        "@UPDATED_DATE, @UPDATED_BY, @DELETED_DATE, @DELETED_BY, @APPROVED_DATE, @APPROVED_BY)",
+        "@UPDATED_DATE, @UPDATED_BY, @DELETED_DATE, @DELETED_BY, @APPROVED_DATE, @APPROVED_BY, @FAMILYSIZE, @HEARABOUT, @WELCOMELETTER, @TREAMENTLETTER, @SUBSCRIBERLIST,@FACEBOOKGROUP)",
         function(err, rowCount) {
             if (err) {
                 console.error(err);
@@ -1297,6 +1297,13 @@ exports.createNewFamily = function(familyObj){
         request.addParameter("DELETED_BY", TYPES.VarChar, familyObj.deleted_by);
         request.addParameter("APPROVED_DATE", TYPES.Date, familyObj.approved_date);
         request.addParameter("APPROVED_BY", TYPES.VarChar, familyObj.approved_by);
+        request.addParameter("FAMILYSIZE", TYPES.VarChar, familyObj.familysize);
+        request.addParameter("HEARABOUT", TYPES.VarChar, familyObj.hearabout);
+        request.addParameter("WELCOMELETTER",TYPES.Bit, 0);
+        request.addParameter("TREAMENTLETTER",TYPES.Bit, 0);
+        request.addParameter("SUBSCRIBERLIST",TYPES.Bit, 0);
+        request.addParameter("FACEBOOKGROUP",TYPES.Bit, 0);
+        
         connection.execSql(request);
     });
     return 1;
@@ -1316,6 +1323,14 @@ exports.getFamilyByID = function(id) {
 
 exports.modifyFamilyByID = function(familyObj) {
     console.log(familyObj);
+    familyObj  = {
+        ...familyObj,
+        welcomeLetter:  getBitValue(familyObj.welcomeLetter),
+        treamentLetter:  getBitValue(familyObj.treamentLetter),
+        subscriberList:getBitValue(familyObj.subscriberList),
+        facebookGroup:getBitValue(familyObj.facebookGroup)
+    }
+    console.log(familyObj);
     pool.acquire(function (err, connection) {
         if (err) {
             console.error(err);
@@ -1325,7 +1340,8 @@ exports.modifyFamilyByID = function(familyObj) {
         var request = new Request("UPDATE [dbo].[Family] SET [first_name] = @FIRST_NAME, [last_name] = @LAST_NAME, [phone_number] = PHONE_NUMBER, [street_address] = @STREET_ADDRESS, " +
         "[zipcode] = @ZIPCODE, [email] = @EMAIL, [cancer_warrior_name] = @CANCER_WARRIOR_NAME ,[work_phone] = @WORK_PHONE, [relationship_to_warrior] = @RELATIONSHIP_TO_WARRIOR, [additional_info] = @ADDITIONAL_INFO , [end_of_treatment_date] = @END_OF_TREATMENT_DATE, " +
         "[active] = @ACTIVE, [created_date] = @CREATED_DATE , [created_by] = @CREATED_BY ,[updated_date] = @UPDATED_DATE, [updated_by] = @UPDATED_BY, " +
-        "[deleted_date] = @DELETED_DATE, [deleted_by] = @DELETED_BY, [approved_date] = @APPROVED_DATE, [approved_by] = @APPROVED_BY WHERE [id] = @ID",
+        "[deleted_date] = @DELETED_DATE, [deleted_by] = @DELETED_BY, [approved_date] = @APPROVED_DATE, [approved_by] = @APPROVED_BY , [familySize] = @FAMILYSIZE, [hearAbout] = @HEARABOUT,"+
+        "[welcomeLetter] = @WELCOMELETTER, [treamentLetter] = @TREAMENTLETTER , [subscriberList] = @SUBSCRIBERLIST , [facebookGroup] = @FACEBOOKGROUP WHERE [id] = @ID ",
         function(err, rowCount) {
             if (err) {
                 console.error(err);
@@ -1355,10 +1371,21 @@ exports.modifyFamilyByID = function(familyObj) {
         request.addParameter("DELETED_BY", TYPES.VarChar, familyObj.deleted_by);
         request.addParameter("APPROVED_DATE", TYPES.Date, familyObj.approved_date);
         request.addParameter("APPROVED_BY", TYPES.VarChar, familyObj.approved_by);
+        request.addParameter("FAMILYSIZE", TYPES.VarChar, familyObj.familysize);
+        request.addParameter("HEARABOUT", TYPES.VarChar, familyObj.hearabout);
+        request.addParameter("WELCOMELETTER",TYPES.Bit, familyObj.welcomeLetter);
+        request.addParameter("TREAMENTLETTER",TYPES.Bit, familyObj.treamentLetter);
+        request.addParameter("SUBSCRIBERLIST",TYPES.Bit, familyObj.subscriberList);
+        request.addParameter("FACEBOOKGROUP",TYPES.Bit, familyObj.facebookGroup);
         connection.execSql(request);
     });
     // Returning one if no error occurred.
     return 1;
+}
+
+function getBitValue(value) {
+    console.log(value ? 1: 0);
+    return value ? 1 : 0;
 }
 
 exports.getThisMonthFamiliesApproved = function() {
