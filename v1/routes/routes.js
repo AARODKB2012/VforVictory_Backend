@@ -113,8 +113,6 @@ router.post('/VPizzaGC/new', controller.createNewVPizzaCard);
 router.post('/VPizzaGC/edit', controller.modifyVPizzaGC);
 router.post('/family/edit', controller.modifyFamilyByID);
 
-
-
 // Email Functions
 router.post('/email/send',emailController.sendEmail);
 
