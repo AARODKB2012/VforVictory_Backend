@@ -105,6 +105,7 @@ router.post('/service/followupFamily',controller.markFamilyFollowedUp);
 router.post('/service/markActive',controller.markServiceActive);
 router.post('/service/markInactive',controller.markServiceInactive);
 router.post('/service/delete',controller.deleteRequest);
+router.post('/service/valuecost',controller.setValueCost);
 
 router.post('/family/new',controller.createNewFamily);
 router.post('/family/markActive',controller.markFamilyActive);

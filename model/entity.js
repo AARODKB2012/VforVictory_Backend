@@ -366,7 +366,7 @@ exports.createNewBusiness = function (businessObject) {
         "[notes],[active], [created_by], [created_date]) " +
         "VALUES (@BUSINESS_NAME, @EMAIL, @PRIMARY_CONTACT_FNAME, @PRIMARY_CONTACT_LNAME, @PRIMARY_CONTACT_PHONE_NUMBER, " +
         "@SECONDARY_CONTACT_FNAME,@SECONDARY_CONTACT_LNAME, @SECONDARY_CONTACT_PHONE_NUMBER, @ADDRESS, @SERVICES_OFFERED, " +
-        "@SERVICE_AREA, @DISCOUNT_AMOUNT, @PREFERRED_METHOD_CONTACT, @EOY_RECEIPT, @FACEBOOK, @TWITTER, @INSTAGRAM, @NOTES, @ACTIVE,@CREATED_BY, @CREATED_DATE)", 
+        "@SERVICE_AREA, @DISCOUNT_AMOUNT, @PREFERRED_METHOD_CONTACT, @EOY_RECEIPT, @FACEBOOK, @TWITTER, @INSTAGRAM, @NOTES, @ACTIVE,@CREATED_BY, @CREATED_DATE)",
         function (err, rowCount) {
             if (err) {
                 console.error(err);
@@ -673,7 +673,7 @@ exports.fulfillRequest = function(userObject) {
       }
       // use the connection as normal
       var request = new Request("UPDATE [dbo].[Request] SET [pending] = @PENDING, [approved] = @APPROVED, [fulfilled_date] = @FULFILLED_DATE, [fulfilled_by] = @FULFILLED_BY, " +
-      "[followedup_business] = @FOLLOWEDUP_BUSINESS, [followedup_family] = @FOLLOWEDUP_FAMILY WHERE [record_id] = @ID",
+      "[followedup_business] = @FOLLOWEDUP_BUSINESS, [followedup_family] = @FOLLOWEDUP_FAMILY, [value] = @VALUE WHERE [record_id] = @ID",
       function(err, rowCount) {
           if (err) {
               console.error(err);
@@ -690,6 +690,7 @@ exports.fulfillRequest = function(userObject) {
       request.addParameter('PENDING', TYPES.Bit, 0);
       request.addParameter('FOLLOWEDUP_BUSINESS', TYPES.Bit, userObject.followedUpB);
       request.addParameter('FOLLOWEDUP_FAMILY', TYPES.Bit, userObject.followedUpF);
+      request.addParameter('VALUE', TYPES.Decimal, userObject.value)
       connection.execSql(request);
   });
 
@@ -946,10 +947,10 @@ exports.getActiveFamily = function() {
         });
     });
 }
-      
+
 exports.getInactiveFamily = function() {
     return new Promise( resolve => {
-        tp.sql("SELECT * FROM [dbo].[Family] WHERE active = 0")  
+        tp.sql("SELECT * FROM [dbo].[Family] WHERE active = 0")
     .execute()
         .then(function(results) {
             // console.log(results);
@@ -1044,7 +1045,7 @@ exports.modifyBudget = function (budgetObj) {
             return;
         }
         //use the connection as normal
-        var request = new Request("UPDATE [dbo].[Budget] SET [amount] = @AMOUNT, [start_date] = @START_DATE, [finish_date] = @FINISH_DATE, " + 
+        var request = new Request("UPDATE [dbo].[Budget] SET [amount] = @AMOUNT, [start_date] = @START_DATE, [finish_date] = @FINISH_DATE, " +
         "[current_balance] = @CURRENT_BALANCE, [familyId] = @FAMILYID WHERE [id] = @ID",
         function(err, rowCount) {
             if (err) {
@@ -1054,7 +1055,7 @@ exports.modifyBudget = function (budgetObj) {
             //release the connection back to the pool when finished
             connection.release();
         });
-  
+
         request.addParameter("ID", TYPES.Int, budgetObj.id);
         request.addParameter("AMOUNT", TYPES.Float, budgetObj.amount);
         request.addParameter("START_DATE", TYPES.Date, budgetObj.start_date);
@@ -1126,7 +1127,7 @@ exports.modifyExpense = function (expenseObj) {
             return;
         }
         //use the connection as normal
-        var request = new Request("UPDATE [dbo].[Expense] SET [description] = @DESCRIPTION,[charge_date] = @CHARGE_DATE, [amount] = @AMOUNT," + 
+        var request = new Request("UPDATE [dbo].[Expense] SET [description] = @DESCRIPTION,[charge_date] = @CHARGE_DATE, [amount] = @AMOUNT," +
         "[comment] = @COMMENT, [budget_id] = @BUDGET_ID WHERE [id] = @ID",
         function(err, rowCount) {
             if (err) {
@@ -1167,7 +1168,7 @@ exports.createNewVPizzaCard = function(pizzaCardObj){
             return;
         }
          // use the connection as normal
-        var request = new Request("INSERT INTO [dbo].[VPizza_Card] ([id],[description],[amount],[familyId],[currentBalance],[lastRefillDate]) " + 
+        var request = new Request("INSERT INTO [dbo].[VPizza_Card] ([id],[description],[amount],[familyId],[currentBalance],[lastRefillDate]) " +
         "VALUES (@ID, @DESCRIPTION, @AMOUNT, @FAMILYID, @CURRENTBALANCE, @LASTREFILLDATE)",
         function(err, rowCount) {
             if (err) {
@@ -1208,7 +1209,7 @@ exports.modifyVPizzaCard = function(pizzaCardObj){
             return;
         }
          //use the connection as normal
-         var request = new Request("UPDATE [dbo].[VPizza_Card] SET [description] = @DESCRIPTION,[amount] = @AMOUNT,[familyId] = @FAMILYID, " + 
+         var request = new Request("UPDATE [dbo].[VPizza_Card] SET [description] = @DESCRIPTION,[amount] = @AMOUNT,[familyId] = @FAMILYID, " +
          "[currentBalance] = @CURRENTBALANCE, [lastRefillDate] = @LASTREFILLDATE) WHERE [id] = @ID",
         function(err, rowCount) {
             if (err) {
@@ -1262,7 +1263,7 @@ exports.createNewFamily = function(familyObj){
             return;
         }
 
-        var request = new Request("INSERT INTO [dbo].[Family] ([first_name], [last_name], [phone_number], [street_address], [zipcode], [email], [cancer_warrior_name], " + 
+        var request = new Request("INSERT INTO [dbo].[Family] ([first_name], [last_name], [phone_number], [street_address], [zipcode], [email], [cancer_warrior_name], " +
         "[work_phone], [relationship_to_warrior], [additional_info], [end_of_treatment_date], [active], [created_date], [created_by], " +
         "[updated_date], [updated_by], [deleted_date], [deleted_by], [approved_date], [approved_by]) " +
         "VALUES (@FIRST_NAME, @LAST_NAME, @PHONE_NUMBER, @STREET_ADDRESS, @ZIPCODE, @EMAIL, @CANCER_WARRIOR_NAME, @WORK_PHONE," +
@@ -1397,7 +1398,7 @@ exports.createNewCategory = function (businessObject) {
         }
         // use the connection as normal
         var request = new Request("INSERT INTO [dbo].[Categories] ([CATEGORY_NAME], [created_by], [created_date]) " +
-        "VALUES (@CATEGORY_NAME, @CREATED_BY, @CREATED_DATE)", 
+        "VALUES (@CATEGORY_NAME, @CREATED_BY, @CREATED_DATE)",
         function (err, rowCount) {
             if (err) {
                 console.error(err);
@@ -1435,7 +1436,7 @@ exports.updateCategory = function (businessObject) {
             return;
         }
         // use the connection as normal
-        var request = new Request("update [dbo].[Categories] set category_name = @CATEGORY_NAME, updated_by = @UPDATED_BY, updated_date = @UPDATED_DATE where id = @ID", 
+        var request = new Request("update [dbo].[Categories] set category_name = @CATEGORY_NAME, updated_by = @UPDATED_BY, updated_date = @UPDATED_DATE where id = @ID",
         function (err, rowCount) {
             if (err) {
                 console.error(err);
@@ -1473,7 +1474,7 @@ exports.approveBusiness = function (businessId, approver) {
             return;
         }
         // use the connection as normal
-        var request = new Request("update [dbo].[Business] set [approved_by] = @APPROVED_BY, [approved_date] = @APPROVED_DATE where [record_id] = @ID", 
+        var request = new Request("update [dbo].[Business] set [approved_by] = @APPROVED_BY, [approved_date] = @APPROVED_DATE where [record_id] = @ID",
         function (err, rowCount) {
             if (err) {
                 console.error(err);
@@ -1490,3 +1491,28 @@ exports.approveBusiness = function (businessId, approver) {
     return 1;
 };
 
+exports.setValueCost = function(userObject) {
+  pool.acquire(function (err, connection) {
+      if (err) {
+          console.error(err);
+          return;
+      }
+      // use the connection as normal
+      var request = new Request("UPDATE [dbo].[Request] SET [value] = @VALUE, [cost] = @COST WHERE [record_id] = @ID",
+      function(err, rowCount) {
+          if (err) {
+              console.error(err);
+              return;
+          }
+          // release the connection back to the pool when finished
+          connection.release();
+      });
+
+      request.addParameter('ID', TYPES.VarChar, userObject.id);
+      request.addParameter('VALUE', TYPES.Decimal, userObject.value);
+      request.addParameter('COST', TYPES.Decimal, userObject.cost);
+      connection.execSql(request);
+  });
+
+  return 1;
+}

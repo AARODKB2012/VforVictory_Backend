@@ -753,15 +753,15 @@ exports.getBusinessLogo = async function (req, res,next){
     .execute()
     .then(function(results) {
         if(results){
-            const r = fs.createReadStream(results[0].URL) 
+            const r = fs.createReadStream(results[0].URL)
             const ps = new stream.PassThrough()
             stream.pipeline(
             r,
-            ps, 
+            ps,
             (err) => {
                 if (err) {
                 console.log(err)
-                    return res.status(400).json({status: 409, errorMessage: `Error getting image: ${err}`}); 
+                    return res.status(400).json({status: 409, errorMessage: `Error getting image: ${err}`});
                 }
             })
             ps.pipe(res)
@@ -771,7 +771,7 @@ exports.getBusinessLogo = async function (req, res,next){
            console.log(err);
            res.status(409).json({status: 409, errorMessage: `Error saving to database: ${err}`});
        });
-} 
+}
 
 exports.getServicesRendered = async function (req, res,next){
     let servicesRenderedList = [];
@@ -795,14 +795,14 @@ exports.approveBusiness = async function (req, res,next){
         console.log(err);
         res.status(409).json({status: 409, errorMessage: `Error saving to database: ${err}`});
     });
-} 
+}
 
 exports.modifyBudget = async function (req, res, next) {
     let rowCount = sql.modifyBudget(req.body);
     if(rowCount == 1){
         res.status(201).json({message: 'Updated budget!' , budgetUpdated: true})
     }else{
-        res.status(202).send({message: 'Unable to modify budget'});  
+        res.status(202).send({message: 'Unable to modify budget'});
     }
 }
 
@@ -840,7 +840,7 @@ exports.modifyExpense = async function(req,res,next){
     if(rowCount == 1){
         res.status(201).json({message: 'Updated Expense' , budgetUpdated: true , results:req.body})
     }else{
-        res.status(202).send({message: 'Unable to modify Expense'});  
+        res.status(202).send({message: 'Unable to modify Expense'});
     }
 }
 
@@ -878,7 +878,7 @@ exports.modifyVPizzaGC = async function(req,res,next){
     if(rowCount == 1){
         res.status(201).json({message: 'Updated GiftCard' , giftCardUpdated: true , results:req.body})
     }else{
-        res.status(202).send({message: 'Unable to modify GiftCard'});  
+        res.status(202).send({message: 'Unable to modify GiftCard'});
     }
 }
 
@@ -917,7 +917,7 @@ exports.modifyFamilyByID = async function (req, res, next) {
     if(rowCount == 1){
         res.status(201).json({message: 'Updated Family' , familyUpdated: true})
     }else{
-        res.status(202).send();  
+        res.status(202).send();
     }
 }
 
@@ -941,3 +941,12 @@ exports.getThisMonthFamiliesCreated = async function(req,res,next){
     }
 }
 
+exports.setValueCost = async function (req, res,next){
+  let rowCount = sql.setValueCost(req.body);
+  console.log(rowCount);
+  if(rowCount == 1){
+    res.status(201).json({requestFulfilled: true});
+  }else{
+    res.status(202).send();
+  }
+}
