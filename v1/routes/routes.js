@@ -67,13 +67,14 @@ router.get('/business/services/rendered/:businessName',controller.getServicesRen
 router.get('/budget/id/:id',controller.getBudgetByID);
 router.get('/expense',controller.getAllExpenses);
 router.get('/expense/id/:id', controller.getExpenseByID);
-router.get('/VPizzaGC', controller.getAllVGiftCards);
 router.get('/budget/familyId/:familyId', controller.getBudgetByFamilyID);
 router.get('/expense/month', controller.getThisMonthExpenses);
 router.get('/family/id/:id', controller.getFamilyByID);
 router.get('/family/approved/month', controller.getThisMonthFamiliesApproved);
 router.get('/family/created/month', controller.getThisMonthFamiliesCreated);
-
+router.get('/VPizza', controller.getAllVGiftCards);
+router.get('/VPizza/giftcard/id/:id', controller.getVPizzaGFByFamilyID);
+router.get('/Family/id/:id/VPizza/family_id/:family_id', controller.getFullVPizzaGF);
 //Add POST endpoint here
 router.post('/volunteer/new',controller.createNewVolunteer);
 router.post('/volunteer/edit',controller.updateVolunteer);
@@ -109,10 +110,10 @@ router.post('/family/active',controller.getActiveFamily);
 router.post('/budget/edit',controller.modifyBudget);
 router.post('/expense/new',controller.createNewExpense);
 router.post('/expense/edit', controller.modifyExpense);
-router.post('/VPizzaGC/new', controller.createNewVPizzaCard);
-router.post('/VPizzaGC/edit', controller.modifyVPizzaGC);
 router.post('/family/edit', controller.modifyFamilyByID);
-router.post('/family/addVPizza', controller.addVPizzaGiftCard);
+router.post('/family/VPizza', controller.addVPizzaGiftCard);
+router.post('/VPizza/new', controller.createNewVPizzaCard);
+
 // Email Functions
 router.post('/email/send',emailController.sendEmail);
 
