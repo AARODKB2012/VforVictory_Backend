@@ -909,3 +909,19 @@ exports.setValueCost = async function (req, res,next){
     res.status(202).send();
   }
 }
+
+
+exports.approveFamily = async function (req, res,next){
+    sql.tp.sql(`exec [usp_approveFamily] ${req.params.familyId}, '${req.params.approvedBy}'`)
+    .execute()
+    .then(function(result) {
+        console.log(result)
+        if(result){
+            res.status(200).json({familyApproved: true});
+        }
+    }).fail(function(err) {
+        console.log(err);
+        res.status(409).json({status: 409, errorMessage: `Error saving to database: ${err}`});
+    });
+}
+

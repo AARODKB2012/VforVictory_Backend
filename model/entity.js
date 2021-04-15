@@ -1203,12 +1203,12 @@ exports.createNewFamily = function(familyObj){
             return;
         }
 
-        var request = new Request("INSERT INTO [dbo].[Family] ([first_name], [last_name], [phone_number], [street_address], [zipcode], [email], [cancer_warrior_name], " +
-        "[work_phone], [relationship_to_warrior], [additional_info], [end_of_treatment_date], [active], [created_date], [created_by], " +
-        "[updated_date], [updated_by], [deleted_date], [deleted_by], [approved_date], [approved_by]) " +
+        var request = new Request("INSERT INTO [dbo].[Family] ([first_name], [last_name], [phone_number], [street_address], [zipcode], [email], [cancer_warrior_name], " + 
+        "[work_phone], [relationship_to_warrior], [additional_info], [end_of_treatment_date], [active], [created_date], [created_by]," +
+        "[updated_date], [updated_by], [deleted_date], [deleted_by], [approved_date], [approved_by], [familySize], [hearAbout], [welcomeLetter], [treamentLetter], [subscriberList], [facebookGroup]) " +
         "VALUES (@FIRST_NAME, @LAST_NAME, @PHONE_NUMBER, @STREET_ADDRESS, @ZIPCODE, @EMAIL, @CANCER_WARRIOR_NAME, @WORK_PHONE," +
         "@RELATIONSHIP_TO_WARRIOR, @ADDITIONAL_INFO, @END_OF_TREATMENT_DATE,@ACTIVE, @CREATED_DATE, @CREATED_BY, " +
-        "@UPDATED_DATE, @UPDATED_BY, @DELETED_DATE, @DELETED_BY, @APPROVED_DATE, @APPROVED_BY)",
+        "@UPDATED_DATE, @UPDATED_BY, @DELETED_DATE, @DELETED_BY, @APPROVED_DATE, @APPROVED_BY, @FAMILYSIZE, @HEARABOUT, @WELCOMELETTER, @TREAMENTLETTER, @SUBSCRIBERLIST,@FACEBOOKGROUP)",
         function(err, rowCount) {
             if (err) {
                 console.error(err);
@@ -1217,17 +1217,17 @@ exports.createNewFamily = function(familyObj){
             //release the connection back to the pool when finished
             connection.release();
         });
-        request.addParameter("FIRST_NAME", TYPES.VarChar, familyObj.firstName);
-        request.addParameter("LAST_NAME", TYPES.VarChar, familyObj.lastName);
-        request.addParameter("PHONE_NUMBER", TYPES.VarChar, familyObj.phoneNumber);
-        request.addParameter("STREET_ADDRESS", TYPES.VarChar, familyObj.streetAddress);
+        request.addParameter("FIRST_NAME", TYPES.VarChar, familyObj.first_name);
+        request.addParameter("LAST_NAME", TYPES.VarChar, familyObj.last_name);
+        request.addParameter("PHONE_NUMBER", TYPES.VarChar, familyObj.phone_number);
+        request.addParameter("STREET_ADDRESS", TYPES.VarChar, familyObj.street_address);
         request.addParameter("ZIPCODE", TYPES.VarChar, familyObj.zipcode);
         request.addParameter("EMAIL", TYPES.VarChar, familyObj.email);
-        request.addParameter("CANCER_WARRIOR_NAME", TYPES.VarChar, familyObj.cancerWarriorname);
-        request.addParameter("WORK_PHONE", TYPES.VarChar, familyObj.workPhone);
-        request.addParameter("RELATIONSHIP_TO_WARRIOR", TYPES.VarChar, familyObj.relationshipTowarrior);
-        request.addParameter("ADDITIONAL_INFO", TYPES.VarChar, familyObj.additionalInfo);
-        request.addParameter("END_OF_TREATMENT_DATE", TYPES.VarChar, familyObj.endOftreatmentDate);
+        request.addParameter("CANCER_WARRIOR_NAME", TYPES.VarChar, familyObj.cancer_warrior_name);
+        request.addParameter("WORK_PHONE", TYPES.VarChar, familyObj.work_phone);
+        request.addParameter("RELATIONSHIP_TO_WARRIOR", TYPES.VarChar, familyObj.relationship_to_warrior);
+        request.addParameter("ADDITIONAL_INFO", TYPES.VarChar, familyObj.additional_info);
+        request.addParameter("END_OF_TREATMENT_DATE", TYPES.VarChar, familyObj.end_of_treatment_date);
        // request.addParameter("ID", TYPES.VarChar, familyObj.id);
         request.addParameter("ACTIVE", TYPES.Bit, 1);
         request.addParameter("CREATED_DATE", TYPES.Date, new Date);
@@ -1238,6 +1238,13 @@ exports.createNewFamily = function(familyObj){
         request.addParameter("DELETED_BY", TYPES.VarChar, familyObj.deleted_by);
         request.addParameter("APPROVED_DATE", TYPES.Date, familyObj.approved_date);
         request.addParameter("APPROVED_BY", TYPES.VarChar, familyObj.approved_by);
+        request.addParameter("FAMILYSIZE", TYPES.VarChar, familyObj.familysize);
+        request.addParameter("HEARABOUT", TYPES.VarChar, familyObj.hearabout);
+        request.addParameter("WELCOMELETTER",TYPES.Bit, 0);
+        request.addParameter("TREAMENTLETTER",TYPES.Bit, 0);
+        request.addParameter("SUBSCRIBERLIST",TYPES.Bit, 0);
+        request.addParameter("FACEBOOKGROUP",TYPES.Bit, 0);
+        
         connection.execSql(request);
     });
     return 1;
@@ -1257,6 +1264,14 @@ exports.getFamilyByID = function(id) {
 
 exports.modifyFamilyByID = function(familyObj) {
     console.log(familyObj);
+    familyObj  = {
+        ...familyObj,
+        welcomeLetter:  getBitValue(familyObj.welcomeLetter),
+        treamentLetter:  getBitValue(familyObj.treamentLetter),
+        subscriberList:getBitValue(familyObj.subscriberList),
+        facebookGroup:getBitValue(familyObj.facebookGroup)
+    }
+    console.log(familyObj);
     pool.acquire(function (err, connection) {
         if (err) {
             console.error(err);
@@ -1266,7 +1281,8 @@ exports.modifyFamilyByID = function(familyObj) {
         var request = new Request("UPDATE [dbo].[Family] SET [first_name] = @FIRST_NAME, [last_name] = @LAST_NAME, [phone_number] = PHONE_NUMBER, [street_address] = @STREET_ADDRESS, " +
         "[zipcode] = @ZIPCODE, [email] = @EMAIL, [cancer_warrior_name] = @CANCER_WARRIOR_NAME ,[work_phone] = @WORK_PHONE, [relationship_to_warrior] = @RELATIONSHIP_TO_WARRIOR, [additional_info] = @ADDITIONAL_INFO , [end_of_treatment_date] = @END_OF_TREATMENT_DATE, " +
         "[active] = @ACTIVE, [created_date] = @CREATED_DATE , [created_by] = @CREATED_BY ,[updated_date] = @UPDATED_DATE, [updated_by] = @UPDATED_BY, " +
-        "[deleted_date] = @DELETED_DATE, [deleted_by] = @DELETED_BY, [approved_date] = @APPROVED_DATE, [approved_by] = @APPROVED_BY WHERE [id] = @ID",
+        "[deleted_date] = @DELETED_DATE, [deleted_by] = @DELETED_BY, [approved_date] = @APPROVED_DATE, [approved_by] = @APPROVED_BY , [familySize] = @FAMILYSIZE, [hearAbout] = @HEARABOUT,"+
+        "[welcomeLetter] = @WELCOMELETTER, [treamentLetter] = @TREAMENTLETTER , [subscriberList] = @SUBSCRIBERLIST , [facebookGroup] = @FACEBOOKGROUP WHERE [id] = @ID ",
         function(err, rowCount) {
             if (err) {
                 console.error(err);
@@ -1275,17 +1291,17 @@ exports.modifyFamilyByID = function(familyObj) {
             //release the connection back to the pool when finished
             connection.release();
         });
-        request.addParameter("FIRST_NAME", TYPES.VarChar, familyObj.firstName);
-        request.addParameter("LAST_NAME", TYPES.VarChar, familyObj.lastName);
-        request.addParameter("PHONE_NUMBER", TYPES.VarChar, familyObj.phoneNumber);
-        request.addParameter("STREET_ADDRESS", TYPES.VarChar, familyObj.streetAddress);
+        request.addParameter("FIRST_NAME", TYPES.VarChar, familyObj.first_name);
+        request.addParameter("LAST_NAME", TYPES.VarChar, familyObj.last_name);
+        request.addParameter("PHONE_NUMBER", TYPES.VarChar, familyObj.phone_number);
+        request.addParameter("STREET_ADDRESS", TYPES.VarChar, familyObj.street_address);
         request.addParameter("ZIPCODE", TYPES.VarChar, familyObj.zipcode);
         request.addParameter("EMAIL", TYPES.VarChar, familyObj.email);
-        request.addParameter("CANCER_WARRIOR_NAME", TYPES.VarChar, familyObj.cancerWarriorname);
-        request.addParameter("WORK_PHONE", TYPES.VarChar, familyObj.workPhone);
-        request.addParameter("RELATIONSHIP_TO_WARRIOR", TYPES.VarChar, familyObj.relationshipTowarrior);
-        request.addParameter("ADDITIONAL_INFO", TYPES.VarChar, familyObj.additionalInfo);
-        request.addParameter("END_OF_TREATMENT_DATE", TYPES.VarChar, familyObj.endOftreatmentDate);
+        request.addParameter("CANCER_WARRIOR_NAME", TYPES.VarChar, familyObj.cancer_warrior_name);
+        request.addParameter("WORK_PHONE", TYPES.VarChar, familyObj.work_phone);
+        request.addParameter("RELATIONSHIP_TO_WARRIOR", TYPES.VarChar, familyObj.relationship_to_warrior);
+        request.addParameter("ADDITIONAL_INFO", TYPES.VarChar, familyObj.additional_info);
+        request.addParameter("END_OF_TREATMENT_DATE", TYPES.VarChar, familyObj.end_of_treatment_date);
         request.addParameter("ID", TYPES.Int, familyObj.id);
         request.addParameter("ACTIVE", TYPES.Bit, 1);
         request.addParameter("CREATED_DATE", TYPES.Date, familyObj.created_date);
@@ -1296,10 +1312,21 @@ exports.modifyFamilyByID = function(familyObj) {
         request.addParameter("DELETED_BY", TYPES.VarChar, familyObj.deleted_by);
         request.addParameter("APPROVED_DATE", TYPES.Date, familyObj.approved_date);
         request.addParameter("APPROVED_BY", TYPES.VarChar, familyObj.approved_by);
+        request.addParameter("FAMILYSIZE", TYPES.VarChar, familyObj.familysize);
+        request.addParameter("HEARABOUT", TYPES.VarChar, familyObj.hearabout);
+        request.addParameter("WELCOMELETTER",TYPES.Bit, familyObj.welcomeLetter);
+        request.addParameter("TREAMENTLETTER",TYPES.Bit, familyObj.treamentLetter);
+        request.addParameter("SUBSCRIBERLIST",TYPES.Bit, familyObj.subscriberList);
+        request.addParameter("FACEBOOKGROUP",TYPES.Bit, familyObj.facebookGroup);
         connection.execSql(request);
     });
     // Returning one if no error occurred.
     return 1;
+}
+
+function getBitValue(value) {
+    console.log(value ? 1: 0);
+    return value ? 1 : 0;
 }
 
 exports.getThisMonthFamiliesApproved = function() {
@@ -1445,3 +1472,27 @@ exports.setValueCost = function(userObject) {
 
   return 1;
 }
+
+exports.approveFamily = function (familyId, approver) {
+    pool.acquire(function (err, connection) {
+        if (err) {
+            console.error(err);
+            return;
+        }
+        // use the connection as normal
+        var request = new Request("update [dbo].[Family] set [approved_by] = @APPROVED_BY, [approved_date] = @APPROVED_DATE where [id] = @ID", 
+        function (err, rowCount) {
+            if (err) {
+                console.error(err);
+                return;
+            }
+            // release the connection back to the pool when finished
+            connection.release();
+        });
+        request.addParameter("ID", TYPES.VarChar, familyId);
+        request.addParameter("APPROVED_BY", TYPES.VarChar, approver);
+        request.addParameter("APPROVED_DATE", TYPES.Date, new Date);
+        connection.execSql(request);
+    });
+    return 1;
+};

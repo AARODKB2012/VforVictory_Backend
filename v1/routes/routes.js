@@ -107,6 +107,7 @@ router.post('/family/new',controller.createNewFamily);
 router.post('/family/markActive',controller.markFamilyActive);
 router.post('/family/markInactive',controller.markFamilyInactive);
 router.post('/family/active',controller.getActiveFamily);
+router.post('/family/:familyId/approve/:approvedBy', controller.approveFamily);
 
 router.post('/budget/edit',controller.modifyBudget);
 router.post('/expense/new',controller.createNewExpense);
