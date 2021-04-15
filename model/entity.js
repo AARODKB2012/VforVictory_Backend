@@ -554,23 +554,9 @@ exports.getAllRoles = function() {
     });
 }
 
-exports.getAllServices = function() {
+exports.getAllRequests = function() {
   return new Promise( resolve => {
-      tp.sql("SELECT * FROM [dbo].[Services]")
-      .execute()
-      .then(function(results) {
-          // console.log(results);
-          resolve(results);
-      }).fail(function(err) {
-          console.log(err);
-      });
-  });
-}
-
-
-exports.getActiveServices = function() {
-  return new Promise( resolve => {
-      tp.sql("SELECT * FROM [dbo].[Services] WHERE active = 1")
+      tp.sql("SELECT * FROM [dbo].[Request] WHERE active = 1")
       .execute()
       .then(function(results) {
           // console.log(results);
@@ -622,7 +608,7 @@ exports.getServiceById = function(serviceId) {
 
 exports.getRequestById = function(serviceId) {
   return new Promise( resolve => {
-      tp.sql("SELECT * FROM [dbo].[Requests] where id = " + serviceId)
+      tp.sql("SELECT * FROM [dbo].[Request] where id = " + serviceId)
       .execute()
       .then(function(results) {
           // console.log(results);
@@ -683,6 +669,8 @@ exports.fulfillRequest = function(userObject) {
           connection.release();
       });
 
+      var option = { "precision": 10, "scale": 2 }
+
       request.addParameter('ID', TYPES.VarChar, userObject.id);
       request.addParameter('FULFILLED_DATE', TYPES.Date, new Date);
       request.addParameter('FULFILLED_BY', TYPES.NVarChar, userObject.currentUser);
@@ -690,7 +678,7 @@ exports.fulfillRequest = function(userObject) {
       request.addParameter('PENDING', TYPES.Bit, 0);
       request.addParameter('FOLLOWEDUP_BUSINESS', TYPES.Bit, userObject.followedUpB);
       request.addParameter('FOLLOWEDUP_FAMILY', TYPES.Bit, userObject.followedUpF);
-      request.addParameter('VALUE', TYPES.Decimal, userObject.value)
+      request.addParameter('VALUE', TYPES.Decimal, userObject.value, option)
       connection.execSql(request);
   });
 
@@ -797,54 +785,6 @@ exports.markFamilyFollowedUp = function(userObject) {
   return 1;
 }
 
-exports.markServiceActive = function(userObject) {
-  pool.acquire(function (err, connection) {
-      if (err) {
-          console.error(err);
-          return;
-      }
-      // use the connection as normal
-      var request = new Request("UPDATE [dbo].[Services] SET [active] = 1 WHERE [id] = @ID",
-      function(err, rowCount) {
-          if (err) {
-              console.error(err);
-              return;
-          }
-          // release the connection back to the pool when finished
-          connection.release();
-      });
-
-      request.addParameter('ID', TYPES.VarChar, userObject.id);
-      connection.execSql(request);
-  });
-
-  return 1;
-}
-
-exports.markServiceInactive = function(userObject) {
-  pool.acquire(function (err, connection) {
-      if (err) {
-          console.error(err);
-          return;
-      }
-      // use the connection as normal
-      var request = new Request("UPDATE [dbo].[Services] SET [active] = 0 WHERE [id] = @ID",
-      function(err, rowCount) {
-          if (err) {
-              console.error(err);
-              return;
-          }
-          // release the connection back to the pool when finished
-          connection.release();
-      });
-
-      request.addParameter('ID', TYPES.VarChar, userObject.id);
-      connection.execSql(request);
-  });
-
-  return 1;
-}
-
 exports.deleteRequest = function(userObject) {
   pool.acquire(function (err, connection) {
       if (err) {
@@ -924,7 +864,7 @@ exports.getBusinessesToApprove = function() {
 
 exports.getThisMonthRequests = function() {
     return new Promise( resolve => {
-        tp.sql("SELECT * FROM [dbo].[Requests] where DATEDIFF(MONTH, GETDATE(), date_requested) < 30")
+        tp.sql("SELECT * FROM [dbo].[Request] where DATEDIFF(MONTH, GETDATE(), requested_date) < 30 and active = 1")
         .execute()
         .then(function(results) {
             // console.log(results);
@@ -1454,19 +1394,6 @@ exports.updateCategory = function (businessObject) {
     return 1;
 };
 
-exports.getServicesRendered = function(businessName) {
-    return new Promise( resolve => {
-        tp.sql(`select id, name, date_requested, date_fulfilled, active from [dbo].[Requests] where business_name = '${businessName}'`)
-        .execute()
-        .then(function(results) {
-            // console.log(results);
-            resolve(results);
-        }).fail(function(err) {
-            console.log(err);
-        });
-    });
-}
-
 exports.approveBusiness = function (businessId, approver) {
     pool.acquire(function (err, connection) {
         if (err) {
@@ -1508,9 +1435,11 @@ exports.setValueCost = function(userObject) {
           connection.release();
       });
 
+      var option = { "precision": 10, "scale": 2 }
+
       request.addParameter('ID', TYPES.VarChar, userObject.id);
-      request.addParameter('VALUE', TYPES.Decimal, userObject.value);
-      request.addParameter('COST', TYPES.Decimal, userObject.cost);
+      request.addParameter('VALUE', TYPES.Decimal, userObject.value, option);
+      request.addParameter('COST', TYPES.Decimal, userObject.cost, option);
       connection.execSql(request);
   });
 

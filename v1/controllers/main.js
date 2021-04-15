@@ -426,16 +426,6 @@ exports.getAllRoles = async function (req, res,next){
     }
 }
 
-exports.getAllServices = async function (req, res,next){
-  let serviceList = [];
-  serviceList = await sql.getAllServices();
-  if(serviceList.length > 0){
-      res.status(200).json({status:200, results: serviceList, resultsLength: serviceList.length});
-  }else{
-      res.status(204).send();
-  }
-}
-
 exports.getAllCategories = async function (req, res,next){
   let categoryList = [];
   categoryList = await sql.getAllCategories();
@@ -446,15 +436,15 @@ exports.getAllCategories = async function (req, res,next){
   }
 }
 
-exports.getActiveServices = async function (req, res,next){
-  let serviceList = [];
-  serviceList = await sql.getActiveServices();
-  if(serviceList.length > 0){
-      res.status(200).json({status:200, results: serviceList, resultsLength: serviceList.length});
-  }else{
+exports.getAllRequests = async function (req, res, next) {
+  let reqList = [];
+  reqList = await sql.getAllRequests();
+  if (reqList.length > 0) {
+      res.status(200).json({status: 200, results: reqList, resultsLength: reqList.length});
+  } else {
       res.status(204).send();
   }
-}
+};
 
 exports.getActiveRequests = async function (req, res,next){
   let activeList = [];
@@ -471,16 +461,6 @@ exports.getRenderedServices = async function (req, res,next){
   renderedList = await sql.getRenderedServices();
   if(renderedList.length > 0){
       res.status(200).json({status:200, results: renderedList, resultsLength: renderedList.length});
-  }else{
-      res.status(204).send();
-  }
-}
-
-exports.getServiceById = async function (req, res,next){
-  let serviceList = [];
-  serviceList = await sql.getServiceById(req.params.serviceId);
-  if(serviceList.length > 0){
-      res.status(200).json({status:200, results: serviceList, resultsLength: serviceList.length});
   }else{
       res.status(204).send();
   }
@@ -555,27 +535,6 @@ exports.markFamilyFollowedUp = async function (req, res,next){
     res.status(202).send();
   }
 }
-
-exports.markServiceActive = async function (req, res,next){
-  let rowCount = sql.markServiceActive(req.body);
-  console.log(rowCount);
-  if(rowCount == 1){
-    res.status(201).json({requestFulfilled: true});
-  }else{
-    res.status(202).send();
-  }
-}
-
-exports.markServiceInactive = async function (req, res,next){
-  let rowCount = sql.markServiceInactive(req.body);
-  console.log(rowCount);
-  if(rowCount == 1){
-    res.status(201).json({requestFulfilled: true});
-  }else{
-    res.status(202).send();
-  }
-}
-
 
 exports.deleteRequest = async function (req, res,next){
   let rowCount = sql.deleteRequest(req.body);
