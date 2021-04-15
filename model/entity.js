@@ -659,7 +659,7 @@ exports.fulfillRequest = function(userObject) {
       }
       // use the connection as normal
       var request = new Request("UPDATE [dbo].[Request] SET [pending] = @PENDING, [approved] = @APPROVED, [fulfilled_date] = @FULFILLED_DATE, [fulfilled_by] = @FULFILLED_BY, " +
-      "[followedup_business] = @FOLLOWEDUP_BUSINESS, [followedup_family] = @FOLLOWEDUP_FAMILY, [value] = @VALUE WHERE [record_id] = @ID",
+      "[followedup_business] = @FOLLOWEDUP_BUSINESS, [followedup_family] = @FOLLOWEDUP_FAMILY, [service_value] = @SERVICE_VALUE WHERE [record_id] = @ID",
       function(err, rowCount) {
           if (err) {
               console.error(err);
@@ -669,8 +669,6 @@ exports.fulfillRequest = function(userObject) {
           connection.release();
       });
 
-      var option = { "precision": 10, "scale": 2 }
-
       request.addParameter('ID', TYPES.VarChar, userObject.id);
       request.addParameter('FULFILLED_DATE', TYPES.Date, new Date);
       request.addParameter('FULFILLED_BY', TYPES.NVarChar, userObject.currentUser);
@@ -678,7 +676,7 @@ exports.fulfillRequest = function(userObject) {
       request.addParameter('PENDING', TYPES.Bit, 0);
       request.addParameter('FOLLOWEDUP_BUSINESS', TYPES.Bit, userObject.followedUpB);
       request.addParameter('FOLLOWEDUP_FAMILY', TYPES.Bit, userObject.followedUpF);
-      request.addParameter('VALUE', TYPES.Decimal, userObject.value, option)
+      request.addParameter('SERVICE_VALUE', TYPES.Float, userObject.value)
       connection.execSql(request);
   });
 
@@ -1425,7 +1423,7 @@ exports.setValueCost = function(userObject) {
           return;
       }
       // use the connection as normal
-      var request = new Request("UPDATE [dbo].[Request] SET [value] = @VALUE, [cost] = @COST WHERE [record_id] = @ID",
+      var request = new Request("UPDATE [dbo].[Request] SET [service_value] = @SERVICE_VALUE, [service_cost] = @SERVICE_COST WHERE [record_id] = @ID",
       function(err, rowCount) {
           if (err) {
               console.error(err);
@@ -1435,11 +1433,9 @@ exports.setValueCost = function(userObject) {
           connection.release();
       });
 
-      var option = { "precision": 10, "scale": 2 }
-
       request.addParameter('ID', TYPES.VarChar, userObject.id);
-      request.addParameter('VALUE', TYPES.Decimal, userObject.value, option);
-      request.addParameter('COST', TYPES.Decimal, userObject.cost, option);
+      request.addParameter('SERVICE_VALUE', TYPES.Float, userObject.value);
+      request.addParameter('SERVICE_COST', TYPES.Float, userObject.cost);
       connection.execSql(request);
   });
 
