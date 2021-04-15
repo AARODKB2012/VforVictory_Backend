@@ -1107,16 +1107,15 @@ exports.getExpenseByID = function(id) {
     });
 }
 
-exports.createNewVPizzaCard = function(pizzaCardObj){
-    console.log(pizzaCardObj);
+exports.createNewVPizzaCard = function(vPizzaObj){
+    console.log(vPizzaObj);
         pool.acquire(function (err, connection) {
         if (err) {
             console.error(err);
             return;
         }
          // use the connection as normal
-        var request = new Request("INSERT INTO [dbo].[VPizza_Card] ([id],[description],[amount],[familyId],[currentBalance],[lastRefillDate]) " + 
-        "VALUES (@ID, @DESCRIPTION, @AMOUNT, @FAMILYID, @CURRENTBALANCE, @LASTREFILLDATE)",
+        var request = new Request("INSERT INTO [dbo].[VPizza] ([refill_date], [family_id]) VALUES (@REFILL_DATE,@FAMILY_ID)",
         function(err, rowCount) {
             if (err) {
                 console.error(err);
@@ -1125,12 +1124,9 @@ exports.createNewVPizzaCard = function(pizzaCardObj){
             //release the connection back to the pool when finished
             connection.release();
         });
-        request.addParameter("ID", TYPES.Int, pizzaCardObj.id);
-        request.addParameter("DESCRIPTION", TYPES.Text, pizzaCardObj.description);
-        request.addParameter("AMOUNT", TYPES.Float, pizzaCardObj.amount);
-        request.addParameter("FAMILYID", TYPES.Int, pizzaCardObj.familyId);
-        request.addParameter("CURRENTBALANCE", TYPES.Float, pizzaCardObj.currentBalance);
-        request.addParameter("LASTREFILLDATE", TYPES.Date, pizzaCardObj.lastRefillDate);
+        
+        request.addParameter("REFILL_DATE", TYPES.Date, new Date);
+        request.addParameter("FAMILY_ID", TYPES.Int, vPizzaObj.family_id);
         connection.execSql(request);
     });
     return 1;
@@ -1138,7 +1134,7 @@ exports.createNewVPizzaCard = function(pizzaCardObj){
 
 exports.getAllVGiftCards = function(){
     return new Promise( resolve => {
-        tp.sql("SELECT * FROM [dbo].[VPizza_Card]")
+        tp.sql("SELECT * FROM [dbo].[VPizza]")
     .execute()
         .then(function(results){
             resolve(results);
@@ -1147,35 +1143,6 @@ exports.getAllVGiftCards = function(){
         });
     });
 }
-
-exports.modifyVPizzaCard = function(pizzaCardObj){
-    console.log(pizzaCardObj);
-        pool.acquire(function (err, connection) {
-        if (err) {
-            console.error(err);
-            return;
-        }
-         //use the connection as normal
-         var request = new Request("UPDATE [dbo].[VPizza_Card] SET [description] = @DESCRIPTION,[amount] = @AMOUNT,[familyId] = @FAMILYID, " + 
-         "[currentBalance] = @CURRENTBALANCE, [lastRefillDate] = @LASTREFILLDATE) WHERE [id] = @ID",
-        function(err, rowCount) {
-            if (err) {
-                console.error(err);
-                return;
-            }
-            //release the connection back to the pool when finished
-            connection.release();
-        });
-        request.addParameter("ID", TYPES.Int, pizzaCardObj.id);
-        request.addParameter("DESCRIPTION", TYPES.Text, pizzaCardObj.description);
-        request.addParameter("AMOUNT", TYPES.Float, pizzaCardObj.amount);
-        request.addParameter("FAMILYID", TYPES.Int, pizzaCardObj.familyId);
-        request.addParameter("CURRENTBALANCE", TYPES.Float, pizzaCardObj.currentBalance);
-        request.addParameter("LASTREFILLDATE", TYPES.Date, pizzaCardObj.lastRefillDate);
-        connection.execSql(request);
-    });
-    return 1;
-};
 
 exports.getBudgetByFamilyID = function(familyId) {
     return new Promise( resolve => {
@@ -1421,3 +1388,25 @@ exports.approveBusiness = function (businessId, approver) {
     });
     return 1;
 };
+
+exports.addVPizzaGiftCard = function(familyObj){
+    console.log(familyObj);
+        pool.acquire(function (err, connection) {
+        if (err) {
+            console.error(err);
+            return;
+        }
+        var request = new Request("INSERT INTO [dbo].[Family] ([vPizza_giftcard],[vPizza_refill_amount]) VALUES (@VPIZZA_GIFTCARD,@VPIZZA_REFILL_AMOUNT)",
+        function(err, rowCount) {
+            if (err) {
+                console.error(err);
+                return;
+            }
+            //release the connection back to the pool when finished
+            connection.release();
+        });
+        request.addParameter("VPIZZA_GIFTCARD", TYPES.VarChar, familyObj.vPizza_giftcard);
+        request.addParameter("VPIZZA_REFILL_AMOUNT", TYPES.Float, familyObj.vPizza_refill_amount);
+    });
+    return 1;
+}

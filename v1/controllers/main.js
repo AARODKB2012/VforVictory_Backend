@@ -920,3 +920,13 @@ exports.getThisMonthFamiliesCreated = async function(req,res,next){
         res.status(204).send();
     }
 }
+
+exports.addVPizzaGiftCard = async function(req,res,next){
+    let rowCount = sql.addVPizzaGiftCard(req.body);
+    console.log(rowCount);
+    if (rowCount == 1) {
+        res.status(201).json({giftCardCreated: true, results:req.body});
+    } else {
+        res.status(202).send();
+    }
+}
