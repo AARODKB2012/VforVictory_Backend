@@ -1100,16 +1100,15 @@ exports.getExpenseByID = function(id) {
     });
 }
 
-exports.createNewVPizzaCard = function(pizzaCardObj){
-    console.log(pizzaCardObj);
+exports.createNewVPizzaCard = function(vPizzaObj){
+    console.log(vPizzaObj);
         pool.acquire(function (err, connection) {
         if (err) {
             console.error(err);
             return;
         }
          // use the connection as normal
-        var request = new Request("INSERT INTO [dbo].[VPizza_Card] ([id],[description],[amount],[familyId],[currentBalance],[lastRefillDate]) " +
-        "VALUES (@ID, @DESCRIPTION, @AMOUNT, @FAMILYID, @CURRENTBALANCE, @LASTREFILLDATE)",
+        var request = new Request("INSERT INTO [dbo].[VPizza] ([refill_date], [family_id]) VALUES (@REFILL_DATE,@FAMILY_ID)",
         function(err, rowCount) {
             if (err) {
                 console.error(err);
@@ -1118,12 +1117,9 @@ exports.createNewVPizzaCard = function(pizzaCardObj){
             //release the connection back to the pool when finished
             connection.release();
         });
-        request.addParameter("ID", TYPES.Int, pizzaCardObj.id);
-        request.addParameter("DESCRIPTION", TYPES.Text, pizzaCardObj.description);
-        request.addParameter("AMOUNT", TYPES.Float, pizzaCardObj.amount);
-        request.addParameter("FAMILYID", TYPES.Int, pizzaCardObj.familyId);
-        request.addParameter("CURRENTBALANCE", TYPES.Float, pizzaCardObj.currentBalance);
-        request.addParameter("LASTREFILLDATE", TYPES.Date, pizzaCardObj.lastRefillDate);
+        
+        request.addParameter("REFILL_DATE", TYPES.Date, new Date);
+        request.addParameter("FAMILY_ID", TYPES.Int, vPizzaObj.family_id);
         connection.execSql(request);
     });
     return 1;

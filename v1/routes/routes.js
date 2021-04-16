@@ -119,8 +119,6 @@ router.post('/family/notes/delete',controller.deleteNote);
 router.post('/budget/edit',controller.modifyBudget);
 router.post('/expense/new',controller.createNewExpense);
 router.post('/expense/edit', controller.modifyExpense);
-router.post('/VPizzaGC/new', controller.createNewVPizzaCard);
-router.post('/VPizzaGC/edit', controller.modifyVPizzaGC);
 router.post('/family/edit', controller.modifyFamilyByID);
 
 
@@ -128,7 +126,7 @@ router.post('/family/new',controller.createNewFamily);
 router.post('/family/markActive',controller.markFamilyActive);
 router.post('/family/markInactive',controller.markFamilyInactive);
 router.post('/family/active',controller.getActiveFamily);
-
+router.post('/VPizza/new', controller.createNewVPizzaCard);
 
 
 // Email Functions
