@@ -299,7 +299,7 @@ exports.getAllBudgets = function () {
 };
 
 exports.createNewBudget = function (budgetObj) {
-console.log(budgetObj);
+    console.log(budgetObj);
 pool.acquire(function (err, connection) {
     if (err) {
         console.error(err);

@@ -768,7 +768,7 @@ exports.disableBusiness = async function (req, res,next){
         console.log(err);
         res.status(409).json({status: 409, errorMessage: `Error saving to database: ${err}`});
     });
-}.
+}
 
 
 exports.modifyBudget = async function (req, res, next) {
