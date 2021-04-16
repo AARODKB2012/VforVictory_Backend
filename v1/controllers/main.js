@@ -754,7 +754,7 @@ exports.approveBusiness = async function (req, res,next){
         console.log(err);
         res.status(409).json({status: 409, errorMessage: `Error saving to database: ${err}`});
     });
-} 
+}
 
 exports.disableBusiness = async function (req, res,next){
     sql.tp.sql(`exec [usp_disableBusiness] ${req.params.businessId}, '${req.params.disabledBy}'`)
@@ -768,7 +768,7 @@ exports.disableBusiness = async function (req, res,next){
         console.log(err);
         res.status(409).json({status: 409, errorMessage: `Error saving to database: ${err}`});
     });
-}.
+}
 
 
 exports.modifyBudget = async function (req, res, next) {
@@ -968,7 +968,7 @@ exports.getFamilyNotes = async function(req,res,next){
     res.status(204).send();
   }
 }
-  
+
 exports.addNote = async function (req, res, next) {
     let rowCount = sql.addNote(req.body);
     console.log(rowCount);
@@ -978,7 +978,7 @@ exports.addNote = async function (req, res, next) {
         res.status(202).send();
     }
 }
-  
+
 exports.editNote = async function (req, res, next) {
     let rowCount = sql.editNote(req.body);
     if(rowCount == 1){
@@ -987,7 +987,7 @@ exports.editNote = async function (req, res, next) {
         res.status(202).send();
     }
 }
-  
+
 exports.deleteNote = async function (req, res, next) {
     let rowCount = sql.deleteNote(req.body);
     if(rowCount == 1){
