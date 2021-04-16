@@ -362,11 +362,11 @@ exports.createNewBusiness = function (businessObject) {
         // use the connection as normal
         var request = new Request("INSERT INTO [dbo].[Business] ([business_name],[email],[primary_contact_fName],[primary_contact_lName], " +
         "[primary_contact_phone_number],[secondary_contact_fName],[secondary_contact_lName],[secondary_contact_phone_number]," +
-        "[address],[Services_Offered],[Service_Area],[Discount_Amount],[Preferred_Method_Contact],[EOY_Receipt], [facebook_url], [twiter_url], [instagram_url]," +
+        "[address],[Services_Offered],[Service_Area],[Discount_Amount],[Preferred_Method_Contact],[EOY_Receipt], [facebook_url], [twiter_url], [instagram_url], [business_url]," +
         "[notes],[active], [created_by], [created_date]) " +
         "VALUES (@BUSINESS_NAME, @EMAIL, @PRIMARY_CONTACT_FNAME, @PRIMARY_CONTACT_LNAME, @PRIMARY_CONTACT_PHONE_NUMBER, " +
         "@SECONDARY_CONTACT_FNAME,@SECONDARY_CONTACT_LNAME, @SECONDARY_CONTACT_PHONE_NUMBER, @ADDRESS, @SERVICES_OFFERED, " +
-        "@SERVICE_AREA, @DISCOUNT_AMOUNT, @PREFERRED_METHOD_CONTACT, @EOY_RECEIPT, @FACEBOOK, @TWITTER, @INSTAGRAM, @NOTES, @ACTIVE,@CREATED_BY, @CREATED_DATE)",
+        "@SERVICE_AREA, @DISCOUNT_AMOUNT, @PREFERRED_METHOD_CONTACT, @EOY_RECEIPT, @FACEBOOK, @TWITTER, @INSTAGRAM, @WEBSITE, @NOTES, @ACTIVE,@CREATED_BY, @CREATED_DATE)", 
         function (err, rowCount) {
             if (err) {
                 console.error(err);
@@ -392,6 +392,7 @@ exports.createNewBusiness = function (businessObject) {
         request.addParameter("FACEBOOK", TYPES.VarChar, businessObject.facebookUrl);
         request.addParameter("TWITTER", TYPES.VarChar, businessObject.twitterUrl);
         request.addParameter("INSTAGRAM", TYPES.VarChar, businessObject.instagramUrl);
+        request.addParameter("WEBSITE", TYPES.VarChar, businessObject.website);
         request.addParameter("NOTES", TYPES.NVarChar, businessObject.notes);
         request.addParameter("ACTIVE", TYPES.Bit, 1);
         request.addParameter("CREATED_BY", TYPES.VarChar, businessObject.createdBy);
@@ -412,7 +413,7 @@ exports.updateBusiness = function(businessObject) {
       "[primary_contact_lName] = @PRIMARY_CONTACT_LNAME, [primary_contact_phone_number] = @PRIMARY_CONTACT_PHONE_NUMBER, [secondary_contact_fName] = @SECONDARY_CONTACT_FNAME, " +
       "[secondary_contact_lName] = @SECONDARY_CONTACT_LNAME,[secondary_contact_phone_number] = @SECONDARY_CONTACT_PHONE_NUMBER, [address] = @ADDRESS, " +
       "[Services_Offered] = @SERVICES_OFFERED, [Service_Area] = @SERVICE_AREA,[Discount_Amount] = @DISCOUNT_AMOUNT,[Preferred_Method_Contact] = @PREFERRED_METHOD_CONTACT, " +
-      "[EOY_Receipt] = @EOY_RECEIPT, [updated_by] = @UPDATED_BY, [updated_date] = @UPDATED_DATE, [active] = @ACTIVE, [facebook_url] = @FACEBOOK, [twiter_url] = @TWITTER, [instagram_url] = @INSTAGRAM "+
+      "[EOY_Receipt] = @EOY_RECEIPT, [updated_by] = @UPDATED_BY, [updated_date] = @UPDATED_DATE, [active] = @ACTIVE, [facebook_url] = @FACEBOOK, [twiter_url] = @TWITTER, [instagram_url] = @INSTAGRAM, [business_url] = @WEBSITE "+
       " WHERE [record_id] = @ID",
       function(err, rowCount) {
           if (err) {
@@ -440,10 +441,11 @@ exports.updateBusiness = function(businessObject) {
       request.addParameter("EOY_RECEIPT", TYPES.VarChar, businessObject.eoyReceipt);
       request.addParameter("UPDATED_BY", TYPES.VarChar, businessObject.updatedBy);
       request.addParameter("UPDATED_DATE", TYPES.Date, new Date);
-      request.addParameter("ACTIVE", TYPES.Bit, 1);
+      request.addParameter("ACTIVE", TYPES.Bit, businessObject.active);
       request.addParameter("FACEBOOK", TYPES.VarChar, businessObject.facebookUrl);
       request.addParameter("TWITTER", TYPES.VarChar, businessObject.twitterUrl);
       request.addParameter("INSTAGRAM", TYPES.VarChar, businessObject.instagramUrl);
+      request.addParameter("WEBSITE", TYPES.VarChar, businessObject.website);
       connection.execSql(request);
   });
 
@@ -636,7 +638,6 @@ exports.createNewRequest = function(userObject) {
           // release the connection back to the pool when finished
           connection.release();
       });
-
       request.addParameter('FAMILY_ID', TYPES.NVarChar, userObject.familyId);
       request.addParameter('BUSINESS_ID', TYPES.NVarChar, userObject.businessId);
       request.addParameter('PENDING', TYPES.Bit, 1);
@@ -765,7 +766,7 @@ exports.markFamilyFollowedUp = function(userObject) {
           return;
       }
       // use the connection as normal
-      var request = new Request("UPDATE [dbo].[Request] SET [followedup_family] = 1 WHERE [record_id] = @ID",
+      var request = new Request("UPDATE [dbo].[Request] SET [followedup_family] = @TOGGLE WHERE [record_id] = @ID",
       function(err, rowCount) {
           if (err) {
               console.error(err);
@@ -1417,6 +1418,19 @@ exports.updateCategory = function (businessObject) {
     return 1;
 };
 
+exports.getServicesRendered = function(businessId) {
+    return new Promise( resolve => {
+        tp.sql(`select (select CONCAT(f.first_name,' ', f.last_name) from Family f where id = r.family_id) as name, record_id, requested_date, fulfilled_date, active from [dbo].[Request] r where business_id = '${businessId}'`)
+        .execute()
+        .then(function(results) {
+            // console.log(results);
+            resolve(results);
+        }).fail(function(err) {
+            console.log(err);
+        });
+    });
+}
+
 exports.approveBusiness = function (businessId, approver) {
     pool.acquire(function (err, connection) {
         if (err) {
@@ -1495,15 +1509,14 @@ exports.approveFamily = function (familyId, approver) {
 exports.getApprovedFamily = function() {
     return new Promise( resolve => {
         tp.sql("SELECT * FROM [dbo].[Family] where active = 1 and approved_by is not null and approved_date is not null")
-        .execute()
-        .then(function(results) {
-            // console.log(results);
+      .execute()
+        .then(function(results){
             resolve(results);
-        }).fail(function(err) {
+        }).fail(function(err){
             console.log(err);
         });
     });
-}
+} 
 
 exports.getFamilyNotes = function(id) {
     return new Promise( resolve => {

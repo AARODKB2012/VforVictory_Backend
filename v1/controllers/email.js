@@ -2,7 +2,9 @@ const nodemailer = require('nodemailer');
 require('dotenv').config();
 const fs = require('fs');
 const path = require('path');
-var handlebars = require('handlebars');
+const handlebars = require('handlebars');
+const sgMail = require('@sendgrid/mail')
+sgMail.setApiKey(process.env.SENDGRID_API_KEY)
 
 var transporter = nodemailer.createTransport({
     service: process.env.EMAIL_SERVICE,
@@ -12,7 +14,7 @@ var transporter = nodemailer.createTransport({
     }
 });
 
-exports.sendEmail = async function (req, res,next){
+exports.sendEmailGmail = async function (req, res,next){
   const filePath = path.join(__dirname, '../../templates/password_reset.html');
   const source = fs.readFileSync(filePath, 'utf-8').toString();
   const template = handlebars.compile(source);
@@ -33,5 +35,35 @@ exports.sendEmail = async function (req, res,next){
     } else {
       res.status(200).json({mailResponse: true});
     }
+  });
+}
+
+exports.sendGridEmail = async function (req, res,next){
+  const filePath = path.join(__dirname, '../../templates/password_reset.html');
+  const source = fs.readFileSync(filePath, 'utf-8').toString();
+  const template = handlebars.compile(source);
+  const replacements = {
+    resetURL: req.body.messageBody
+  };
+  const htmlToSend = template(replacements);
+
+  const email = {
+    to: req.body.mailTo,
+    from: process.env.SENDGRID_USERNAME,
+    subject: req.body.subject,
+    text: 'This is a sample email message.',
+    html: htmlToSend,
+  }
+
+  sgMail
+  .send(email)
+  .then((response) => {
+    console.log(response[0].statusCode)
+    console.log(response[0].headers)
+    res.status(200).json({mailResponse: true});
+  })
+  .catch((error) => {
+    console.error(error);
+    res.status(200).json({mailResponse: error});
   });
 }

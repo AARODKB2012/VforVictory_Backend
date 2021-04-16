@@ -734,7 +734,7 @@ exports.getBusinessLogo = async function (req, res,next){
 
 exports.getServicesRendered = async function (req, res,next){
     let servicesRenderedList = [];
-    servicesRenderedList = await sql.getServicesRendered(req.params.businessName);
+    servicesRenderedList = await sql.getServicesRendered(req.params.businessId);
     if(servicesRenderedList.length > 0){
         res.status(200).json({status:200, results: servicesRenderedList, resultsLength: servicesRenderedList.length});
     }else{
@@ -754,7 +754,22 @@ exports.approveBusiness = async function (req, res,next){
         console.log(err);
         res.status(409).json({status: 409, errorMessage: `Error saving to database: ${err}`});
     });
-}
+} 
+
+exports.disableBusiness = async function (req, res,next){
+    sql.tp.sql(`exec [usp_disableBusiness] ${req.params.businessId}, '${req.params.disabledBy}'`)
+    .execute()
+    .then(function(result) {
+        console.log(result)
+        if(result){
+            res.status(200).json({businessDisabled: true});
+        }
+    }).fail(function(err) {
+        console.log(err);
+        res.status(409).json({status: 409, errorMessage: `Error saving to database: ${err}`});
+    });
+}.
+
 
 exports.modifyBudget = async function (req, res, next) {
     let rowCount = sql.modifyBudget(req.body);
