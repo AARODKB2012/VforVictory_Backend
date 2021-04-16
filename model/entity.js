@@ -306,7 +306,9 @@ pool.acquire(function (err, connection) {
         return;
     }
     // use the connection as normal
-    var request = new Request("INSERT INTO [dbo].[Budget] ([id],[amount],[start_date],[finish_date],[family_id],[current_balance]) " + "VALUES (@ID ,@AMOUNT ,@START_DATE ,@FINISH_DATE ,@FAMILY_ID ,@CURRENT_BALANCE);", function (err, rowCount) {
+    var request = new Request("INSERT INTO [dbo].[Budget] ([amount],[created_date],[created_by],[current_balance],[family_id],[description],[comment]) " +
+        "VALUES (@AMOUNT ,@CREATED_DATE,@CREATED_BY,@CURRENT_BALANCE ,@FAMILY_ID ,@DESCRIPTION ,@COMMENT);",
+         function (err, rowCount) {
         if (err) {
             console.error(err);
             return;
@@ -314,12 +316,14 @@ pool.acquire(function (err, connection) {
         // release the connection back to the pool when finished
         connection.release();
     });
-    request.addParameter("ID", TYPES.Int, budgetObj.id);
+   //request.addParameter("ID", TYPES.Int, budgetObj.id);
     request.addParameter("AMOUNT", TYPES.Float, budgetObj.amount);
-    request.addParameter("START_DATE", TYPES.Date, budgetObj.start_date);
-    request.addParameter("FINISH_DATE", TYPES.Date, budgetObj.finish_date);
-    request.addParameter("FAMILY_ID", TYPES.Int, budgetObj.family_id);
+    request.addParameter("CREATED_DATE", TYPES.Date, new Date);
+    request.addParameter("CREATED_BY", TYPES.VarChar, budgetObj.created_by);
     request.addParameter("CURRENT_BALANCE", TYPES.Float, budgetObj.current_balance);
+    request.addParameter("FAMILY_ID", TYPES.Int, budgetObj.familyId);
+    request.addParameter("DESCRIPTION", TYPES.NVarChar,budgetObj.description);
+    request.addParameter("COMMENT", TYPES.NVarChar,budgetObj.comment);
     connection.execSql(request);
   });
 
@@ -474,34 +478,6 @@ exports.getAllBudgets = function () {
             console.log(err);
         });
     });
-};
-
-exports.createNewBudget = function (budgetObj) {
-    console.log(budgetObj);
-    pool.acquire(function (err, connection) {
-        if (err) {
-            console.error(err);
-            return;
-        }
-        // use the connection as normal
-        var request = new Request("INSERT INTO [dbo].[Budget] ([id],[amount],[start_date],[finish_date],[family_id],[current_balance]) " + "VALUES (@ID ,@AMOUNT ,@START_DATE ,@FINISH_DATE ,@FAMILY_ID ,@CURRENT_BALANCE);", function (err, rowCount) {
-            if (err) {
-                console.error(err);
-                return;
-            }
-            // release the connection back to the pool when finished
-            connection.release();
-        });
-        request.addParameter("ID", TYPES.Int, budgetObj.id);
-        request.addParameter("AMOUNT", TYPES.Float, budgetObj.amount);
-        request.addParameter("START_DATE", TYPES.Date, budgetObj.start_date);
-        request.addParameter("FINISH_DATE", TYPES.Date, budgetObj.finish_date);
-        request.addParameter("FAMILY_ID", TYPES.Int, budgetObj.family_id);
-        request.addParameter("CURRENT_BALANCE", TYPES.Float, budgetObj.current_balance);
-        connection.execSql(request);
-    });
-
-  return 1;
 };
 
 exports.getVolunteerById = function(volunteerId) {
@@ -984,8 +960,8 @@ exports.modifyBudget = function (budgetObj) {
             return;
         }
         //use the connection as normal
-        var request = new Request("UPDATE [dbo].[Budget] SET [amount] = @AMOUNT, [start_date] = @START_DATE, [finish_date] = @FINISH_DATE, " +
-        "[current_balance] = @CURRENT_BALANCE, [familyId] = @FAMILYID WHERE [id] = @ID",
+        var request = new Request("UPDATE [dbo].[Budget] SET [amount] = @AMOUNT, updated_date = @UPDATED_DATE , updated_by = @UPDATED_BY, " + 
+        "[current_balance] = @CURRENT_BALANCE, [family_id] = @FAMILY_ID, [description] = @DESCRIPTION, [comment] = @COMMENT WHERE [id] = @ID",
         function(err, rowCount) {
             if (err) {
                 console.error(err);
@@ -994,13 +970,14 @@ exports.modifyBudget = function (budgetObj) {
             //release the connection back to the pool when finished
             connection.release();
         });
-
         request.addParameter("ID", TYPES.Int, budgetObj.id);
         request.addParameter("AMOUNT", TYPES.Float, budgetObj.amount);
-        request.addParameter("START_DATE", TYPES.Date, budgetObj.start_date);
-        request.addParameter("FINISH_DATE", TYPES.Date, budgetObj.finish_date);
+        request.addParameter("UPDATED_DATE", TYPES.Date, new Date);
+        request.addParameter("UPDATED_BY", TYPES.VarChar, budgetObj.updated_by);
         request.addParameter("CURRENT_BALANCE", TYPES.Float, budgetObj.current_balance);
-        request.addParameter("FAMILYID", TYPES.Int, budgetObj.familyId);
+        request.addParameter("FAMILY_ID", TYPES.Int, budgetObj.family_id);
+        request.addParameter("DESCRIPTION", TYPES.NVarChar,budgetObj.description);
+        request.addParameter("COMMENT", TYPES.NVarChar,budgetObj.comment);
         connection.execSql(request);
     });
     return 1;
@@ -1026,7 +1003,8 @@ console.log(expenseObj);
         return;
     }
      // use the connection as normal
-    var request = new Request("INSERT INTO [dbo].[Expense] ([id],[description],[charge_date],[amount],[comment],[budget_id]) " + "VALUES (@ID, @DESCRIPTION, @CHARGE_DATE, @AMOUNT, @COMMENT, @BUDGET_ID)",
+    var request = new Request("INSERT INTO [dbo].[Expense] ([description],[created_date],[created_by],[expense_amount],[budget_id])" +
+    "VALUES (@DESCRIPTION, @CREATED_DATE,@CREATED_BY,@EXPENSE_AMOUNT,@BUDGET_ID)",
         function(err, rowCount) {
             if (err) {
                 console.error(err);
@@ -1035,11 +1013,10 @@ console.log(expenseObj);
                 //release the connection back to the pool when finished
                 connection.release();
         });
-        request.addParameter("ID", TYPES.Int, expenseObj.id);
-        request.addParameter("DESCRIPTION", TYPES.Text, expenseObj.description);
-        request.addParameter("CHARGE_DATE", TYPES.Date, new Date);
-        request.addParameter("AMOUNT", TYPES.Float, expenseObj.amount);
-        request.addParameter("COMMENT", TYPES.Text, expenseObj.comment);
+        request.addParameter("DESCRIPTION", TYPES.NVarChar, expenseObj.description);
+        request.addParameter("CREATED_DATE", TYPES.Date, new Date);
+        request.addParameter("CREATED_BY", TYPES.VarChar, expenseObj.created_by);
+        request.addParameter("EXPENSE_AMOUNT", TYPES.Float, expenseObj.expense_amount);
         request.addParameter("BUDGET_ID", TYPES.Int, expenseObj.budget_id);
         connection.execSql(request);
     });
@@ -1126,7 +1103,7 @@ exports.createNewVPizzaCard = function(vPizzaObj){
 
 exports.getAllVGiftCards = function(){
     return new Promise( resolve => {
-        tp.sql("SELECT * FROM [dbo].[VPizza_Card]")
+        tp.sql("SELECT * FROM [dbo].[VPizza]")
     .execute()
         .then(function(results){
             resolve(results);
@@ -1247,7 +1224,7 @@ exports.createNewFamily = function(familyObj){
 
 exports.getFamilyByID = function(id) {
     return new Promise( resolve => {
-        tp.sql("SELECT * FROM [dbo].[Family] where id = " + id)
+        tp.sql("SELECT * FROM [dbo].[Family] WHERE id = " + id)
     .execute()
         .then(function(results){
             resolve(results);
@@ -1299,9 +1276,7 @@ exports.modifyFamilyByID = function(familyObj) {
         request.addParameter("END_OF_TREATMENT_DATE", TYPES.VarChar, familyObj.end_of_treatment_date);
         request.addParameter("ID", TYPES.Int, familyObj.id);
         request.addParameter("ACTIVE", TYPES.Bit, 1);
-        request.addParameter("CREATED_DATE", TYPES.Date, familyObj.created_date);
-        request.addParameter("CREATED_BY", TYPES.VarChar, familyObj.created_by);
-        request.addParameter("UPDATED_DATE", TYPES.Date, familyObj.updated_date);
+        request.addParameter("UPDATED_DATE", TYPES.Date, new Date);
         request.addParameter("UPDATED_BY", TYPES.VarChar, familyObj.updated_by);
         request.addParameter("DELETED_DATE", TYPES.Date, familyObj.deleted_date);
         request.addParameter("DELETED_BY", TYPES.VarChar, familyObj.deleted_by);
@@ -1351,7 +1326,6 @@ exports.getThisMonthFamiliesCreated = function() {
         });
     });
 }
-
 
 exports.createNewCategory = function (businessObject) {
     console.log(businessObject);

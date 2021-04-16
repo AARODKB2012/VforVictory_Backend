@@ -915,6 +915,16 @@ exports.getThisMonthFamiliesCreated = async function(req,res,next){
     }
 }
 
+exports.addVPizzaGiftCard = async function(req,res,next){
+    let renderedList = [];
+    renderedList = await sql.addVPizzaGiftCard(req.body);
+    if(renderedList.length > 0){
+        res.status(200).send({status:200, results: renderedList, resultsLength: renderedList.length})
+    }else{
+      res.status(204).send();
+  }
+}
+
 exports.setValueCost = async function (req, res,next){
   let rowCount = sql.setValueCost(req.body);
   console.log(rowCount);
@@ -954,9 +964,9 @@ exports.getFamilyNotes = async function(req,res,next){
     noteList = await sql.getFamilyNotes(req.params.familyId);
     if(noteList.length > 0){
         res.status(200).send({status:200, results: noteList, resultsLength: noteList.length})
-    }else{
-        res.status(204).send();
-    }
+     }else{
+    res.status(204).send();
+  }
 }
   
 exports.addNote = async function (req, res, next) {
@@ -996,7 +1006,7 @@ exports.getVPizzaGFByFamilyID = async function ( req, res, next){
         res.status(204).send();
     }
 }
-  
+
 exports.getFullVPizzaGF = async function (req, res, next){
     let requestList = [];
     requestList = await sql.getFullVPizzaGF(req.params.id, req.params.family_id);

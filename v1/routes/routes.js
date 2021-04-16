@@ -81,7 +81,6 @@ router.get('/VPizza', controller.getAllVGiftCards);
 router.get('/VPizza/giftcard/id/:id', controller.getVPizzaGFByFamilyID);
 router.get('/Family/id/:id/VPizza/family_id/:family_id', controller.getFullVPizzaGF);
 
-
 //Add POST endpoint here
 router.post('/volunteer/new',controller.createNewVolunteer);
 router.post('/volunteer/edit',controller.updateVolunteer);
@@ -122,6 +121,15 @@ router.post('/budget/edit',controller.modifyBudget);
 router.post('/expense/new',controller.createNewExpense);
 router.post('/expense/edit', controller.modifyExpense);
 router.post('/family/edit', controller.modifyFamilyByID);
+router.post('/family/VPizza', controller.addVPizzaGiftCard);
+router.post('/VPizza/new', controller.createNewVPizzaCard);
+
+
+router.post('/family/new',controller.createNewFamily);
+router.post('/family/markActive',controller.markFamilyActive);
+router.post('/family/markInactive',controller.markFamilyInactive);
+router.post('/family/active',controller.getActiveFamily);
+router.post('/VPizza/new', controller.createNewVPizzaCard);
 
 
 router.post('/family/new',controller.createNewFamily);
