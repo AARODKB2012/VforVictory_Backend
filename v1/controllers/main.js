@@ -909,3 +909,41 @@ exports.setValueCost = async function (req, res,next){
     res.status(202).send();
   }
 }
+
+exports.getFamilyNotes = async function(req,res,next){
+  let noteList = [];
+  noteList = await sql.getFamilyNotes(req.params.familyId);
+  if(noteList.length > 0){
+      res.status(200).send({status:200, results: noteList, resultsLength: noteList.length})
+  }else{
+      res.status(204).send();
+  }
+}
+
+exports.addNote = async function (req, res, next) {
+  let rowCount = sql.addNote(req.body);
+  console.log(rowCount);
+  if (rowCount == 1) {
+      res.status(201).json({noteAdded: true});
+  } else {
+      res.status(202).send();
+  }
+};
+
+exports.editNote = async function (req, res, next) {
+  let rowCount = sql.editNote(req.body);
+  if(rowCount == 1){
+    res.status(201).json({noteUpdated: true});
+  } else {
+      res.status(202).send();
+  }
+}
+
+exports.deleteNote = async function (req, res, next) {
+  let rowCount = sql.deleteNote(req.body);
+  if(rowCount == 1){
+    res.status(201).json({noteDeleted: true});
+  } else {
+      res.status(202).send();
+  }
+}

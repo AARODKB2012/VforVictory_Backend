@@ -74,6 +74,7 @@ router.get('/family/created/month', controller.getThisMonthFamiliesCreated);
 
 router.get('/family/email/:familyEmail',controller.getFamilyByEmail);
 router.get('/family/id/:familyId',controller.getFamilyById);
+router.get('/family/notes/id/:familyId',controller.getFamilyNotes);
 
 
 
@@ -120,6 +121,9 @@ router.post('/family/new',controller.createNewFamily);
 router.post('/family/markActive',controller.markFamilyActive);
 router.post('/family/markInactive',controller.markFamilyInactive);
 router.post('/family/active',controller.getActiveFamily);
+router.post('/family/notes/new',controller.addNote);
+router.post('/family/notes/edit',controller.editNote);
+router.post('/family/notes/delete',controller.deleteNote);
 
 
 

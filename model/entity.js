@@ -342,7 +342,7 @@ exports.getBusinessById = function(businessId) {
 
 exports.getAllCategories = function () {
   return new Promise((resolve) => {
-      tp.sql("SELECT * FROM [dbo].[Categories] order by [category_name]")
+      tp.sql("SELECT * FROM [dbo].[Categories] order by (case [category_name] when 'Others' then 2 else 1 end) ")
       .execute()
       .then(function (results) {
           resolve(results);
@@ -1441,3 +1441,93 @@ exports.setValueCost = function(userObject) {
 
   return 1;
 }
+
+exports.getFamilyNotes = function(id) {
+  return new Promise( resolve => {
+      tp.sql("SELECT * FROM [dbo].[Family_Note] where active = 1 and family_id = " + id)
+  .execute()
+      .then(function(results){
+          resolve(results);
+      }).fail(function(err){
+          console.log(err);
+      });
+  });
+}
+
+exports.addNote = function (noteObj) {
+  console.log(noteObj);
+  pool.acquire(function (err, connection) {
+      if (err) {
+          console.error(err);
+          return;
+      }
+      // use the connection as normal
+      var request = new Request("INSERT INTO [dbo].[Family_Note] ([family_id],[contents],[created_by],[last_modified],[active]) "
+      + "VALUES (@FAMILY_ID, @CONTENTS, @CREATED_BY, @LAST_MODIFIED, @ACTIVE)", function (err, rowCount) {
+          if (err) {
+              console.error(err);
+              return;
+          }
+          // release the connection back to the pool when finished
+          connection.release();
+      });
+      request.addParameter("FAMILY_ID", TYPES.Int, noteObj.familyId);
+      request.addParameter("CONTENTS", TYPES.NVarChar, noteObj.contents);
+      request.addParameter("CREATED_BY", TYPES.NVarChar, noteObj.currentUser);
+      request.addParameter("LAST_MODIFIED", TYPES.DateTime, new Date);
+      request.addParameter("ACTIVE", TYPES.Bit, 1);
+      connection.execSql(request);
+  });
+
+return 1;
+};
+
+exports.editNote = function(noteObj){
+  console.log(noteObj);
+      pool.acquire(function (err, connection) {
+      if (err) {
+          console.error(err);
+          return;
+      }
+       //use the connection as normal
+       var request = new Request("UPDATE [dbo].[Family_Note] SET [contents] = @CONTENTS, " +
+       "[created_by] = @CREATED_BY, [last_modified] = @LAST_MODIFIED WHERE [record_id] = @RECORD_ID",
+      function(err, rowCount) {
+          if (err) {
+              console.error(err);
+              return;
+          }
+          //release the connection back to the pool when finished
+          connection.release();
+      });
+      request.addParameter("RECORD_ID", TYPES.Int, noteObj.id);
+      request.addParameter("CONTENTS", TYPES.NVarChar, noteObj.contents);
+      request.addParameter("CREATED_BY", TYPES.NVarChar, noteObj.currentUser);
+      request.addParameter("LAST_MODIFIED", TYPES.DateTime, new Date);
+      connection.execSql(request);
+  });
+  return 1;
+};
+
+exports.deleteNote = function(noteObj){
+  console.log(noteObj);
+      pool.acquire(function (err, connection) {
+      if (err) {
+          console.error(err);
+          return;
+      }
+       //use the connection as normal
+       var request = new Request("UPDATE [dbo].[Family_Note] SET [active] = 0 WHERE [record_id] = @RECORD_ID",
+      function(err, rowCount) {
+          if (err) {
+              console.error(err);
+              return;
+          }
+          //release the connection back to the pool when finished
+          connection.release();
+      });
+      request.addParameter("RECORD_ID", TYPES.Int, noteObj.id);
+      connection.execSql(request);
+  });
+  return 1;
+};
