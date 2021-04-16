@@ -43,12 +43,10 @@ router.get('/volunteer/role/',controller.getAllRoles);
 router.get('/volunteer/username/:username/profile/picture',controller.getProfilePicture);
 router.get('/volunteer/login/history/:userId',controller.getLoginHistory);
 
-router.get('/service',controller.getAllServices);
+router.get('/service',controller.getAllRequests);
 router.get('/service/category',controller.getAllCategories);
-router.get('/service/list',controller.getActiveServices);
 router.get('/service/active',controller.getActiveRequests);
 router.get('/service/rendered',controller.getRenderedServices);
-router.get('/service/get/id/:serviceId',controller.getServiceById);
 router.get('/service/id/:serviceId',controller.getRequestById);
 
 router.get('/family/inactive',controller.getInactiveFamily);
@@ -76,6 +74,7 @@ router.get('/family/created/month', controller.getThisMonthFamiliesCreated);
 
 router.get('/family/email/:familyEmail',controller.getFamilyByEmail);
 router.get('/family/id/:familyId',controller.getFamilyById);
+router.get('/family/notes/id/:familyId',controller.getFamilyNotes);
 
 
 
@@ -102,9 +101,8 @@ router.post('/service/notifyBusiness',controller.markBusinessNotified);
 router.post('/service/notifyFamily',controller.markFamilyNotified);
 router.post('/service/followupBusiness',controller.markBusinessFollowedUp);
 router.post('/service/followupFamily',controller.markFamilyFollowedUp);
-router.post('/service/markActive',controller.markServiceActive);
-router.post('/service/markInactive',controller.markServiceInactive);
 router.post('/service/delete',controller.deleteRequest);
+router.post('/service/valuecost',controller.setValueCost);
 
 router.post('/family/new',controller.createNewFamily);
 router.post('/family/markActive',controller.markFamilyActive);
@@ -123,6 +121,9 @@ router.post('/family/new',controller.createNewFamily);
 router.post('/family/markActive',controller.markFamilyActive);
 router.post('/family/markInactive',controller.markFamilyInactive);
 router.post('/family/active',controller.getActiveFamily);
+router.post('/family/notes/new',controller.addNote);
+router.post('/family/notes/edit',controller.editNote);
+router.post('/family/notes/delete',controller.deleteNote);
 
 
 

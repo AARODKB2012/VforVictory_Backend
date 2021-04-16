@@ -426,16 +426,6 @@ exports.getAllRoles = async function (req, res,next){
     }
 }
 
-exports.getAllServices = async function (req, res,next){
-  let serviceList = [];
-  serviceList = await sql.getAllServices();
-  if(serviceList.length > 0){
-      res.status(200).json({status:200, results: serviceList, resultsLength: serviceList.length});
-  }else{
-      res.status(204).send();
-  }
-}
-
 exports.getAllCategories = async function (req, res,next){
   let categoryList = [];
   categoryList = await sql.getAllCategories();
@@ -446,15 +436,15 @@ exports.getAllCategories = async function (req, res,next){
   }
 }
 
-exports.getActiveServices = async function (req, res,next){
-  let serviceList = [];
-  serviceList = await sql.getActiveServices();
-  if(serviceList.length > 0){
-      res.status(200).json({status:200, results: serviceList, resultsLength: serviceList.length});
-  }else{
+exports.getAllRequests = async function (req, res, next) {
+  let reqList = [];
+  reqList = await sql.getAllRequests();
+  if (reqList.length > 0) {
+      res.status(200).json({status: 200, results: reqList, resultsLength: reqList.length});
+  } else {
       res.status(204).send();
   }
-}
+};
 
 exports.getActiveRequests = async function (req, res,next){
   let activeList = [];
@@ -471,16 +461,6 @@ exports.getRenderedServices = async function (req, res,next){
   renderedList = await sql.getRenderedServices();
   if(renderedList.length > 0){
       res.status(200).json({status:200, results: renderedList, resultsLength: renderedList.length});
-  }else{
-      res.status(204).send();
-  }
-}
-
-exports.getServiceById = async function (req, res,next){
-  let serviceList = [];
-  serviceList = await sql.getServiceById(req.params.serviceId);
-  if(serviceList.length > 0){
-      res.status(200).json({status:200, results: serviceList, resultsLength: serviceList.length});
   }else{
       res.status(204).send();
   }
@@ -555,27 +535,6 @@ exports.markFamilyFollowedUp = async function (req, res,next){
     res.status(202).send();
   }
 }
-
-exports.markServiceActive = async function (req, res,next){
-  let rowCount = sql.markServiceActive(req.body);
-  console.log(rowCount);
-  if(rowCount == 1){
-    res.status(201).json({requestFulfilled: true});
-  }else{
-    res.status(202).send();
-  }
-}
-
-exports.markServiceInactive = async function (req, res,next){
-  let rowCount = sql.markServiceInactive(req.body);
-  console.log(rowCount);
-  if(rowCount == 1){
-    res.status(201).json({requestFulfilled: true});
-  }else{
-    res.status(202).send();
-  }
-}
-
 
 exports.deleteRequest = async function (req, res,next){
   let rowCount = sql.deleteRequest(req.body);
@@ -753,15 +712,15 @@ exports.getBusinessLogo = async function (req, res,next){
     .execute()
     .then(function(results) {
         if(results){
-            const r = fs.createReadStream(results[0].URL) 
+            const r = fs.createReadStream(results[0].URL)
             const ps = new stream.PassThrough()
             stream.pipeline(
             r,
-            ps, 
+            ps,
             (err) => {
                 if (err) {
                 console.log(err)
-                    return res.status(400).json({status: 409, errorMessage: `Error getting image: ${err}`}); 
+                    return res.status(400).json({status: 409, errorMessage: `Error getting image: ${err}`});
                 }
             })
             ps.pipe(res)
@@ -771,7 +730,7 @@ exports.getBusinessLogo = async function (req, res,next){
            console.log(err);
            res.status(409).json({status: 409, errorMessage: `Error saving to database: ${err}`});
        });
-} 
+}
 
 exports.getServicesRendered = async function (req, res,next){
     let servicesRenderedList = [];
@@ -795,14 +754,14 @@ exports.approveBusiness = async function (req, res,next){
         console.log(err);
         res.status(409).json({status: 409, errorMessage: `Error saving to database: ${err}`});
     });
-} 
+}
 
 exports.modifyBudget = async function (req, res, next) {
     let rowCount = sql.modifyBudget(req.body);
     if(rowCount == 1){
         res.status(201).json({message: 'Updated budget!' , budgetUpdated: true})
     }else{
-        res.status(202).send({message: 'Unable to modify budget'});  
+        res.status(202).send({message: 'Unable to modify budget'});
     }
 }
 
@@ -840,7 +799,7 @@ exports.modifyExpense = async function(req,res,next){
     if(rowCount == 1){
         res.status(201).json({message: 'Updated Expense' , budgetUpdated: true , results:req.body})
     }else{
-        res.status(202).send({message: 'Unable to modify Expense'});  
+        res.status(202).send({message: 'Unable to modify Expense'});
     }
 }
 
@@ -878,7 +837,7 @@ exports.modifyVPizzaGC = async function(req,res,next){
     if(rowCount == 1){
         res.status(201).json({message: 'Updated GiftCard' , giftCardUpdated: true , results:req.body})
     }else{
-        res.status(202).send({message: 'Unable to modify GiftCard'});  
+        res.status(202).send({message: 'Unable to modify GiftCard'});
     }
 }
 
@@ -917,7 +876,7 @@ exports.modifyFamilyByID = async function (req, res, next) {
     if(rowCount == 1){
         res.status(201).json({message: 'Updated Family' , familyUpdated: true})
     }else{
-        res.status(202).send();  
+        res.status(202).send();
     }
 }
 
@@ -941,3 +900,50 @@ exports.getThisMonthFamiliesCreated = async function(req,res,next){
     }
 }
 
+exports.setValueCost = async function (req, res,next){
+  let rowCount = sql.setValueCost(req.body);
+  console.log(rowCount);
+  if(rowCount == 1){
+    res.status(201).json({requestFulfilled: true});
+  }else{
+    res.status(202).send();
+  }
+}
+
+exports.getFamilyNotes = async function(req,res,next){
+  let noteList = [];
+  noteList = await sql.getFamilyNotes(req.params.familyId);
+  if(noteList.length > 0){
+      res.status(200).send({status:200, results: noteList, resultsLength: noteList.length})
+  }else{
+      res.status(204).send();
+  }
+}
+
+exports.addNote = async function (req, res, next) {
+  let rowCount = sql.addNote(req.body);
+  console.log(rowCount);
+  if (rowCount == 1) {
+      res.status(201).json({noteAdded: true});
+  } else {
+      res.status(202).send();
+  }
+};
+
+exports.editNote = async function (req, res, next) {
+  let rowCount = sql.editNote(req.body);
+  if(rowCount == 1){
+    res.status(201).json({noteUpdated: true});
+  } else {
+      res.status(202).send();
+  }
+}
+
+exports.deleteNote = async function (req, res, next) {
+  let rowCount = sql.deleteNote(req.body);
+  if(rowCount == 1){
+    res.status(201).json({noteDeleted: true});
+  } else {
+      res.status(202).send();
+  }
+}
