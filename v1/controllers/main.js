@@ -943,7 +943,7 @@ exports.getFamilyNotes = async function(req,res,next){
     }else{
         res.status(204).send();
     }
-  }
+}
   
 exports.addNote = async function (req, res, next) {
     let rowCount = sql.addNote(req.body);
@@ -953,25 +953,44 @@ exports.addNote = async function (req, res, next) {
     } else {
         res.status(202).send();
     }
-  };
+}
   
-  exports.editNote = async function (req, res, next) {
+exports.editNote = async function (req, res, next) {
     let rowCount = sql.editNote(req.body);
     if(rowCount == 1){
       res.status(201).json({noteUpdated: true});
     } else {
         res.status(202).send();
     }
-  }
+}
   
-  exports.deleteNote = async function (req, res, next) {
+exports.deleteNote = async function (req, res, next) {
     let rowCount = sql.deleteNote(req.body);
     if(rowCount == 1){
       res.status(201).json({noteDeleted: true});
     } else {
         res.status(202).send();
     }
-  }
+}
 
+exports.getVPizzaGFByFamilyID = async function ( req, res, next){
+    let requestList = [];
+    requestList = await sql.getVPizzaGFByFamilyID(req.params.id);
+    if(requestList.length > 0){
+        res.status(200).json({status:200, results: requestList, resultsLength: requestList.length});
+    }else{
+        res.status(204).send();
+    }
+}
+  
+exports.getFullVPizzaGF = async function (req, res, next){
+    let requestList = [];
+    requestList = await sql.getFullVPizzaGF(req.params.id, req.params.family_id);
+    if(requestList.length > 0){
+        res.status(200).json({status:200, results: requestList, resultsLength: requestList.length});
+    }else{
+        res.status(204).send();
+    }
+}
 
 

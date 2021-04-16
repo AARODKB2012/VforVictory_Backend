@@ -67,7 +67,6 @@ router.get('/business/services/rendered/:businessName',controller.getServicesRen
 router.get('/budget/id/:id',controller.getBudgetByID);
 router.get('/expense',controller.getAllExpenses);
 router.get('/expense/id/:id', controller.getExpenseByID);
-router.get('/VPizzaGC', controller.getAllVGiftCards);
 router.get('/budget/familyId/:familyId', controller.getBudgetByFamilyID);
 router.get('/expense/month', controller.getThisMonthExpenses);
 router.get('/family/id/:id', controller.getFamilyByID);
@@ -77,6 +76,9 @@ router.get('/family/created/month', controller.getThisMonthFamiliesCreated);
 router.get('/family/email/:familyEmail',controller.getFamilyByEmail);
 router.get('/family/id/:familyId',controller.getFamilyById);
 
+router.get('/VPizza', controller.getAllVGiftCards);
+router.get('/VPizza/giftcard/id/:id', controller.getVPizzaGFByFamilyID);
+router.get('/Family/id/:id/VPizza/family_id/:family_id', controller.getFullVPizzaGF);
 
 
 //Add POST endpoint here

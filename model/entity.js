@@ -1205,10 +1205,10 @@ exports.createNewFamily = function(familyObj){
 
         var request = new Request("INSERT INTO [dbo].[Family] ([first_name], [last_name], [phone_number], [street_address], [zipcode], [email], [cancer_warrior_name], " + 
         "[work_phone], [relationship_to_warrior], [additional_info], [end_of_treatment_date], [active], [created_date], [created_by]," +
-        "[updated_date], [updated_by], [deleted_date], [deleted_by], [approved_date], [approved_by], [familySize], [hearAbout], [welcomeLetter], [treamentLetter], [subscriberList], [facebookGroup]) " +
+        "[updated_date], [updated_by], [deleted_date], [deleted_by], [approved_date], [approved_by], [familySize], [hearAbout], [welcomeLetter], [treamentLetter], [subscriberList], [facebookGroup],[vPizza_giftcard],[vPizza_refill_amount]) " +
         "VALUES (@FIRST_NAME, @LAST_NAME, @PHONE_NUMBER, @STREET_ADDRESS, @ZIPCODE, @EMAIL, @CANCER_WARRIOR_NAME, @WORK_PHONE," +
         "@RELATIONSHIP_TO_WARRIOR, @ADDITIONAL_INFO, @END_OF_TREATMENT_DATE,@ACTIVE, @CREATED_DATE, @CREATED_BY, " +
-        "@UPDATED_DATE, @UPDATED_BY, @DELETED_DATE, @DELETED_BY, @APPROVED_DATE, @APPROVED_BY, @FAMILYSIZE, @HEARABOUT, @WELCOMELETTER, @TREAMENTLETTER, @SUBSCRIBERLIST,@FACEBOOKGROUP)",
+        "@UPDATED_DATE, @UPDATED_BY, @DELETED_DATE, @DELETED_BY, @APPROVED_DATE, @APPROVED_BY, @FAMILYSIZE, @HEARABOUT, @WELCOMELETTER, @TREAMENTLETTER, @SUBSCRIBERLIST,@FACEBOOKGROUP,@VPIZZA_GIFTCARD,@VPIZZA_REFILL_AMOUNT)",
         function(err, rowCount) {
             if (err) {
                 console.error(err);
@@ -1228,7 +1228,6 @@ exports.createNewFamily = function(familyObj){
         request.addParameter("RELATIONSHIP_TO_WARRIOR", TYPES.VarChar, familyObj.relationship_to_warrior);
         request.addParameter("ADDITIONAL_INFO", TYPES.VarChar, familyObj.additional_info);
         request.addParameter("END_OF_TREATMENT_DATE", TYPES.VarChar, familyObj.end_of_treatment_date);
-       // request.addParameter("ID", TYPES.VarChar, familyObj.id);
         request.addParameter("ACTIVE", TYPES.Bit, 1);
         request.addParameter("CREATED_DATE", TYPES.Date, new Date);
         request.addParameter("CREATED_BY", TYPES.VarChar, familyObj.created_by);
@@ -1244,7 +1243,8 @@ exports.createNewFamily = function(familyObj){
         request.addParameter("TREAMENTLETTER",TYPES.Bit, 0);
         request.addParameter("SUBSCRIBERLIST",TYPES.Bit, 0);
         request.addParameter("FACEBOOKGROUP",TYPES.Bit, 0);
-        
+        request.addParameter("VPIZZA_GIFTCARD", TYPES.VarChar, familyObj.vPizza_giftcard);
+        request.addParameter("VPIZZA_REFILL_AMOUNT", TYPES.Float, familyObj.vPizza_refill_amount);
         connection.execSql(request);
     });
     return 1;
@@ -1282,7 +1282,7 @@ exports.modifyFamilyByID = function(familyObj) {
         "[zipcode] = @ZIPCODE, [email] = @EMAIL, [cancer_warrior_name] = @CANCER_WARRIOR_NAME ,[work_phone] = @WORK_PHONE, [relationship_to_warrior] = @RELATIONSHIP_TO_WARRIOR, [additional_info] = @ADDITIONAL_INFO , [end_of_treatment_date] = @END_OF_TREATMENT_DATE, " +
         "[active] = @ACTIVE, [created_date] = @CREATED_DATE , [created_by] = @CREATED_BY ,[updated_date] = @UPDATED_DATE, [updated_by] = @UPDATED_BY, " +
         "[deleted_date] = @DELETED_DATE, [deleted_by] = @DELETED_BY, [approved_date] = @APPROVED_DATE, [approved_by] = @APPROVED_BY , [familySize] = @FAMILYSIZE, [hearAbout] = @HEARABOUT,"+
-        "[welcomeLetter] = @WELCOMELETTER, [treamentLetter] = @TREAMENTLETTER , [subscriberList] = @SUBSCRIBERLIST , [facebookGroup] = @FACEBOOKGROUP WHERE [id] = @ID ",
+        "[welcomeLetter] = @WELCOMELETTER, [treamentLetter] = @TREAMENTLETTER , [subscriberList] = @SUBSCRIBERLIST , [facebookGroup] = @FACEBOOKGROUP, [vPizza_giftcard] = @VPIZZA_GIFTCARD ,[vPizza_refill_amount] = @VPIZZA_REFILL_AMOUNT WHERE [id] = @ID ",
         function(err, rowCount) {
             if (err) {
                 console.error(err);
@@ -1318,6 +1318,8 @@ exports.modifyFamilyByID = function(familyObj) {
         request.addParameter("TREAMENTLETTER",TYPES.Bit, familyObj.treamentLetter);
         request.addParameter("SUBSCRIBERLIST",TYPES.Bit, familyObj.subscriberList);
         request.addParameter("FACEBOOKGROUP",TYPES.Bit, familyObj.facebookGroup);
+        request.addParameter("VPIZZA_GIFTCARD", TYPES.VarChar, familyObj.vPizza_giftcard);
+        request.addParameter("VPIZZA_REFILL_AMOUNT", TYPES.Float, familyObj.vPizza_refill_amount);
         connection.execSql(request);
     });
     // Returning one if no error occurred.
@@ -1521,7 +1523,7 @@ exports.getFamilyNotes = function(id) {
             console.log(err);
         });
     });
-  }
+}
   
 exports.addNote = function (noteObj) {
     console.log(noteObj);
@@ -1549,9 +1551,9 @@ exports.addNote = function (noteObj) {
     });
    
   return 1;
-  };
+};
    
-  exports.editNote = function(noteObj){
+exports.editNote = function(noteObj){
     console.log(noteObj);
         pool.acquire(function (err, connection) {
         if (err) {
@@ -1576,9 +1578,9 @@ exports.addNote = function (noteObj) {
         connection.execSql(request);
     });
     return 1;
-  };
+};
    
-  exports.deleteNote = function(noteObj){
+exports.deleteNote = function(noteObj){
     console.log(noteObj);
         pool.acquire(function (err, connection) {
         if (err) {
@@ -1599,4 +1601,33 @@ exports.addNote = function (noteObj) {
         connection.execSql(request);
     });
     return 1;
-  };
+};
+
+exports.getVPizzaGFByFamilyID = function(id) {
+    return new Promise( resolve => {
+        tp.sql("SELECT [vPizza_giftcard], [vPizza_refill_amount] FROM [dbo].[Family] where id = " + id + 
+        "")
+        .execute()
+        .then(function(results) {
+            // console.log(results);
+            resolve(results);
+        }).fail(function(err) {
+            console.log(err);
+        });
+    });
+}
+
+exports.getFullVPizzaGF = function (id, family_id) {
+    return new Promise( resolve => {
+        tp.sql("SELECT [dbo].[Family].[vPizza_giftcard],[dbo].[Family].[vPizza_refill_amount],[dbo].[VPizza].[refill_date],[dbo].[VPizza].[family_id]  " +
+        "FROM [dbo].[Family], [dbo].[VPizza] "  + 
+        "WHERE ([dbo].[Family].[id]= " + id + ") AND ([dbo].[VPizza].[family_id]= " + family_id + ")")
+        .execute()
+        .then(function(results) {
+            // console.log(results);
+            resolve(results);
+        }).fail(function(err) {
+            console.log(err);
+        });
+    });
+}
