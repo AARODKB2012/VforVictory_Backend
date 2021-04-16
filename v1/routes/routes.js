@@ -111,8 +111,20 @@ router.post('/budget/edit',controller.modifyBudget);
 router.post('/expense/new',controller.createNewExpense);
 router.post('/expense/edit', controller.modifyExpense);
 router.post('/family/edit', controller.modifyFamilyByID);
+<<<<<<< Updated upstream
 router.post('/family/VPizza', controller.addVPizzaGiftCard);
 router.post('/VPizza/new', controller.createNewVPizzaCard);
+=======
+
+
+router.post('/family/new',controller.createNewFamily);
+router.post('/family/markActive',controller.markFamilyActive);
+router.post('/family/markInactive',controller.markFamilyInactive);
+router.post('/family/active',controller.getActiveFamily);
+router.post('/VPizza/new', controller.createNewVPizzaCard);
+
+
+>>>>>>> Stashed changes
 
 // Email Functions
 router.post('/email/send',emailController.sendEmail);
