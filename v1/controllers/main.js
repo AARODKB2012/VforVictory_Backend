@@ -755,7 +755,7 @@ exports.getBusinessLogo = async function (req, res,next){
 
 exports.getServicesRendered = async function (req, res,next){
     let servicesRenderedList = [];
-    servicesRenderedList = await sql.getServicesRendered(req.params.businessName);
+    servicesRenderedList = await sql.getServicesRendered(req.params.businessId);
     if(servicesRenderedList.length > 0){
         res.status(200).json({status:200, results: servicesRenderedList, resultsLength: servicesRenderedList.length});
     }else{

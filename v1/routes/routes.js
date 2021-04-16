@@ -62,7 +62,7 @@ router.get('/business/month',controller.getThisMonthBusinesses);
 router.get('/business/unapproved',controller.getBusinessesToApprove);
 router.get('/business/category/:categoryId',controller.getCategoryById);
 router.get('/business/name/:businessName/logo',controller.getBusinessLogo);
-router.get('/business/services/rendered/:businessName',controller.getServicesRendered);
+router.get('/business/services/rendered/:businessId',controller.getServicesRendered);
 
 
 //Add POST endpoint here

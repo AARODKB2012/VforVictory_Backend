@@ -60,8 +60,10 @@ exports.sendGridEmail = async function (req, res,next){
   .then((response) => {
     console.log(response[0].statusCode)
     console.log(response[0].headers)
+    res.status(200).json({mailResponse: true});
   })
   .catch((error) => {
-    console.error(error)
+    console.error(error);
+    res.status(200).json({mailResponse: error});
   });
 }

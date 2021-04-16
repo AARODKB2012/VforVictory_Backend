@@ -621,7 +621,7 @@ exports.getActiveServices = function() {
 
 exports.getActiveRequests = function() {
   return new Promise( resolve => {
-      tp.sql("SELECT * FROM [dbo].[Requests] WHERE active = 1")
+      tp.sql("SELECT * FROM [dbo].[Request] WHERE active = 1")
       .execute()
       .then(function(results) {
           // console.log(results);
@@ -634,7 +634,7 @@ exports.getActiveRequests = function() {
 
 exports.getRenderedServices = function() {
   return new Promise( resolve => {
-      tp.sql("SELECT * FROM [dbo].[Requests] WHERE active = 0")
+      tp.sql("SELECT * FROM [dbo].[Request] WHERE active = 0")
       .execute()
       .then(function(results) {
           // console.log(results);
@@ -660,7 +660,7 @@ exports.getServiceById = function(serviceId) {
 
 exports.getRequestById = function(serviceId) {
   return new Promise( resolve => {
-      tp.sql("SELECT * FROM [dbo].[Requests] where id = " + serviceId)
+      tp.sql("SELECT * FROM [dbo].[Request] where id = " + serviceId)
       .execute()
       .then(function(results) {
           // console.log(results);
@@ -678,9 +678,9 @@ exports.createNewRequest = function(userObject) {
           return;
       }
       // use the connection as normal
-      var request = new Request("INSERT INTO [dbo].[Requests] ([name], [email], [business_name], [business_category], [date_requested], [date_fulfilled], [notified_business], " +
+      var request = new Request("INSERT INTO [dbo].[Request] ([name], [email], [business_name], [business_category], [requested_date], [fulfilled_date], [notified_business], " +
       " [notified_family], [followedup_business], [followedup_family], [active], [notes]) " +
-      " VALUES (@NAME, @EMAIL, @BUSINESS_NAME, @BUSINESS_CATEGORY, @DATE_REQUESTED, @DATE_FULFILLED, @NOTIFIED_BUSINESS, @NOTIFIED_FAMILY, @FOLLOWEDUP_BUSINESS, @FOLLOWEDUP_FAMILY, @ACTIVE, @NOTES)",
+      " VALUES (@NAME, @EMAIL, @BUSINESS_NAME, @BUSINESS_CATEGORY, @requested_date, @fulfilled_date, @NOTIFIED_BUSINESS, @NOTIFIED_FAMILY, @FOLLOWEDUP_BUSINESS, @FOLLOWEDUP_FAMILY, @ACTIVE, @NOTES)",
       function(err, rowCount) {
           if (err) {
               console.error(err);
@@ -694,8 +694,8 @@ exports.createNewRequest = function(userObject) {
       request.addParameter('EMAIL', TYPES.NVarChar, userObject.email);
       request.addParameter('BUSINESS_NAME', TYPES.NVarChar, userObject.businessName);
       request.addParameter('BUSINESS_CATEGORY', TYPES.NVarChar, userObject.businessCategory);
-      request.addParameter('DATE_REQUESTED', TYPES.NVarChar, userObject.dateRequested);
-      request.addParameter('DATE_FULFILLED', TYPES.NVarChar, '');
+      request.addParameter('requested_date', TYPES.NVarChar, userObject.dateRequested);
+      request.addParameter('fulfilled_date', TYPES.NVarChar, '');
       request.addParameter('NOTIFIED_BUSINESS', TYPES.Bit, userObject.notifiedBusiness);
       request.addParameter('NOTIFIED_FAMILY', TYPES.Bit, userObject.notifiedFamily);
       request.addParameter('FOLLOWEDUP_BUSINESS', TYPES.Bit, userObject.followedupBusiness);
@@ -715,7 +715,7 @@ exports.fulfillRequest = function(userObject) {
           return;
       }
       // use the connection as normal
-      var request = new Request("UPDATE [dbo].[Requests] SET [active] = 0, [date_fulfilled] = @DATE_FULFILLED WHERE [id] = @ID",
+      var request = new Request("UPDATE [dbo].[Request] SET [active] = 0, [fulfilled_date] = @fulfilled_date WHERE [id] = @ID",
       function(err, rowCount) {
           if (err) {
               console.error(err);
@@ -726,7 +726,7 @@ exports.fulfillRequest = function(userObject) {
       });
 
       request.addParameter('ID', TYPES.VarChar, userObject.id);
-      request.addParameter('DATE_FULFILLED', TYPES.NVarChar, userObject.dateFulfilled)
+      request.addParameter('fulfilled_date', TYPES.NVarChar, userObject.dateFulfilled)
       request.addParameter('ACTIVE', TYPES.Bit, 0);
       connection.execSql(request);
   });
@@ -741,7 +741,7 @@ exports.markBusinessNotified = function(userObject) {
           return;
       }
       // use the connection as normal
-      var request = new Request("UPDATE [dbo].[Requests] SET [notified_business] = 1 WHERE [id] = @ID",
+      var request = new Request("UPDATE [dbo].[Request] SET [notified_business] = 1 WHERE [id] = @ID",
       function(err, rowCount) {
           if (err) {
               console.error(err);
@@ -766,7 +766,7 @@ exports.markFamilyNotified = function(userObject) {
           return;
       }
       // use the connection as normal
-      var request = new Request("UPDATE [dbo].[Requests] SET [notified_family] = 1 WHERE [id] = @ID",
+      var request = new Request("UPDATE [dbo].[Request] SET [notified_family] = 1 WHERE [id] = @ID",
       function(err, rowCount) {
           if (err) {
               console.error(err);
@@ -791,7 +791,7 @@ exports.markBusinessFollowedUp = function(userObject) {
           return;
       }
       // use the connection as normal
-      var request = new Request("UPDATE [dbo].[Requests] SET [followedup_business] = 1 WHERE [id] = @ID",
+      var request = new Request("UPDATE [dbo].[Request] SET [followedup_business] = 1 WHERE [id] = @ID",
       function(err, rowCount) {
           if (err) {
               console.error(err);
@@ -815,7 +815,7 @@ exports.markFamilyFollowedUp = function(userObject) {
           return;
       }
       // use the connection as normal
-      var request = new Request("UPDATE [dbo].[Requests] SET [followedup_family] = 1 WHERE [id] = @ID",
+      var request = new Request("UPDATE [dbo].[Request] SET [followedup_family] = 1 WHERE [id] = @ID",
       function(err, rowCount) {
           if (err) {
               console.error(err);
@@ -887,7 +887,7 @@ exports.deleteRequest = function(userObject) {
           return;
       }
       // use the connection as normal
-      var request = new Request("DELETE FROM [dbo].[Requests] WHERE [id] = @ID",
+      var request = new Request("DELETE FROM [dbo].[Request] WHERE [id] = @ID",
       function(err, rowCount) {
           if (err) {
               console.error(err);
@@ -959,7 +959,7 @@ exports.getBusinessesToApprove = function() {
 
 exports.getThisMonthRequests = function() {
     return new Promise( resolve => {
-        tp.sql("SELECT * FROM [dbo].[Requests] where DATEDIFF(MONTH, GETDATE(), date_requested) < 30")
+        tp.sql("SELECT * FROM [dbo].[Request] where DATEDIFF(MONTH, GETDATE(), requested_date) < 30")
         .execute()
         .then(function(results) {
             // console.log(results);
@@ -1109,9 +1109,9 @@ exports.updateCategory = function (businessObject) {
     return 1;
 };
 
-exports.getServicesRendered = function(businessName) {
+exports.getServicesRendered = function(businessId) {
     return new Promise( resolve => {
-        tp.sql(`select id, name, date_requested, date_fulfilled, active from [dbo].[Requests] where business_name = '${businessName}'`)
+        tp.sql(`select (select CONCAT(f.first_name, f.last_name) from Family f where id = r.family_id) as name, record_id, requested_date, fulfilled_date, active from [dbo].[Request] r where business_id = '${businessId}'`)
         .execute()
         .then(function(results) {
             // console.log(results);
