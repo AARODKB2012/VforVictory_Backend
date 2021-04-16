@@ -910,7 +910,6 @@ exports.setValueCost = async function (req, res,next){
   }
 }
 
-
 exports.approveFamily = async function (req, res,next){
     sql.tp.sql(`exec [usp_approveFamily] ${req.params.familyId}, '${req.params.approvedBy}'`)
     .execute()
@@ -992,5 +991,3 @@ exports.getFullVPizzaGF = async function (req, res, next){
         res.status(204).send();
     }
 }
-
-
