@@ -55,6 +55,8 @@ router.get('/family',controller.getAllFamily);
 router.get('/family/month',controller.getThisMonthFamilies);
 router.get('/family/unapproved',controller.getFamiliesToApprove);
 router.get('/service/requested/month',controller.getThisMonthRequests);
+router.get('/family/approved',controller.getApprovedFamily);
+router.get('/family/notes/id/:familyId',controller.getFamilyNotes);
 
 router.get('/business/month',controller.getThisMonthBusinesses);
 router.get('/business/unapproved',controller.getBusinessesToApprove);
@@ -108,6 +110,9 @@ router.post('/family/markActive',controller.markFamilyActive);
 router.post('/family/markInactive',controller.markFamilyInactive);
 router.post('/family/active',controller.getActiveFamily);
 router.post('/family/:familyId/approve/:approvedBy', controller.approveFamily);
+router.post('/family/notes/new',controller.addNote);
+router.post('/family/notes/edit',controller.editNote);
+router.post('/family/notes/delete',controller.deleteNote);
 
 router.post('/budget/edit',controller.modifyBudget);
 router.post('/expense/new',controller.createNewExpense);

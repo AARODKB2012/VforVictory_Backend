@@ -925,3 +925,53 @@ exports.approveFamily = async function (req, res,next){
     });
 }
 
+exports.getApprovedFamily = async function (req, res,next){
+    let familyList = [];
+    familyList = await sql.getApprovedFamily();
+    if(familyList.length > 0){
+        res.status(200).json({status:200, results: familyList, resultsLength: familyList.length});
+    }else{
+        res.status(204).json();
+    }
+}
+
+exports.getFamilyNotes = async function(req,res,next){
+    let noteList = [];
+    noteList = await sql.getFamilyNotes(req.params.familyId);
+    if(noteList.length > 0){
+        res.status(200).send({status:200, results: noteList, resultsLength: noteList.length})
+    }else{
+        res.status(204).send();
+    }
+  }
+  
+exports.addNote = async function (req, res, next) {
+    let rowCount = sql.addNote(req.body);
+    console.log(rowCount);
+    if (rowCount == 1) {
+        res.status(201).json({noteAdded: true});
+    } else {
+        res.status(202).send();
+    }
+  };
+  
+  exports.editNote = async function (req, res, next) {
+    let rowCount = sql.editNote(req.body);
+    if(rowCount == 1){
+      res.status(201).json({noteUpdated: true});
+    } else {
+        res.status(202).send();
+    }
+  }
+  
+  exports.deleteNote = async function (req, res, next) {
+    let rowCount = sql.deleteNote(req.body);
+    if(rowCount == 1){
+      res.status(201).json({noteDeleted: true});
+    } else {
+        res.status(202).send();
+    }
+  }
+
+
+
