@@ -76,10 +76,12 @@ router.get('/family/created/month', controller.getThisMonthFamiliesCreated);
 router.get('/family/email/:familyEmail',controller.getFamilyByEmail);
 router.get('/family/id/:familyId',controller.getFamilyById);
 router.get('/family/notes/id/:familyId',controller.getFamilyNotes);
+router.get('/family/services/rendered/:familyId',controller.getFamilyServicesRendered);
 
 router.get('/VPizza', controller.getAllVGiftCards);
 router.get('/VPizza/giftcard/id/:id', controller.getVPizzaGFByFamilyID);
 router.get('/Family/id/:id/VPizza/family_id/:family_id', controller.getFullVPizzaGF);
+router.get('/VPizza/history',controller.getVPizzaTransactionHistory);
 
 //Add POST endpoint here
 router.post('/volunteer/new',controller.createNewVolunteer);
@@ -130,13 +132,7 @@ router.post('/family/markActive',controller.markFamilyActive);
 router.post('/family/markInactive',controller.markFamilyInactive);
 router.post('/family/active',controller.getActiveFamily);
 router.post('/VPizza/new', controller.createNewVPizzaCard);
-
-
-router.post('/family/new',controller.createNewFamily);
-router.post('/family/markActive',controller.markFamilyActive);
-router.post('/family/markInactive',controller.markFamilyInactive);
-router.post('/family/active',controller.getActiveFamily);
-router.post('/VPizza/new', controller.createNewVPizzaCard);
+router.post('/VPizza/refill', controller.markPizzaRefilled);
 
 
 

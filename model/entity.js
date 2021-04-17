@@ -370,7 +370,7 @@ exports.createNewBusiness = function (businessObject) {
         "[notes],[active], [created_by], [created_date]) " +
         "VALUES (@BUSINESS_NAME, @EMAIL, @PRIMARY_CONTACT_FNAME, @PRIMARY_CONTACT_LNAME, @PRIMARY_CONTACT_PHONE_NUMBER, " +
         "@SECONDARY_CONTACT_FNAME,@SECONDARY_CONTACT_LNAME, @SECONDARY_CONTACT_PHONE_NUMBER, @ADDRESS, @SERVICES_OFFERED, " +
-        "@SERVICE_AREA, @DISCOUNT_AMOUNT, @PREFERRED_METHOD_CONTACT, @EOY_RECEIPT, @FACEBOOK, @TWITTER, @INSTAGRAM, @WEBSITE, @NOTES, @ACTIVE,@CREATED_BY, @CREATED_DATE)", 
+        "@SERVICE_AREA, @DISCOUNT_AMOUNT, @PREFERRED_METHOD_CONTACT, @EOY_RECEIPT, @FACEBOOK, @TWITTER, @INSTAGRAM, @WEBSITE, @NOTES, @ACTIVE,@CREATED_BY, @CREATED_DATE)",
         function (err, rowCount) {
             if (err) {
                 console.error(err);
@@ -927,7 +927,7 @@ exports.markFamilyInactive = function(userObject) {
 
 exports.getFamilyByEmail = function(familyEmail) {
   return new Promise( resolve => {
-      tp.sql("SELECT * FROM [dbo].[Family] where email = '" + familyEmail + "'")
+      tp.sql("SELECT * FROM [dbo].[Family] where email = '" + familyEmail + "' and active = 1")
       .execute()
       .then(function(results) {
           // console.log(results);
@@ -960,7 +960,7 @@ exports.modifyBudget = function (budgetObj) {
             return;
         }
         //use the connection as normal
-        var request = new Request("UPDATE [dbo].[Budget] SET [amount] = @AMOUNT, updated_date = @UPDATED_DATE , updated_by = @UPDATED_BY, " + 
+        var request = new Request("UPDATE [dbo].[Budget] SET [amount] = @AMOUNT, updated_date = @UPDATED_DATE , updated_by = @UPDATED_BY, " +
         "[current_balance] = @CURRENT_BALANCE, [family_id] = @FAMILY_ID, [description] = @DESCRIPTION, [comment] = @COMMENT WHERE [id] = @ID",
         function(err, rowCount) {
             if (err) {
@@ -1093,7 +1093,7 @@ exports.createNewVPizzaCard = function(vPizzaObj){
             //release the connection back to the pool when finished
             connection.release();
         });
-        
+
         request.addParameter("REFILL_DATE", TYPES.Date, new Date);
         request.addParameter("FAMILY_ID", TYPES.Int, vPizzaObj.family_id);
         connection.execSql(request);
@@ -1175,7 +1175,7 @@ exports.createNewFamily = function(familyObj){
             return;
         }
 
-        var request = new Request("INSERT INTO [dbo].[Family] ([first_name], [last_name], [phone_number], [street_address], [zipcode], [email], [cancer_warrior_name], " + 
+        var request = new Request("INSERT INTO [dbo].[Family] ([first_name], [last_name], [phone_number], [street_address], [zipcode], [email], [cancer_warrior_name], " +
         "[work_phone], [relationship_to_warrior], [additional_info], [end_of_treatment_date], [active], [created_date], [created_by]," +
         "[updated_date], [updated_by], [deleted_date], [deleted_by], [approved_date], [approved_by], [familySize], [hearAbout], [welcomeLetter], [treamentLetter], [subscriberList], [facebookGroup],[vPizza_giftcard],[vPizza_refill_amount]) " +
         "VALUES (@FIRST_NAME, @LAST_NAME, @PHONE_NUMBER, @STREET_ADDRESS, @ZIPCODE, @EMAIL, @CANCER_WARRIOR_NAME, @WORK_PHONE," +
@@ -1252,7 +1252,7 @@ exports.modifyFamilyByID = function(familyObj) {
         //use the connection as normal
         var request = new Request("UPDATE [dbo].[Family] SET [first_name] = @FIRST_NAME, [last_name] = @LAST_NAME, [phone_number] = PHONE_NUMBER, [street_address] = @STREET_ADDRESS, " +
         "[zipcode] = @ZIPCODE, [email] = @EMAIL, [cancer_warrior_name] = @CANCER_WARRIOR_NAME ,[work_phone] = @WORK_PHONE, [relationship_to_warrior] = @RELATIONSHIP_TO_WARRIOR, [additional_info] = @ADDITIONAL_INFO , [end_of_treatment_date] = @END_OF_TREATMENT_DATE, " +
-        "[active] = @ACTIVE, [created_date] = @CREATED_DATE , [created_by] = @CREATED_BY ,[updated_date] = @UPDATED_DATE, [updated_by] = @UPDATED_BY, " +
+        "[active] = @ACTIVE, [updated_date] = @UPDATED_DATE, [updated_by] = @UPDATED_BY, " +
         "[deleted_date] = @DELETED_DATE, [deleted_by] = @DELETED_BY, [approved_date] = @APPROVED_DATE, [approved_by] = @APPROVED_BY , [familySize] = @FAMILYSIZE, [hearAbout] = @HEARABOUT,"+
         "[welcomeLetter] = @WELCOMELETTER, [treamentLetter] = @TREAMENTLETTER , [subscriberList] = @SUBSCRIBERLIST , [facebookGroup] = @FACEBOOKGROUP, [vPizza_giftcard] = @VPIZZA_GIFTCARD ,[vPizza_refill_amount] = @VPIZZA_REFILL_AMOUNT WHERE [id] = @ID ",
         function(err, rowCount) {
@@ -1394,7 +1394,7 @@ exports.updateCategory = function (businessObject) {
 
 exports.getServicesRendered = function(businessId) {
     return new Promise( resolve => {
-        tp.sql(`select (select CONCAT(f.first_name,' ', f.last_name) from Family f where id = r.family_id) as name, record_id, requested_date, fulfilled_date, active from [dbo].[Request] r where business_id = '${businessId}'`)
+        tp.sql(`select (select CONCAT(f.first_name,' ', f.last_name) from Family f where id = r.family_id) as name, record_id, requested_date, fulfilled_date, service_value, service_cost, pending from [dbo].[Request] r where business_id = '${businessId}'`)
         .execute()
         .then(function(results) {
             // console.log(results);
@@ -1462,7 +1462,7 @@ exports.approveFamily = function (familyId, approver) {
             return;
         }
         // use the connection as normal
-        var request = new Request("update [dbo].[Family] set [approved_by] = @APPROVED_BY, [approved_date] = @APPROVED_DATE where [id] = @ID", 
+        var request = new Request("update [dbo].[Family] set [approved_by] = @APPROVED_BY, [approved_date] = @APPROVED_DATE where [id] = @ID",
         function (err, rowCount) {
             if (err) {
                 console.error(err);
@@ -1490,7 +1490,7 @@ exports.getApprovedFamily = function() {
             console.log(err);
         });
     });
-} 
+}
 
 exports.getFamilyNotes = function(id) {
     return new Promise( resolve => {
@@ -1503,7 +1503,7 @@ exports.getFamilyNotes = function(id) {
         });
     });
 }
-  
+
 exports.addNote = function (noteObj) {
     console.log(noteObj);
     pool.acquire(function (err, connection) {
@@ -1528,10 +1528,10 @@ exports.addNote = function (noteObj) {
         request.addParameter("ACTIVE", TYPES.Bit, 1);
         connection.execSql(request);
     });
-   
+
   return 1;
 };
-   
+
 exports.editNote = function(noteObj){
     console.log(noteObj);
         pool.acquire(function (err, connection) {
@@ -1558,7 +1558,7 @@ exports.editNote = function(noteObj){
     });
     return 1;
 };
-   
+
 exports.deleteNote = function(noteObj){
     console.log(noteObj);
         pool.acquire(function (err, connection) {
@@ -1567,7 +1567,7 @@ exports.deleteNote = function(noteObj){
             return;
         }
          //use the connection as normal
-         var request = new Request("UPDATE [dbo].[Family_Note] SET [active] = 0 WHERE [record_id] = @RECORD_ID",
+         var request = new Request("INSERT INTO [dbo].[Family_Note] VALUES [active] = 0 WHERE [record_id] = @RECORD_ID",
         function(err, rowCount) {
             if (err) {
                 console.error(err);
@@ -1584,7 +1584,7 @@ exports.deleteNote = function(noteObj){
 
 exports.getVPizzaGFByFamilyID = function(id) {
     return new Promise( resolve => {
-        tp.sql("SELECT [vPizza_giftcard], [vPizza_refill_amount] FROM [dbo].[Family] where id = " + id + 
+        tp.sql("SELECT [vPizza_giftcard], [vPizza_refill_amount] FROM [dbo].[Family] where id = " + id +
         "")
         .execute()
         .then(function(results) {
@@ -1599,7 +1599,7 @@ exports.getVPizzaGFByFamilyID = function(id) {
 exports.getFullVPizzaGF = function (id, family_id) {
     return new Promise( resolve => {
         tp.sql("SELECT [dbo].[Family].[vPizza_giftcard],[dbo].[Family].[vPizza_refill_amount],[dbo].[VPizza].[refill_date],[dbo].[VPizza].[family_id]  " +
-        "FROM [dbo].[Family], [dbo].[VPizza] "  + 
+        "FROM [dbo].[Family], [dbo].[VPizza] "  +
         "WHERE ([dbo].[Family].[id]= " + id + ") AND ([dbo].[VPizza].[family_id]= " + family_id + ")")
         .execute()
         .then(function(results) {
@@ -1609,4 +1609,54 @@ exports.getFullVPizzaGF = function (id, family_id) {
             console.log(err);
         });
     });
+}
+
+exports.getVPizzaTransactionHistory = function () {
+  return new Promise((resolve) => {
+      tp.sql("SELECT * FROM [dbo].[VPizza]").execute().then(function (results) { // console.log(results);
+          resolve(results);
+      }).fail(function (err) {
+          console.log(err);
+      });
+  });
+};
+
+exports.markPizzaRefilled = function(pizzaObj){
+  console.log(pizzaObj);
+      pool.acquire(function (err, connection) {
+      if (err) {
+          console.error(err);
+          return;
+      }
+       //use the connection as normal
+       var request = new Request("INSERT INTO [dbo].[VPizza] ([refill_date], [family_id], [refilled_by], [refill_balance]) " +
+       "VALUES (@REFILL_DATE, @FAMILY_ID, @REFILLED_BY, @REFILL_BALANCE)",
+      function(err, rowCount) {
+          if (err) {
+              console.error(err);
+              return;
+          }
+          //release the connection back to the pool when finished
+          connection.release();
+      });
+      request.addParameter("REFILL_DATE", TYPES.Date, new Date);
+      request.addParameter("FAMILY_ID", TYPES.Int, pizzaObj.id);
+      request.addParameter("REFILLED_BY", TYPES.NVarChar, pizzaObj.currentUser);
+      request.addParameter("REFILL_BALANCE", TYPES.Float, pizzaObj.balance);
+      connection.execSql(request);
+  });
+  return 1;
+};
+
+exports.getFamilyServicesRendered = function(familyId) {
+  return new Promise( resolve => {
+      tp.sql(`select (select f.business_name from Business f where record_id = r.business_id) as business_name, record_id, requested_date, fulfilled_date, service_value, service_cost, pending from [dbo].[Request] r where family_id = '${familyId}'`)
+      .execute()
+      .then(function(results) {
+          // console.log(results);
+          resolve(results);
+      }).fail(function(err) {
+          console.log(err);
+      });
+  });
 }
