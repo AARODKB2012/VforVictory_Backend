@@ -927,7 +927,7 @@ exports.markFamilyInactive = function(userObject) {
 
 exports.getFamilyByEmail = function(familyEmail) {
   return new Promise( resolve => {
-      tp.sql("SELECT * FROM [dbo].[Family] where email = '" + familyEmail + "' and active = 1")
+      tp.sql("SELECT * FROM [dbo].[Family] where email = '" + familyEmail + "' and approved_by is not null and active = 1")
       .execute()
       .then(function(results) {
           // console.log(results);
@@ -1394,7 +1394,7 @@ exports.updateCategory = function (businessObject) {
 
 exports.getServicesRendered = function(businessId) {
     return new Promise( resolve => {
-        tp.sql(`select (select CONCAT(f.first_name,' ', f.last_name) from Family f where id = r.family_id) as name, record_id, requested_date, fulfilled_date, service_value, service_cost, pending from [dbo].[Request] r where business_id = '${businessId}'`)
+        tp.sql(`select (select CONCAT(f.first_name,' ', f.last_name) from Family f where id = r.family_id) as name, record_id, requested_date, fulfilled_date, service_value, service_cost, pending from [dbo].[Request] r where business_id = '${businessId}' and approved != 0`)
         .execute()
         .then(function(results) {
             // console.log(results);
@@ -1567,7 +1567,7 @@ exports.deleteNote = function(noteObj){
             return;
         }
          //use the connection as normal
-         var request = new Request("INSERT INTO [dbo].[Family_Note] VALUES [active] = 0 WHERE [record_id] = @RECORD_ID",
+         var request = new Request("UPDATE [dbo].[Family_Note] SET [active] = 0 WHERE [record_id] = @RECORD_ID",
         function(err, rowCount) {
             if (err) {
                 console.error(err);
